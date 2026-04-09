@@ -26,7 +26,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 #endregion
 
 // Authentication
-builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+//builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
 builder.Services.AddAuthorization();
 
@@ -43,6 +43,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers().RequireAuthorization();
+app.MapControllers();//.RequireAuthorization();
 
 app.Run();
