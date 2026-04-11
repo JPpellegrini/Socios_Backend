@@ -2,17 +2,11 @@
 {
     public class Usuario
     {
-        public Guid Id { get; private set; }
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
-
-        private Usuario() { } // EF
-
-        public Usuario(string email, string passwordHash)
-        {
-            Id = Guid.NewGuid();
-            Email = email;
-            PasswordHash = passwordHash;
-        }
+        public int Id_Usuario { get; set; }
+        public string UsuarioNombre { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Estado { get; set; } = null!;
+        public int Id_Rol { get; set; }
+        public Rol Rol { get; set; } = null!;
     }
 }

@@ -43,14 +43,14 @@ namespace Socios.Api.Authentication
                     return AuthenticateResult.Fail("Invalid credentials.");
 
                 var hasher = new PasswordHasher<Usuario>();
-                var verifyResult = hasher.VerifyHashedPassword(usuario, usuario.PasswordHash, password);
+                var verifyResult = hasher.VerifyHashedPassword(usuario, usuario.Password, password);
                 if (verifyResult == PasswordVerificationResult.Failed)
                     return AuthenticateResult.Fail("Invalid credentials.");
 
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                    new Claim(ClaimTypes.Name, usuario.Email)
+                    new Claim(ClaimTypes.NameIdentifier, usuario.Id_Usuario.ToString()),
+                    new Claim(ClaimTypes.Name, usuario.UsuarioNombre)
                 };
 
                 var identity = new ClaimsIdentity(claims, Scheme.Name);

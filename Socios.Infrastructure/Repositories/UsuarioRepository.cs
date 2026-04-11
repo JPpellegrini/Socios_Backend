@@ -14,14 +14,9 @@ namespace Socios.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Usuario?> GetByEmailAsync(string email)
+        public async Task<Usuario?> GetByEmailAsync(string usuarioNombre)
         {
-            return await _context.Usuarios.FirstOrDefaultAsync(x => x.Email == email);
-        }
-
-        public async Task AddAsync(Usuario usuario)
-        {
-            await _context.Usuarios.AddAsync(usuario);
+            return await _context.Usuarios.FirstOrDefaultAsync(x => x.UsuarioNombre == usuarioNombre);
         }
     }
 }
