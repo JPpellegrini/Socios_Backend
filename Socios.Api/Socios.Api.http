@@ -4,3 +4,10 @@ GET {{Socios.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{Socios.Api_HostAddress}}/api/v1/me
+Content-Type: application/json
+{
+  "usuarioNombre": "CJR",
+  "password": "1234"
+}
