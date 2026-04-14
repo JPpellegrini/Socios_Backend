@@ -4,6 +4,6 @@ namespace Socios.Application.Interfaces
 {
     public interface IUsuarioRepository
     {
-        Task<Usuario?> GetByEmailAsync(string usuarioNombre);
+        Task<Usuario?> GetUsuarioAsync(string usuarioNombre, string password);
     }
 }

@@ -14,9 +14,17 @@ namespace Socios.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Usuario?> GetByEmailAsync(string usuarioNombre)
+        public async Task<Usuario?> GetUsuarioAsync(string usuarioNombre, string password)
         {
-            return await _context.Usuarios.FirstOrDefaultAsync(x => x.UsuarioNombre == usuarioNombre);
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(x => x.UsuarioNombre == usuarioNombre);
+
+            if (usuario == null) 
+                return null;
+
+            if (!BCrypt.Net.BCrypt.Verify(password, usuario.Password)) 
+                return null;
+
+            return usuario;
         }
     }
 }

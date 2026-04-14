@@ -38,7 +38,7 @@ namespace Socios.Api.Authentication
                 var email = credentials[0];
                 var password = credentials[1];
 
-                var usuario = await _usuarioRepository.GetByEmailAsync(email);
+                var usuario = await _usuarioRepository.GetUsuarioAsync(email, password);
                 if (usuario == null)
                     return AuthenticateResult.Fail("Invalid credentials.");
 

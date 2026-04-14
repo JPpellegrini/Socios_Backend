@@ -26,12 +26,12 @@ namespace Socios.Infrastructure.Context
                 Descripcion = "secretaria que maneja todo el sistema"
             });
 
-            // Seed de Usuario de prueba
+            // Seed de Usuario de prueba (password: 1234, hash con BCrypt)
             modelBuilder.Entity<Usuario>().HasData(new Usuario
             {
                 Id_Usuario = 1,
                 UsuarioNombre = "CJR",
-                Password = "1234",
+                Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
                 Estado = "Activo",
                 Id_Rol = 1
             });
