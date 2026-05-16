@@ -1,13 +1,18 @@
 @Socios.Api_HostAddress = http://localhost:5056
 
+###
+### Weather Forecast (sin auth)
+###
 GET {{Socios.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
-
+### Get User Info (con Basic Auth)
+### Usuario: CJR, Contraseña: 1234
+### Base64: Q0pSOjEyMzQ=
+###
 GET {{Socios.Api_HostAddress}}/api/v1/me
-Content-Type: application/json
-{
-  "usuarioNombre": "CJR",
-  "password": "1234"
-}
+Authorization: Basic Q0pSOjEyMzQ=
+Accept: application/json
+
+
