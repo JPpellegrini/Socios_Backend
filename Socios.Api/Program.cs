@@ -11,9 +11,37 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-#region DbContext
+#region DbContext - Configuracion por entorno
 
-builder.Services.AddDbContext<SociosDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("CJR_Socios")));
+var environment = builder.Environment.EnvironmentName;
+var configuration = builder.Configuration;
+
+string dbConnectionString;
+
+if (environment == "Development")
+{
+    // PostgreSQL local
+    dbConnectionString = configuration.GetConnectionString("CJR_Socios") 
+        ?? throw new InvalidOperationException("Connection string 'PostgreLocal' no encontrada");
+    Console.WriteLine("[Development] Usando PostgreSQL local");
+}
+else if (environment == "Staging")
+{
+    // Supabase para Staging
+    dbConnectionString = configuration.GetConnectionString("Supabase_Staging") 
+        ?? throw new InvalidOperationException("Connection string 'Supabase_Staging' no encontrada");
+    Console.WriteLine("[Staging] Usando Supabase");
+}
+else
+{
+    // Azure PostgreSQL para Producción
+    dbConnectionString = configuration.GetConnectionString("Azure_Production") 
+        ?? throw new InvalidOperationException("Connection string 'Azure_Production' no encontrada");
+    Console.WriteLine("[Production] Usando Azure PostgreSQL");
+}
+
+builder.Services.AddDbContext<SociosDbContext>(options =>
+    options.UseNpgsql(dbConnectionString));
 
 #endregion
 
