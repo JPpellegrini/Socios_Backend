@@ -13,8 +13,9 @@ builder.Services.AddSwaggerGen();
 
 #region DbContext - Configuracion por entorno
 
-var environment = builder.Environment.EnvironmentName;
 var configuration = builder.Configuration;
+
+var environment = configuration["Environment"];
 
 string dbConnectionString;
 
