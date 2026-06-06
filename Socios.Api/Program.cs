@@ -49,6 +49,7 @@ builder.Services.AddDbContext<SociosDbContext>(options =>
 #region Inyecciones de dependencias
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
 
 #endregion
 
