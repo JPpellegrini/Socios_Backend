@@ -13,5 +13,15 @@ namespace Socios.Infrastructure.Repositories
         {
             _context = context;
         }
+
+        public async Task<IEnumerable<Ciudad>> GetAllAsync()
+        {
+            return await _context.Ciudades.ToListAsync();
+        }
+
+        public async Task<Ciudad?> GetByIdAsync(int id)
+        {
+            return await _context.Ciudades.FindAsync(id);
+        }
     }
 }

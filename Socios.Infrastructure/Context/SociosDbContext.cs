@@ -13,12 +13,14 @@ namespace Socios.Infrastructure.Context
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Ciudad> Ciudades { get; set; }
+        public DbSet<Entidad> Entidades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
             modelBuilder.ApplyConfiguration(new RolConfiguration());
             modelBuilder.ApplyConfiguration(new CiudadConfiguration());
+            modelBuilder.ApplyConfiguration(new EntidadConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
@@ -42,6 +44,42 @@ namespace Socios.Infrastructure.Context
             modelBuilder.Entity<Ciudad>().HasData(
                 new Ciudad { Id_Ciudad = 1, Nombre = "Roldán" },
                 new Ciudad { Id_Ciudad = 2, Nombre = "Funes" }
+            );
+
+            // Seed de Entidades de ejemplo
+            modelBuilder.Entity<Entidad>().HasData(
+                new Entidad
+                {
+                    Id_Entidad = 1,
+                    Tipo = "DNI",
+                    Dni = "12345678",
+                    CuitCuil = "20123456784",
+                    Nombre = "Luciano",
+                    Apellido = "Oldan",
+                    RazonSocial = null,
+                    Sexo = "Hombre",
+                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Id_Ciudad = 1,
+                    Calle = "Independencia",
+                    Altura = 250,
+                    Observacion = null
+                },
+                new Entidad
+                {
+                    Id_Entidad = 2,
+                    Tipo = "DNI",
+                    Dni = "12345678",
+                    CuitCuil = "20123456784",
+                    Nombre = null,
+                    Apellido = null,
+                    RazonSocial = "CJR",
+                    Sexo = "Persona Juridica",
+                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Id_Ciudad = 1,
+                    Calle = "Independencia",
+                    Altura = 250,
+                    Observacion = null
+                }
             );
         }
     }
