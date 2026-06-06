@@ -14,7 +14,7 @@ namespace Socios.Infrastructure.Configurations
             builder.Property(x => x.Password).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Estado).IsRequired().HasMaxLength(50);
             builder.HasOne(x => x.Rol)
-                .WithMany(r => r.Usuarios)
+                .WithMany()
                 .HasForeignKey(x => x.Id_Rol)
                 .OnDelete(DeleteBehavior.Restrict);
         }
