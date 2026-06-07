@@ -1,13 +1,12 @@
-using Socios.Application.Interfaces;
 using Socios.Infrastructure.Context;
 
 namespace Socios.Infrastructure.Repositories
 {
-    public class CiudadRepository : ICiudadRepository
+    public class MetodoPagoRepository
     {
         private readonly SociosDbContext _context;
 
-        public CiudadRepository(SociosDbContext context)
+        public MetodoPagoRepository(SociosDbContext context)
         {
             _context = context;
         }

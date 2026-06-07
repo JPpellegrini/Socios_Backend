@@ -1,13 +1,12 @@
-using Socios.Application.Interfaces;
 using Socios.Infrastructure.Context;
 
 namespace Socios.Infrastructure.Repositories
 {
-    public class CiudadRepository : ICiudadRepository
+    public class TipoEntidadRepository 
     {
         private readonly SociosDbContext _context;
 
-        public CiudadRepository(SociosDbContext context)
+        public TipoEntidadRepository(SociosDbContext context)
         {
             _context = context;
         }
