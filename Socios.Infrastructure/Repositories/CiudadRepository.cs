@@ -1,5 +1,7 @@
 using Socios.Application.Interfaces;
+using Socios.Domain.Entities;
 using Socios.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Socios.Infrastructure.Repositories
 {
