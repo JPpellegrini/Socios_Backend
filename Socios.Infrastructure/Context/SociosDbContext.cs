@@ -96,9 +96,9 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Cuentas de prueba
             modelBuilder.Entity<Cuenta>().HasData(
-                new Cuenta { Id_Cuenta = 1, Nombre = "Efectivo", NroCuenta = 0, Estado = "Activo" },
-                new Cuenta { Id_Cuenta = 2, Nombre = "Banco Macro", NroCuenta = 789012, Estado = "Activo" },
-                new Cuenta { Id_Cuenta = 3, Nombre = "Banco Macro 2", NroCuenta = 712906, Estado = "Inactivo" }
+                new Cuenta { Id_Cuenta = 1, NombreCuenta = "Efectivo", NroCuenta = 0, Estado = "Activo" },
+                new Cuenta { Id_Cuenta = 2, NombreCuenta = "Banco Macro", NroCuenta = 789012, Estado = "Activo" },
+                new Cuenta { Id_Cuenta = 3, NombreCuenta = "Banco Macro 2", NroCuenta = 712906, Estado = "Inactivo" }
             );
 
             // Seed de Detalle de Movimientos de prueba

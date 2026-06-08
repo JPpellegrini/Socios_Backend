@@ -10,7 +10,7 @@ namespace Socios.Infrastructure.Configurations
         {
             builder.ToTable("cuentas");
             builder.HasKey(c => c.Id_Cuenta);
-            builder.Property(c => c.Nombre).IsRequired().HasMaxLength(100);
+            builder.Property(c => c.NombreCuenta).IsRequired().HasMaxLength(100);
             builder.Property(c => c.NroCuenta).IsRequired();
             builder.Property(c => c.Estado).IsRequired().HasMaxLength(20);
         }
