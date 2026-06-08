@@ -136,8 +136,8 @@ namespace Socios.Infrastructure.Context
             modelBuilder.Entity<TipoEntidad>().HasData(
                 new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "Socio" },
                 new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Proveedor" },
-                new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "Colaborador" },
-                new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Empleado" }
+                new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "Colaborador" },
+                new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "Empleado" }
             );
         }
     }
