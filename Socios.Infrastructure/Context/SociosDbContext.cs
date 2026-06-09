@@ -20,6 +20,9 @@ namespace Socios.Infrastructure.Context
         public DbSet<ObraSocial> ObraSocial { get; set; }
         public DbSet<Prestacion> Prestacion { get; set; }
         public DbSet<TipoEntidad> TiposEntidad { get; set; }
+        public DbSet<Codeudor> Codeudores { get; set; }
+        public DbSet<Socio> Socios { get; set; }
+        public DbSet<EntidadTipo> EntidadTipos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +36,9 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new ObraSocialConfiguration());
             modelBuilder.ApplyConfiguration(new PrestacionConfiguration());
             modelBuilder.ApplyConfiguration(new TipoEntidadConfiguration());
+            modelBuilder.ApplyConfiguration(new CodeudorConfiguration());
+            modelBuilder.ApplyConfiguration(new SocioConfiguration());
+            modelBuilder.ApplyConfiguration(new EntidadTipoConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
@@ -138,6 +144,23 @@ namespace Socios.Infrastructure.Context
                 new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Proveedor" },
                 new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "Colaborador" },
                 new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "Empleado" }
+            );
+
+            // Seed de Socios de prueba
+            modelBuilder.Entity<Socio>().HasData(
+                new Socio { Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" }
+            );
+
+            // Seed de Codeudores de prueba
+            modelBuilder.Entity<Codeudor>().HasData(
+                new Codeudor { Id_Entidad_Codeudor = 1, Id_Entidad = 2 }
+            );
+
+            // Seed de EntidadTipo (PK compuesta) de prueba
+            modelBuilder.Entity<EntidadTipo>().HasData(
+                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 1, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_Entidad = 1978, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "INACTIVO" }
             );
         }
     }
