@@ -23,6 +23,9 @@ namespace Socios.Infrastructure.Context
         public DbSet<Codeudor> Codeudores { get; set; }
         public DbSet<Socio> Socios { get; set; }
         public DbSet<EntidadTipo> EntidadTipos { get; set; }
+        public DbSet<EntidadBaja> EntidadBajas { get; set; }
+        public DbSet<Colaborador> Colaboradores { get; set; }
+        public DbSet<Contacto> Contactos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +42,9 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new CodeudorConfiguration());
             modelBuilder.ApplyConfiguration(new SocioConfiguration());
             modelBuilder.ApplyConfiguration(new EntidadTipoConfiguration());
+            modelBuilder.ApplyConfiguration(new EntidadBajaConfiguration());
+            modelBuilder.ApplyConfiguration(new ColaboradorConfiguration());
+            modelBuilder.ApplyConfiguration(new ContactoConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
@@ -161,6 +167,25 @@ namespace Socios.Infrastructure.Context
                 new EntidadTipo { Id_Entidad = 1, Id_Tipo = 1, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
                 new EntidadTipo { Id_Entidad = 1, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
                 new EntidadTipo { Id_Entidad = 1978, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "INACTIVO" }
+            );
+
+            // Seed de EntidadBajas
+            modelBuilder.Entity<EntidadBaja>().HasData(
+                new EntidadBaja { Id_Baja = 1, Id_Entidad = 1978, Id_Tipo = 1, Fecha_Baja = new System.DateTime(2016,1,18), Motivo = "MORA" },
+                new EntidadBaja { Id_Baja = 2, Id_Entidad = 201, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2015,12,11), Motivo = "FALLECIMIENTO" },
+                new EntidadBaja { Id_Baja = 3, Id_Entidad = 1458, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2016,2,21), Motivo = "RENUNCIA" }
+            );
+
+            // Seed de Colaboradores
+            modelBuilder.Entity<Colaborador>().HasData(
+                new Colaborador { Id_Colaborador = 1, Id_Prestacion = 1, Id_Entidad = 1 },
+                new Colaborador { Id_Colaborador = 2, Id_Prestacion = 3, Id_Entidad = 2 }
+            );
+
+            // Seed de Contactos
+            modelBuilder.Entity<Contacto>().HasData(
+                new Contacto { Id_Contacto = 1, Tipo = "Celular", ContactoValor = "1234", Id_Entidad = 1 },
+                new Contacto { Id_Contacto = 2, Tipo = "Mail", ContactoValor = "luciano@gmail", Id_Entidad = 1 }
             );
         }
     }
