@@ -22,6 +22,12 @@ namespace Socios.Infrastructure.Context
         public DbSet<TipoEntidad> TiposEntidad { get; set; }
         public DbSet<EstadoCajaDiaria> EstadosCajaDiaria { get; set; }
         public DbSet<Caja> Caja { get; set; }
+        public DbSet<Codeudor> Codeudores { get; set; }
+        public DbSet<Socio> Socios { get; set; }
+        public DbSet<EntidadTipo> EntidadTipos { get; set; }
+        public DbSet<EntidadBaja> EntidadBajas { get; set; }
+        public DbSet<Colaborador> Colaboradores { get; set; }
+        public DbSet<Contacto> Contactos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +43,12 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new TipoEntidadConfiguration());
             modelBuilder.ApplyConfiguration(new EstadoCajaDiariaConfiguration());
             modelBuilder.ApplyConfiguration(new CajaConfiguration());
+            modelBuilder.ApplyConfiguration(new CodeudorConfiguration());
+            modelBuilder.ApplyConfiguration(new SocioConfiguration());
+            modelBuilder.ApplyConfiguration(new EntidadTipoConfiguration());
+            modelBuilder.ApplyConfiguration(new EntidadBajaConfiguration());
+            modelBuilder.ApplyConfiguration(new ColaboradorConfiguration());
+            modelBuilder.ApplyConfiguration(new ContactoConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
@@ -154,7 +166,6 @@ namespace Socios.Infrastructure.Context
                 new DetalleMovimiento { Id_Detmov = 4, NombreDetalleMovimiento = "Colaboración" },
                 new DetalleMovimiento { Id_Detmov = 5, NombreDetalleMovimiento = "Pago a Proveedor" },
                 new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "Transferencia" }
-
             );
 
             // Seed de Metodos de Pago de prueba
@@ -184,6 +195,7 @@ namespace Socios.Infrastructure.Context
                 new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "Colaborador" },
                 new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "Empleado" }
             );
+
             // Seed de EstadoCajaDiaria de prueba
             modelBuilder.Entity<EstadoCajaDiaria>().HasData(
                 new EstadoCajaDiaria { Id_CajaDiaria = 1, 
@@ -197,6 +209,7 @@ namespace Socios.Infrastructure.Context
                                        FechaHora = new DateTime(2026, 6, 9, 12, 05, 0), 
                                        Saldo = 150000 }
             );
+
             // Seed de Caja de prueba
             modelBuilder.Entity<Caja>().HasData(
                 new Caja
@@ -227,6 +240,42 @@ namespace Socios.Infrastructure.Context
                     Id_Detmov = 5,
                     Observacion = "Pago Cuota Mayo"
                 }
+            );    
+
+            // Seed de Socios de prueba
+            modelBuilder.Entity<Socio>().HasData(
+                new Socio { Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" }
+            );
+
+            // Seed de Codeudores de prueba
+            modelBuilder.Entity<Codeudor>().HasData(
+                new Codeudor { Id_Entidad_Codeudor = 1, Id_Entidad = 2 }
+            );
+
+            // Seed de EntidadTipo (PK compuesta) de prueba
+            modelBuilder.Entity<EntidadTipo>().HasData(
+                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 1, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_Entidad = 1978, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "INACTIVO" }
+            );
+
+            // Seed de EntidadBajas
+            modelBuilder.Entity<EntidadBaja>().HasData(
+                new EntidadBaja { Id_Baja = 1, Id_Entidad = 1978, Id_Tipo = 1, Fecha_Baja = new System.DateTime(2016,1,18), Motivo = "MORA" },
+                new EntidadBaja { Id_Baja = 2, Id_Entidad = 201, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2015,12,11), Motivo = "FALLECIMIENTO" },
+                new EntidadBaja { Id_Baja = 3, Id_Entidad = 1458, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2016,2,21), Motivo = "RENUNCIA" }
+            );
+
+            // Seed de Colaboradores
+            modelBuilder.Entity<Colaborador>().HasData(
+                new Colaborador { Id_Colaborador = 1, Id_Prestacion = 1, Id_Entidad = 1 },
+                new Colaborador { Id_Colaborador = 2, Id_Prestacion = 3, Id_Entidad = 2 }
+            );
+
+            // Seed de Contactos
+            modelBuilder.Entity<Contacto>().HasData(
+                new Contacto { Id_Contacto = 1, Tipo = "Celular", ContactoValor = "1234", Id_Entidad = 1 },
+                new Contacto { Id_Contacto = 2, Tipo = "Mail", ContactoValor = "luciano@gmail", Id_Entidad = 1 }
             );
         }
     }
