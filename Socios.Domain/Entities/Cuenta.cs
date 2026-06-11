@@ -4,7 +4,7 @@ namespace Socios.Domain.Entities
     {
         public int Id_Cuenta { get; set; }
         public string NombreCuenta { get; set; } = null!;
-        public int NroCuenta { get; set; }
+        public int NroCuenta { get; set; } = 0;
         public string Estado { get; set; } = null!;
     }
 }

@@ -20,6 +20,8 @@ namespace Socios.Infrastructure.Context
         public DbSet<ObraSocial> ObraSocial { get; set; }
         public DbSet<Prestacion> Prestacion { get; set; }
         public DbSet<TipoEntidad> TiposEntidad { get; set; }
+        public DbSet<EstadoCajaDiaria> EstadosCajaDiaria { get; set; }
+        public DbSet<Caja> Caja { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,14 +35,23 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new ObraSocialConfiguration());
             modelBuilder.ApplyConfiguration(new PrestacionConfiguration());
             modelBuilder.ApplyConfiguration(new TipoEntidadConfiguration());
+            modelBuilder.ApplyConfiguration(new EstadoCajaDiariaConfiguration());
+            modelBuilder.ApplyConfiguration(new CajaConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
             {
                 Id_Rol = 1,
                 RolNombre = "Secretaria",
-                Descripcion = "secretaria que maneja todo el sistema"
-            });
+                Descripcion = "Secretaria que maneja todo el sistema"
+            },
+            new Rol
+            {
+                Id_Rol = 2,
+                RolNombre = "Consultor",
+                Descripcion = "Solo posee acceso al módulo de informes"
+            }
+            );
 
             // Seed de Usuario de prueba (password: 1234, hash con BCrypt)
             modelBuilder.Entity<Usuario>().HasData(new Usuario
@@ -49,13 +60,31 @@ namespace Socios.Infrastructure.Context
                 UsuarioNombre = "CJR",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
                 Estado = "Activo",
+                Id_Rol = 2
+            },
+            new Usuario          
+            {
+                Id_Usuario = 2,
+                UsuarioNombre = "Adriana",
+                Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
+                Estado = "Activo",
                 Id_Rol = 1
-            });
+            },
+            new Usuario
+            {
+                Id_Usuario = 3,
+                UsuarioNombre = "Marcela",
+                Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
+                Estado = "Activo",
+                Id_Rol = 1
+            }
+            );
 
             // Seed de Ciudades de prueba
             modelBuilder.Entity<Ciudad>().HasData(
                 new Ciudad { Id_Ciudad = 1, Nombre = "Roldán" },
-                new Ciudad { Id_Ciudad = 2, Nombre = "Funes" }
+                new Ciudad { Id_Ciudad = 2, Nombre = "Funes" },
+                new Ciudad { Id_Ciudad = 3, Nombre = "Rosario" }
             );
 
             // Seed de Entidades de ejemplo
@@ -80,7 +109,7 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Entidad = 2,
                     Tipo = "DNI",
-                    Dni = "12345678",
+                    Dni = null,
                     CuitCuil = "20123456784",
                     Nombre = null,
                     Apellido = null,
@@ -90,6 +119,22 @@ namespace Socios.Infrastructure.Context
                     Id_Ciudad = 1,
                     Calle = "Independencia",
                     Altura = 250,
+                    Observacion = null
+                },
+                new Entidad
+                {
+                    Id_Entidad = 3,
+                    Tipo = "DNI",
+                    Dni = null,
+                    CuitCuil = "30657866330",
+                    Nombre = null,
+                    Apellido = null,
+                    RazonSocial = "Litoral Gas S.A",
+                    Sexo = "Persona Juridica",
+                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Id_Ciudad = 3,
+                    Calle = "Mitre",
+                    Altura = 166,
                     Observacion = null
                 }
             );
@@ -136,8 +181,52 @@ namespace Socios.Infrastructure.Context
             modelBuilder.Entity<TipoEntidad>().HasData(
                 new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "Socio" },
                 new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Proveedor" },
-                new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "Colaborador" },
-                new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Empleado" }
+                new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "Colaborador" },
+                new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "Empleado" }
+            );
+            // Seed de EstadoCajaDiaria de prueba
+            modelBuilder.Entity<EstadoCajaDiaria>().HasData(
+                new EstadoCajaDiaria { Id_CajaDiaria = 1, 
+                                       Id_Usuario = 1, 
+                                       Tipo = "Apertura", 
+                                       FechaHora = new DateTime(2026, 6, 9, 08, 00, 0), 
+                                       Saldo = 0 },
+                new EstadoCajaDiaria { Id_CajaDiaria = 2, 
+                                       Id_Usuario = 1, 
+                                       Tipo = "Cierre", 
+                                       FechaHora = new DateTime(2026, 6, 9, 12, 05, 0), 
+                                       Saldo = 150000 }
+            );
+            // Seed de Caja de prueba
+            modelBuilder.Entity<Caja>().HasData(
+                new Caja
+                {
+                    Id_Movimiento = 1,
+                    Id_CajaDiaria = 1,
+                    Id_Usuario = 2,
+                    FechaHoraMov = new DateTime(2026, 6, 10, 08, 20, 0),
+                    Tipo_Movimiento = "Ingreso",
+                    Id_Entidad = 1,
+                    Monto = 13500,
+                    Id_MetodoPago = 2,
+                    Id_Cuenta = 1,
+                    Id_Detmov = 1,
+                    Observacion = "Pago Cuota Mayo"
+                },
+                new Caja
+                {
+                    Id_Movimiento = 2,
+                    Id_CajaDiaria = 1,
+                    Id_Usuario = 2,
+                    FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
+                    Tipo_Movimiento = "Egreso",
+                    Id_Entidad = 3,
+                    Monto = 42500.47m,
+                    Id_MetodoPago = 1,
+                    Id_Cuenta = 2,
+                    Id_Detmov = 5,
+                    Observacion = "Pago Cuota Mayo"
+                }
             );
         }
     }
