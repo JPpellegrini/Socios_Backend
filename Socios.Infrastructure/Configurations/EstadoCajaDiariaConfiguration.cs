@@ -8,15 +8,17 @@ namespace Socios.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<EstadoCajaDiaria> builder)
         {
-            builder.ToTable("estado_caja_diaria");
+            builder.ToTable("estado_cajadiaria");
             builder.HasKey(e => e.Id_CajaDiaria);
+            
+            builder.Property(c => c.Tipo).IsRequired().HasMaxLength(20);
+            builder.Property(c => c.FechaHora).IsRequired();
+            builder.Property(c => c.Saldo).IsRequired().HasColumnType("decimal(18,2)");
+
             builder.HasOne(x => x.Usuario)
                 .WithMany()
                 .HasForeignKey(x => x.Id_Usuario)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.Property(c => c.Tipo).IsRequired().HasMaxLength(20);
-            builder.Property(c => c.FechaHora).IsRequired();
-            builder.Property(c => c.Saldo).HasColumnType("decimal(18,2)");
         }
     }
 }

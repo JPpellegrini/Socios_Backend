@@ -9,7 +9,7 @@ namespace Socios.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<EntidadTipo> builder)
         {
             builder.ToTable("entidad_tipos");
-            builder.HasKey(e => new { e.Id_Entidad, e.Id_Tipo });
+            builder.HasKey(e => e.Id_EntidadTipo);
 
             builder.Property(e => e.Fecha_Alta).IsRequired();
             builder.Property(e => e.Estado).IsRequired().HasMaxLength(50);

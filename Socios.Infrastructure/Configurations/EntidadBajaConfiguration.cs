@@ -14,14 +14,9 @@ namespace Socios.Infrastructure.Configurations
             builder.Property(e => e.Motivo).IsRequired().HasMaxLength(250);
             builder.Property(e => e.Fecha_Baja).IsRequired();
 
-            builder.HasOne(e => e.Entidad)
+            builder.HasOne(e => e.EntidadTipo)
                 .WithMany()
-                .HasForeignKey(e => e.Id_Entidad)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(e => e.TipoEntidad)
-                .WithMany()
-                .HasForeignKey(e => e.Id_Tipo)
+                .HasForeignKey(e => e.Id_EntidadTipo)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -9,16 +9,16 @@ namespace Socios.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Codeudor> builder)
         {
             builder.ToTable("codeudores");
-            builder.HasKey(c => new { c.Id_Entidad_Codeudor, c.Id_Entidad });
+            builder.HasKey(c => c.Id_Codeudor);
 
             builder.HasOne(c => c.Entidad)
                 .WithMany()
                 .HasForeignKey(c => c.Id_Entidad)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(c => c.EntidadCodeudor)
+            builder.HasOne(c => c.Entidad)
                 .WithMany()
-                .HasForeignKey(c => c.Id_Entidad_Codeudor)
+                .HasForeignKey(c => c.Id_EntidadCodeudor)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Evitar que los pares sean iguales mediante comprobación en la aplicación o trigger en BD.

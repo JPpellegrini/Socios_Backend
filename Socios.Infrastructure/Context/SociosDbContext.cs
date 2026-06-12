@@ -249,21 +249,21 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Codeudores de prueba
             modelBuilder.Entity<Codeudor>().HasData(
-                new Codeudor { Id_Entidad_Codeudor = 1, Id_Entidad = 2 }
+                new Codeudor { Id_Codeudor = 1, Id_EntidadCodeudor = 1, Id_Entidad = 2 }
             );
 
-            // Seed de EntidadTipo (PK compuesta) de prueba
+            // Seed de EntidadTipo de prueba
             modelBuilder.Entity<EntidadTipo>().HasData(
-                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 1, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
-                new EntidadTipo { Id_Entidad = 1, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
-                new EntidadTipo { Id_Entidad = 1978, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "INACTIVO" }
+                new EntidadTipo { Id_EntidadTipo = 1, Id_Entidad = 1, Id_Tipo = 1, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_EntidadTipo = 2, Id_Entidad = 1, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "ACTIVO" },
+                new EntidadTipo { Id_EntidadTipo = 3, Id_Entidad = 1978, Id_Tipo = 3, Fecha_Alta = new System.DateTime(1995,1,18), Estado = "INACTIVO" }
             );
 
             // Seed de EntidadBajas
             modelBuilder.Entity<EntidadBaja>().HasData(
-                new EntidadBaja { Id_Baja = 1, Id_Entidad = 1978, Id_Tipo = 1, Fecha_Baja = new System.DateTime(2016,1,18), Motivo = "MORA" },
-                new EntidadBaja { Id_Baja = 2, Id_Entidad = 201, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2015,12,11), Motivo = "FALLECIMIENTO" },
-                new EntidadBaja { Id_Baja = 3, Id_Entidad = 1458, Id_Tipo = 3, Fecha_Baja = new System.DateTime(2016,2,21), Motivo = "RENUNCIA" }
+                new EntidadBaja { Id_Baja = 1, Id_EntidadTipo = 1, Fecha_Baja = new System.DateTime(2016,1,18), Motivo = "MORA" },
+                new EntidadBaja { Id_Baja = 2, Id_EntidadTipo = 2, Fecha_Baja = new System.DateTime(2015,12,11), Motivo = "FALLECIMIENTO" },
+                new EntidadBaja { Id_Baja = 3, Id_EntidadTipo = 3, Fecha_Baja = new System.DateTime(2016,2,21), Motivo = "RENUNCIA" }
             );
 
             // Seed de Colaboradores
@@ -274,8 +274,8 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Contactos
             modelBuilder.Entity<Contacto>().HasData(
-                new Contacto { Id_Contacto = 1, Tipo = "Celular", ContactoValor = "1234", Id_Entidad = 1 },
-                new Contacto { Id_Contacto = 2, Tipo = "Mail", ContactoValor = "luciano@gmail", Id_Entidad = 1 }
+                new Contacto { Id_Contacto = 1, Tipo = "Celular", ContactoEntidad = "1234", Id_Entidad = 1 },
+                new Contacto { Id_Contacto = 2, Tipo = "Mail", ContactoEntidad = "luciano@gmail", Id_Entidad = 1 }
             );
         }
     }
