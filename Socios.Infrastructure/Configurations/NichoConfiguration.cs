@@ -15,9 +15,9 @@ namespace Socios.Infrastructure.Configurations
                 .HasForeignKey(n => n.Id_Entidad)
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Property(n => n.Sector).IsRequired().HasMaxLength(100);
-            builder.Property(n => n.Nro_Nicho).IsRequired().HasMaxLength(50);
-            builder.Property(n => n.Valor_Nicho).IsRequired();
-            builder.Property(n => n.Valor_Lapida);
+            builder.Property(n => n.NroNicho).IsRequired().HasMaxLength(50);
+            builder.Property(n => n.ValorNicho).IsRequired();
+            builder.Property(n => n.ValorLapida);
             builder.Property(n => n.ConLapida).IsRequired().HasMaxLength(2);
             builder.Property(n => n.Ocupado).IsRequired().HasMaxLength(2);
             builder.Property(n => n.Cuotas).HasColumnType("int");
