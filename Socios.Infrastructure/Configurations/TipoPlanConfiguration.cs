@@ -14,8 +14,8 @@ namespace Socios.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.Id_TipoCuota)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.Property(c => c.EdadTope).IsRequired().HasColumnType("int");
-            builder.Property(c => c.Tipo_Plan).IsRequired().HasColumnType("bit");
+            builder.Property(c => c.EdadTope);
+            builder.Property(c => c.Tipo_Plan).IsRequired();
         }
     }
 }

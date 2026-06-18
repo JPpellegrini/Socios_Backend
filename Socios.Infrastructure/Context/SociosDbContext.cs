@@ -28,6 +28,12 @@ namespace Socios.Infrastructure.Context
         public DbSet<EntidadBaja> EntidadBajas { get; set; }
         public DbSet<Colaborador> Colaboradores { get; set; }
         public DbSet<Contacto> Contactos { get; set; }
+        public DbSet<MovimientoPrestacion> MovimientoPrestaciones { get; set; }
+        public DbSet<Nicho> Nichos { get; set; }
+        public DbSet<CierreContable> CierresContables { get; set; }
+        public DbSet<TipoCuota> TiposCuotas { get; set; }
+        public DbSet<Cuota> Cuotas { get; set; }
+        public DbSet<TipoPlan> TiposPlan { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +55,12 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new EntidadBajaConfiguration());
             modelBuilder.ApplyConfiguration(new ColaboradorConfiguration());
             modelBuilder.ApplyConfiguration(new ContactoConfiguration());
+            modelBuilder.ApplyConfiguration(new MovimientoPrestacionConfiguration());
+            modelBuilder.ApplyConfiguration(new NichoConfiguration());
+            modelBuilder.ApplyConfiguration(new CierreContableConfiguration());
+            modelBuilder.ApplyConfiguration(new TipoCuotaConfiguration());
+            modelBuilder.ApplyConfiguration(new CuotaConfiguration());
+            modelBuilder.ApplyConfiguration(new TipoPlanConfiguration());
 
             // Seed de Rol Secretaria
             modelBuilder.Entity<Rol>().HasData(new Rol
@@ -216,7 +228,6 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Movimiento = 1,
                     Id_CajaDiaria = 1,
-                    Id_Usuario = 2,
                     FechaHoraMov = new DateTime(2026, 6, 10, 08, 20, 0),
                     Tipo_Movimiento = "Ingreso",
                     Id_Entidad = 1,
@@ -230,7 +241,6 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Movimiento = 2,
                     Id_CajaDiaria = 1,
-                    Id_Usuario = 2,
                     FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
                     Tipo_Movimiento = "Egreso",
                     Id_Entidad = 3,
@@ -239,12 +249,25 @@ namespace Socios.Infrastructure.Context
                     Id_Cuenta = 2,
                     Id_Detmov = 5,
                     Observacion = "Pago Cuota Mayo"
+                },
+                new Caja
+                {
+                    Id_Movimiento = 3,
+                    Id_CajaDiaria = 1,
+                    FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
+                    Tipo_Movimiento = "Ingreso",
+                    Id_Entidad = 3,
+                    Monto = 30000,
+                    Id_MetodoPago = 1,
+                    Id_Cuenta = 2,
+                    Id_Detmov = 4,
+                    Observacion = null
                 }
             );    
 
             // Seed de Socios de prueba
             modelBuilder.Entity<Socio>().HasData(
-                new Socio { Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" }
+                new Socio { Id_Socio = 1, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" }
             );
 
             // Seed de Codeudores de prueba

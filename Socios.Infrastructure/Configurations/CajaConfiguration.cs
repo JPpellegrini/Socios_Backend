@@ -14,10 +14,6 @@ namespace Socios.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.Id_CajaDiaria)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.HasOne(x => x.Usuario)
-                .WithMany()
-                .HasForeignKey(x => x.Id_Usuario)
-                .OnDelete(DeleteBehavior.Restrict);
             builder.Property(x => x.FechaHoraMov).IsRequired();
             builder.Property(x => x.Tipo_Movimiento).IsRequired().HasMaxLength(20);
             builder.HasOne(x => x.Entidad)
@@ -37,7 +33,7 @@ namespace Socios.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.Id_Detmov)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.Property(x => x.Observacion).IsRequired().HasMaxLength(200);
+            builder.Property(x => x.Observacion).HasMaxLength(200);
         }
     }
 }
