@@ -10,7 +10,7 @@ namespace Socios.Infrastructure.Configurations
         {
             builder.ToTable("estado_cajadiaria");
             builder.HasKey(e => e.Id_CajaDiaria);
-            
+            builder.Property(c => c.Nro_Caja).IsRequired();
             builder.Property(c => c.Tipo).IsRequired().HasMaxLength(20);
             builder.Property(c => c.FechaHora).IsRequired();
             builder.Property(c => c.Saldo).IsRequired().HasColumnType("decimal(18,2)");

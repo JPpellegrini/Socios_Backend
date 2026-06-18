@@ -3,6 +3,7 @@
     public class EstadoCajaDiaria
     {
         public int Id_CajaDiaria { get; set; }
+        public int Nro_Caja { get; set; }
         public int Id_Usuario { get; set; }
         public Usuario Usuario { get; set; } = null!;
         public string Tipo { get; set; } = null!;
