@@ -123,7 +123,7 @@ namespace Socios.Infrastructure.Context
                     Apellido = "Oldan",
                     RazonSocial = null,
                     Sexo = "Hombre",
-                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Nacimiento = new System.DateTime(1959, 7, 12),
                     Id_Ciudad = 1,
                     Calle = "Independencia",
                     Altura = 250,
@@ -133,13 +133,13 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Entidad = 2,
                     Tipo = "DNI",
-                    Dni = null,
-                    CuitCuil = "20321851664",
-                    Nombre = null,
-                    Apellido = null,
-                    RazonSocial = "CJR",
-                    Sexo = "Persona Juridica",
-                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Dni = "32185166",
+                    CuitCuil = null,
+                    Nombre = "Juan",
+                    Apellido = "Pérez",
+                    RazonSocial = null,
+                    Sexo = "Hombre",
+                    Nacimiento = new System.DateTime(1998, 3, 1),
                     Id_Ciudad = 2,
                     Calle = "Galindo",
                     Altura = 458,
@@ -159,6 +159,22 @@ namespace Socios.Infrastructure.Context
                     Id_Ciudad = 3,
                     Calle = "Mitre",
                     Altura = 166,
+                    Observacion = null
+                },
+                new Entidad
+                {
+                    Id_Entidad = 4,
+                    Tipo = "DNI",
+                    Dni = "55406681",
+                    CuitCuil = null,
+                    Nombre = "María",
+                    Apellido = "López",
+                    RazonSocial = null,
+                    Sexo = "Mujer",
+                    Nacimiento = new System.DateTime(1987, 12, 11),
+                    Id_Ciudad = 1,
+                    Calle = "Las Heras",
+                    Altura = 347,
                     Observacion = null
                 }
             );
@@ -292,20 +308,20 @@ namespace Socios.Infrastructure.Context
                     Id_MetodoPago = 1,
                     Id_Cuenta = 2,
                     Id_Detmov = 5,
-                    Observacion = "Pago Cuota Mayo"
+                    Observacion = "Pago Gas Mes Junio"
                 },
                 new Caja
                 {
                     Id_Movimiento = 3,
-                    Id_CajaDiaria = 1,
+                    Id_CajaDiaria = 2,
                     FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
                     Tipo_Movimiento = "Ingreso",
-                    Id_Entidad = 3,
+                    Id_Entidad = 4,
                     Monto = 30000,
                     Id_MetodoPago = 1,
                     Id_Cuenta = 2,
                     Id_Detmov = 4,
-                    Observacion = null
+                    Observacion = "Colaboración Podología"
                 }
             );    
 
@@ -336,26 +352,27 @@ namespace Socios.Infrastructure.Context
             // Seed de EntidadTipo de prueba
             modelBuilder.Entity<EntidadTipo>().HasData(
                 new EntidadTipo 
-                { Id_EntidadTipo = 1, 
+                {   
+                    Id_EntidadTipo = 1, 
                     Id_Entidad = 1, 
                     Id_Tipo = 1, 
                     Fecha_Alta = new System.DateTime(1995,1,18), 
-                    Estado = "ACTIVO" 
+                    Estado = "INACTIVO" 
                 },
                 new EntidadTipo 
                 { 
                     Id_EntidadTipo = 2, 
                     Id_Entidad = 1, 
                     Id_Tipo = 3, 
-                    Fecha_Alta = new System.DateTime(1995,1,18), 
+                    Fecha_Alta = new System.DateTime(2000,11,18), 
                     Estado = "ACTIVO" 
                 },
                 new EntidadTipo 
                 { 
                     Id_EntidadTipo = 3, 
-                    Id_Entidad = 1978, 
+                    Id_Entidad = 4, 
                     Id_Tipo = 3, 
-                    Fecha_Alta = new System.DateTime(1995,1,18), 
+                    Fecha_Alta = new System.DateTime(2008,1,18), 
                     Estado = "INACTIVO" 
                 }
             );
@@ -372,15 +389,8 @@ namespace Socios.Infrastructure.Context
                 new EntidadBaja 
                 { 
                     Id_Baja = 2, 
-                    Id_EntidadTipo = 2, 
-                    Fecha_Baja = new System.DateTime(2015,12,11), 
-                    Motivo = "FALLECIMIENTO" 
-                },
-                new EntidadBaja 
-                { 
-                    Id_Baja = 3, 
                     Id_EntidadTipo = 3, 
-                    Fecha_Baja = new System.DateTime(2016,2,21), 
+                    Fecha_Baja = new System.DateTime(2015,12,11), 
                     Motivo = "RENUNCIA" 
                 }
             );
@@ -390,13 +400,8 @@ namespace Socios.Infrastructure.Context
                 new Colaborador 
                 { 
                     Id_Colaborador = 1, 
-                    Id_Prestacion = 1, 
-                    Id_Entidad = 1 },
-                new Colaborador 
-                { 
-                    Id_Colaborador = 2, 
-                    Id_Prestacion = 3, 
-                    Id_Entidad = 2 
+                    Id_Prestacion = 2, 
+                    Id_Entidad = 4 
                 }
             );
 
@@ -406,16 +411,60 @@ namespace Socios.Infrastructure.Context
                 { 
                     Id_Contacto = 1, 
                     Tipo = "Celular", 
-                    ContactoEntidad = "1234", 
-                    Id_Entidad = 1 },
+                    ContactoEntidad = "3413458966", 
+                    Id_Entidad = 1 
+                },
                 new Contacto 
                 { 
                     Id_Contacto = 2, 
                     Tipo = "Mail", 
                     ContactoEntidad = "luciano@gmail", 
                     Id_Entidad = 1 
+                },
+                new Contacto
+                {
+                    Id_Contacto = 3,
+                    Tipo = "Celular",
+                    ContactoEntidad = "3413485977",
+                    Id_Entidad = 4
+                },
+                new Contacto
+                {
+                    Id_Contacto = 4,
+                    Tipo = "Emergencia",
+                    ContactoEntidad = "08007775427",
+                    Id_Entidad = 3
                 }
             );
+            // Seed de Nicho
+            modelBuilder.Entity<Nicho>().HasData(
+                new Nicho
+                {
+                    Id_Nicho = 1,
+                    Id_Entidad = 1,
+                    Sector = "A",
+                    NroNicho = "8",
+                    ValorNicho = 2500000,
+                    ValorLapida = 50000,
+                    ConLapida = "SI",
+                    Ocupado = "SI",
+                    Cuotas = 2,
+                    InteresMensual = 2.5m
+                },
+                new Nicho
+                {
+                    Id_Nicho = 2,
+                    Id_Entidad = null,
+                    Sector = "B",
+                    NroNicho = "1",
+                    ValorNicho = 2500000,
+                    ValorLapida = null,
+                    ConLapida = "NO",
+                    Ocupado = "NO",
+                    Cuotas = null,
+                    InteresMensual = null
+                }
+                );
         }
     }
 }
