@@ -62,7 +62,7 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new CuotaConfiguration());
             modelBuilder.ApplyConfiguration(new TipoPlanConfiguration());
 
-            // Seed de Rol Secretaria
+            // Seed de Rol Secretaria de prueba
             modelBuilder.Entity<Rol>().HasData(new Rol
             {
                 Id_Rol = 1,
@@ -250,7 +250,7 @@ namespace Socios.Infrastructure.Context
                     Nro_Caja = 1,
                     Id_Usuario = 1, 
                     Tipo = "Apertura", 
-                    FechaHora = new DateTime(2026, 6, 9, 08, 00, 0), 
+                    FechaHora = new DateTime(2026, 6, 9, 8, 00, 0), 
                     Saldo = 100000 
                 },
                 new EstadoCajaDiaria 
@@ -268,7 +268,7 @@ namespace Socios.Infrastructure.Context
                     Nro_Caja = 2,
                     Id_Usuario = 2,
                     Tipo = "Apertura",
-                    FechaHora = new DateTime(2026, 6, 9, 08, 10, 0),
+                    FechaHora = new DateTime(2026, 6, 9, 8, 10, 0),
                     Saldo = 78000
                 },
                 new EstadoCajaDiaria
@@ -288,7 +288,7 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Movimiento = 1,
                     Id_CajaDiaria = 1,
-                    FechaHoraMov = new DateTime(2026, 6, 10, 08, 20, 0),
+                    FechaHoraMov = new DateTime(2026, 6, 10, 8, 20, 0),
                     Tipo_Movimiento = "Ingreso",
                     Id_Entidad = 1,
                     Monto = 13500,
@@ -301,7 +301,7 @@ namespace Socios.Infrastructure.Context
                 {
                     Id_Movimiento = 2,
                     Id_CajaDiaria = 1,
-                    FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
+                    FechaHoraMov = new DateTime(2026, 6, 10, 9, 30, 0),
                     Tipo_Movimiento = "Egreso",
                     Id_Entidad = 3,
                     Monto = 42500.47m,
@@ -377,7 +377,7 @@ namespace Socios.Infrastructure.Context
                 }
             );
 
-            // Seed de EntidadBajas
+            // Seed de EntidadBajas de prueba
             modelBuilder.Entity<EntidadBaja>().HasData(
                 new EntidadBaja 
                 { 
@@ -395,7 +395,7 @@ namespace Socios.Infrastructure.Context
                 }
             );
 
-            // Seed de Colaboradores
+            // Seed de Colaboradores de prueba
             modelBuilder.Entity<Colaborador>().HasData(
                 new Colaborador 
                 { 
@@ -405,7 +405,7 @@ namespace Socios.Infrastructure.Context
                 }
             );
 
-            // Seed de Contactos
+            // Seed de Contactos de prueba
             modelBuilder.Entity<Contacto>().HasData(
                 new Contacto 
                 { 
@@ -436,7 +436,7 @@ namespace Socios.Infrastructure.Context
                     Id_Entidad = 3
                 }
             );
-            // Seed de Nicho
+            // Seed de Nicho de prueba
             modelBuilder.Entity<Nicho>().HasData(
                 new Nicho
                 {
@@ -465,6 +465,149 @@ namespace Socios.Infrastructure.Context
                     InteresMensual = null
                 }
                 );
+
+            // Seed de Tipo de Plan de prueba
+            modelBuilder.Entity<TipoPlan>().HasData(
+                new TipoPlan
+                {
+                    Id_TipoPlan = 1,
+                    Id_TipoCuota = 2,
+                    EdadTope = 65,
+                    Tipo_Plan = "A",
+                },
+                new TipoPlan
+                {
+                    Id_TipoPlan = 2,
+                    Id_TipoCuota = 3,
+                    EdadTope = 65,
+                    Tipo_Plan = "B",
+                },
+                new TipoPlan
+                {
+                    Id_TipoPlan = 3,
+                    Id_TipoCuota = 4,
+                    EdadTope = null,
+                    Tipo_Plan = "A",
+                },
+                new TipoPlan
+                {
+                    Id_TipoPlan = 4,
+                    Id_TipoCuota = 5,
+                    EdadTope = null,
+                    Tipo_Plan = "B",
+                }
+            );
+            // Seed de Tipo de Cuota de prueba
+            modelBuilder.Entity<TipoCuota>().HasData(
+                new TipoCuota
+                {
+                    Id_TipoCuota = 1,
+                    Concepto = "SOCIO",
+                    Importe = 4500,
+                    Tiene_EdadTope = true,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                },
+                new TipoCuota
+                {
+                    Id_TipoCuota = 2,
+                    Concepto = "SEPELIO",
+                    Importe = 10000,
+                    Tiene_EdadTope = true,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                },
+                new TipoCuota
+                {
+                    Id_TipoCuota = 3,
+                    Concepto = "SEPELIO",
+                    Importe = 12000,
+                    Tiene_EdadTope = true,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                },
+                new TipoCuota
+                {
+                    Id_TipoCuota = 4,
+                    Concepto = "SEPELIO",
+                    Importe = 12000,
+                    Tiene_EdadTope = false,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                },
+                new TipoCuota
+                {
+                    Id_TipoCuota = 5,
+                    Concepto = "SEPELIO",
+                    Importe = 14000,
+                    Tiene_EdadTope = false,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                },
+                new TipoCuota
+                {
+                    Id_TipoCuota = 6,
+                    Concepto = "NICHO",
+                    Importe = 300000,
+                    Tiene_EdadTope = false,
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                }
+            );
+
+            // Seed de Cierres Contables de prueba
+            modelBuilder.Entity<CierreContable>().HasData(
+                new CierreContable
+                {
+                    Id_Cierre = 1,
+                    Tipo = "Mensual",
+                    Mes_Periodo = 3,
+                    Anio_Periodo = 2026,
+                    Fechor = new DateTime(2026, 3, 31, 9, 0, 0),
+                    Id_Usuario = 3
+                },
+                new CierreContable
+                {
+                    Id_Cierre = 2,
+                    Tipo = "Anual",
+                    Mes_Periodo = null,
+                    Anio_Periodo = 2025,
+                    Fechor = new DateTime(2026, 1, 10, 8, 30, 0),
+                    Id_Usuario = 2
+                }
+            );
+
+            // Seed de MovimientosPrestacion de prueba
+            modelBuilder.Entity<MovimientoPrestacion>().HasData(
+                new MovimientoPrestacion
+                {
+                    Id_MovimientoPrestacion = 1,
+                    Id_Movimiento = 3,
+                    Id_Prestacion = 1
+                }
+            );
+
+            // Seed de Cuotas de prueba
+            modelBuilder.Entity<Cuota>().HasData(
+                new Cuota
+                {
+                    Id_Deuda = 1,
+                    Id_Entidad = 1,
+                    Mes_Periodo = 6,
+                    Anio_Periodo = 2026,
+                    Id_TipoCuota = 1,
+                    Monto = 4500,
+                    FechaHoraGeneracion = new DateTime(2026, 6, 10, 8, 20, 0),
+                    FechaVencimiento = new DateTime(2026, 6, 30),
+                    Estado = "PAGADO"
+                },
+                new Cuota
+                {
+                    Id_Deuda = 2,
+                    Id_Entidad = 1,
+                    Mes_Periodo = 7,
+                    Anio_Periodo = 2026,
+                    Id_TipoCuota = 1,
+                    Monto = 4500,
+                    FechaHoraGeneracion = new DateTime(2026, 6, 27, 8, 20, 0),
+                    FechaVencimiento = new DateTime(2026, 7, 30),
+                    Estado = "PENDIENTE"
+                }
+            );
         }
     }
 }
