@@ -1,3 +1,4 @@
+using Socios.Application.DTOs;
 using Socios.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,5 +12,7 @@ namespace Socios.Application.Interfaces
         Task<Socio> AddAsync(Socio socio);
         Task UpdateAsync(Socio socio);
         Task DeleteAsync(int idEntidad);
+
+        Task<IEnumerable<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
     }
 }

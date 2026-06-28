@@ -35,7 +35,7 @@ else if (environment == "Staging")
 }
 else
 {
-    // Azure PostgreSQL para Producción
+    // Azure PostgreSQL para Producciï¿½n
     dbConnectionString = configuration.GetConnectionString("Azure_Production") 
         ?? throw new InvalidOperationException("Connection string 'Azure_Production' no encontrada");
     Console.WriteLine("[Production] Usando Azure PostgreSQL");
@@ -50,6 +50,7 @@ builder.Services.AddDbContext<SociosDbContext>(options =>
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
+builder.Services.AddScoped<ISocioRepository, SocioRepository>();
 
 #endregion
 
