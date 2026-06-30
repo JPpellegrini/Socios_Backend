@@ -13,6 +13,6 @@ namespace Socios.Application.Interfaces
         Task UpdateAsync(Socio socio);
         Task DeleteAsync(int idEntidad);
 
-        Task<IEnumerable<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
+        Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
     }
 }

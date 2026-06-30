@@ -25,7 +25,7 @@ namespace Socios.Api.Controllers
         ///   - incluirInactivos: false (default) solo ACTIVOS; true incluye INACTIVOS.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> BuscarSociosAsync([FromQuery] SocioFiltroDto filtro)
+        public async Task<IActionResult> BuscarSociosAsync([FromBody] SocioFiltroDto filtro)
         {
             var socios = await _socioRepository.BuscarAsync(filtro);
 

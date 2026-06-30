@@ -50,7 +50,7 @@ namespace Socios.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro)
+        public async Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro)
         {
             // El Estado del socio vive en EntidadTipo (fila cuyo tipo es "Socio"),
             // mientras que Nombre/Apellido/Dni viven en Entidad.
@@ -63,13 +63,13 @@ namespace Socios.Infrastructure.Repositories
                 join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
                 where t.NombreTipoEntidad == "Socio"
                 select new { s, e, et };
-
+            
             var busqueda = filtro.Busqueda?.Trim();
             if (!string.IsNullOrEmpty(busqueda))
             {
                 var patron = $"%{busqueda}%";
                 query = query.Where(x =>
-                    (x.e.Nombre != null && EF.Functions.ILike(x.e.Nombre, patron)) ||
+                    (x.e.Nombre != null && EF.Functions.ILike(x.e.Nombre, patron)) || 
                     (x.e.Apellido != null && EF.Functions.ILike(x.e.Apellido, patron)));
             }
 
@@ -85,16 +85,14 @@ namespace Socios.Infrastructure.Repositories
                 query = query.Where(x => x.et.Estado == "ACTIVO");
             }
 
-            return await query
-                .Select(x => new SocioListadoDto
+            return await query.Select(x => new SocioListadoDto
                 {
                     IdSocio = x.s.Id_Socio,
                     Nombre = x.e.Nombre,
                     Apellido = x.e.Apellido,
                     Dni = x.e.Dni,
                     Estado = x.et.Estado
-                })
-                .ToListAsync();
+                }).ToListAsync();
         }
     }
 }
