@@ -12,7 +12,7 @@ namespace Socios.Infrastructure.Configurations
             builder.HasKey(e => e.Id_Baja);
 
             builder.Property(e => e.Motivo).IsRequired().HasMaxLength(250);
-            builder.Property(e => e.Fecha_Baja).IsRequired();
+            builder.Property(e => e.Fecha_Baja).IsRequired().HasColumnType("date");
 
             builder.HasOne(e => e.EntidadTipo)
                 .WithMany()

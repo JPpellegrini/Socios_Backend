@@ -35,6 +35,17 @@ namespace Socios.Infrastructure.Context
         public DbSet<Cuota> Cuotas { get; set; }
         public DbSet<TipoPlan> TiposPlan { get; set; }
 
+        /// <summary>
+        /// Convención global: todos los DateTime se mapean a 'timestamp without time zone'
+        /// (hora local del negocio, sin requerir UTC). Las propiedades que representan solo
+        /// una fecha (nacimiento, alta, baja, vencimiento) se sobrescriben a 'date' en sus
+        /// respectivas configuraciones.
+        /// </summary>
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<DateTime>().HaveColumnType("timestamp without time zone");
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
@@ -123,7 +134,7 @@ namespace Socios.Infrastructure.Context
                     Apellido = "Oldan",
                     RazonSocial = null,
                     Sexo = "Hombre",
-                    Nacimiento = new System.DateTime(1959, 7, 12),
+                    Nacimiento = new DateTime(1959, 7, 12, 0, 0, 0),
                     Id_Ciudad = 1,
                     Calle = "Independencia",
                     Altura = 250,
@@ -139,7 +150,7 @@ namespace Socios.Infrastructure.Context
                     Apellido = "Pérez",
                     RazonSocial = null,
                     Sexo = "Hombre",
-                    Nacimiento = new System.DateTime(1998, 3, 1),
+                    Nacimiento = new DateTime(1998, 3, 1, 0, 0, 0),
                     Id_Ciudad = 2,
                     Calle = "Galindo",
                     Altura = 458,
@@ -155,7 +166,7 @@ namespace Socios.Infrastructure.Context
                     Apellido = null,
                     RazonSocial = "Litoral Gas S.A",
                     Sexo = "Persona Juridica",
-                    Nacimiento = new System.DateTime(1980, 1, 1),
+                    Nacimiento = new DateTime(1980, 1, 1, 0, 0, 0),
                     Id_Ciudad = 3,
                     Calle = "Mitre",
                     Altura = 166,
@@ -171,7 +182,7 @@ namespace Socios.Infrastructure.Context
                     Apellido = "López",
                     RazonSocial = null,
                     Sexo = "Mujer",
-                    Nacimiento = new System.DateTime(1987, 12, 11),
+                    Nacimiento = new DateTime(1987, 12, 11, 0, 0, 0),
                     Id_Ciudad = 1,
                     Calle = "Las Heras",
                     Altura = 347,
@@ -356,7 +367,7 @@ namespace Socios.Infrastructure.Context
                     Id_EntidadTipo = 1, 
                     Id_Entidad = 1, 
                     Id_Tipo = 1, 
-                    Fecha_Alta = new System.DateTime(1995,1,18), 
+                    Fecha_Alta = new DateTime(1995,1,18, 0, 0, 0), 
                     Estado = "INACTIVO" 
                 },
                 new EntidadTipo 
@@ -364,7 +375,7 @@ namespace Socios.Infrastructure.Context
                     Id_EntidadTipo = 2, 
                     Id_Entidad = 1, 
                     Id_Tipo = 3, 
-                    Fecha_Alta = new System.DateTime(2000,11,18), 
+                    Fecha_Alta = new DateTime(2000,11,18, 0, 0, 0), 
                     Estado = "ACTIVO" 
                 },
                 new EntidadTipo 
@@ -372,7 +383,7 @@ namespace Socios.Infrastructure.Context
                     Id_EntidadTipo = 3, 
                     Id_Entidad = 4, 
                     Id_Tipo = 3, 
-                    Fecha_Alta = new System.DateTime(2008,1,18), 
+                    Fecha_Alta = new DateTime(2008,1,18, 0, 0, 0), 
                     Estado = "INACTIVO" 
                 }
             );
@@ -383,14 +394,14 @@ namespace Socios.Infrastructure.Context
                 { 
                     Id_Baja = 1, 
                     Id_EntidadTipo = 1, 
-                    Fecha_Baja = new System.DateTime(2016,1,18), 
+                    Fecha_Baja = new DateTime(2016,1,18, 0, 0, 0), 
                     Motivo = "MORA" 
                 },
                 new EntidadBaja 
                 { 
                     Id_Baja = 2, 
                     Id_EntidadTipo = 3, 
-                    Fecha_Baja = new System.DateTime(2015,12,11), 
+                    Fecha_Baja = new DateTime(2015,12,11, 0, 0, 0), 
                     Motivo = "RENUNCIA" 
                 }
             );
@@ -505,7 +516,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "SOCIO",
                     Importe = 4500,
                     Tiene_EdadTope = true,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 },
                 new TipoCuota
                 {
@@ -513,7 +524,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "SEPELIO",
                     Importe = 10000,
                     Tiene_EdadTope = true,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 },
                 new TipoCuota
                 {
@@ -521,7 +532,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "SEPELIO",
                     Importe = 12000,
                     Tiene_EdadTope = true,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 },
                 new TipoCuota
                 {
@@ -529,7 +540,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "SEPELIO",
                     Importe = 12000,
                     Tiene_EdadTope = false,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 },
                 new TipoCuota
                 {
@@ -537,7 +548,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "SEPELIO",
                     Importe = 14000,
                     Tiene_EdadTope = false,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 },
                 new TipoCuota
                 {
@@ -545,7 +556,7 @@ namespace Socios.Infrastructure.Context
                     Concepto = "NICHO",
                     Importe = 300000,
                     Tiene_EdadTope = false,
-                    Fecha_ultimamodif = new DateTime(2026, 3, 10)
+                    Fecha_ultimamodif = new DateTime(2026, 3, 10, 0, 0, 0)
                 }
             );
 
@@ -592,7 +603,7 @@ namespace Socios.Infrastructure.Context
                     Id_TipoCuota = 1,
                     Monto = 4500,
                     FechaHoraGeneracion = new DateTime(2026, 6, 10, 8, 20, 0),
-                    FechaVencimiento = new DateTime(2026, 6, 30),
+                    FechaVencimiento = new DateTime(2026, 6, 30, 0, 0, 0),
                     Estado = "PAGADO"
                 },
                 new Cuota
@@ -604,7 +615,7 @@ namespace Socios.Infrastructure.Context
                     Id_TipoCuota = 1,
                     Monto = 4500,
                     FechaHoraGeneracion = new DateTime(2026, 6, 27, 8, 20, 0),
-                    FechaVencimiento = new DateTime(2026, 7, 30),
+                    FechaVencimiento = new DateTime(2026, 7, 30, 0, 0, 0),
                     Estado = "PENDIENTE"
                 }
             );

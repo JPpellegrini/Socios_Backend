@@ -18,6 +18,7 @@ namespace Socios.Infrastructure.Configurations
             builder.Property(e => e.Apellido).HasMaxLength(150);
             builder.Property(e => e.RazonSocial).HasMaxLength(250);
             builder.Property(e => e.Sexo).HasMaxLength(50);
+            builder.Property(e => e.Nacimiento).HasColumnType("date");
             builder.Property(e => e.Calle).HasMaxLength(200);
             builder.Property(e => e.Observacion).HasMaxLength(500);
 

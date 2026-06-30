@@ -11,7 +11,7 @@ namespace Socios.Infrastructure.Configurations
             builder.ToTable("entidad_tipos");
             builder.HasKey(e => e.Id_EntidadTipo);
 
-            builder.Property(e => e.Fecha_Alta).IsRequired();
+            builder.Property(e => e.Fecha_Alta).IsRequired().HasColumnType("date");
             builder.Property(e => e.Estado).IsRequired().HasMaxLength(50);
 
             builder.HasOne(e => e.Entidad)

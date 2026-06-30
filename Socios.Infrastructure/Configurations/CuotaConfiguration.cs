@@ -22,7 +22,7 @@ namespace Socios.Infrastructure.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Property(c => c.Monto).HasColumnType("decimal(18,2)");
             builder.Property(c => c.FechaHoraGeneracion).IsRequired();
-            builder.Property(c => c.FechaVencimiento).IsRequired();
+            builder.Property(c => c.FechaVencimiento).IsRequired().HasColumnType("date");
             builder.Property(c => c.Estado).IsRequired().HasMaxLength(20);
             builder.HasOne(s => s.Caja)
                 .WithMany()
