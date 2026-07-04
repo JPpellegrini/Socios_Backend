@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
 using Socios.Domain.Entities;
 using Socios.Infrastructure.Context;
@@ -47,6 +48,37 @@ namespace Socios.Infrastructure.Repositories
         {
             _context.Update(entidad);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<EntidadDto> BuscarAsync(EntidadFiltroDto filtro)
+        {
+            var query =
+                from e in _context.Entidades
+                join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
+                select new { e, c };
+
+            var busqueda = filtro.Dni?.Trim();
+            if (!string.IsNullOrEmpty(busqueda))
+                query = query.Where(x => (x.e.Dni == busqueda));
+            
+            return await query.Select(x => new EntidadDto
+            {
+                Id_Entidad = x.e.Id_Entidad,
+                CuitCuil = x.e.CuitCuil,
+                Nombre = x.e.Nombre,
+                Apellido = x.e.Apellido,
+                RazonSocial = x.e.RazonSocial,
+                Sexo = x.e.Sexo,
+                Nacimiento = x.e.Nacimiento,
+                Ciudad = new Ciudad
+                {
+                    Id_Ciudad = x.c.Id_Ciudad,
+                    Nombre = x.c.Nombre
+                },
+                Calle = x.e.Calle,
+                Altura = x.e.Altura,
+                Observacion = x.e.Observacion
+            }).FirstOrDefaultAsync() ?? new EntidadDto();
         }
     }
 }

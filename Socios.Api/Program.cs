@@ -51,6 +51,7 @@ builder.Services.AddDbContext<SociosDbContext>(options =>
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
 builder.Services.AddScoped<ISocioRepository, SocioRepository>();
+builder.Services.AddScoped<IEntidadRepository, EntidadRepository>();
 
 #endregion
 
