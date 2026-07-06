@@ -50,7 +50,7 @@ namespace Socios.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<EntidadDto> BuscarAsync(EntidadFiltroDto filtro)
+        public async Task<EntidadDto?> BuscarAsync(EntidadFiltroDto filtro)
         {
             var query =
                 from e in _context.Entidades
@@ -79,7 +79,7 @@ namespace Socios.Infrastructure.Repositories
                 Calle = x.e.Calle,
                 Altura = x.e.Altura,
                 Observacion = x.e.Observacion
-            }).FirstOrDefaultAsync() ?? new EntidadDto();
+            }).FirstOrDefaultAsync();
         }
     }
 }

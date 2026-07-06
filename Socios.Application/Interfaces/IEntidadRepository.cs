@@ -12,6 +12,6 @@ namespace Socios.Application.Interfaces
         Task<Entidad> AddAsync(Entidad entidad);
         Task UpdateAsync(Entidad entidad);
         Task DeleteAsync(int id);
-        Task<EntidadDto> BuscarAsync(EntidadFiltroDto filtro);
+        Task<EntidadDto?> BuscarAsync(EntidadFiltroDto filtro);
     }
 }

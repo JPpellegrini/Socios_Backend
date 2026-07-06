@@ -28,6 +28,9 @@ namespace Socios.Api.Controllers
         {
             var entidad = await _entidadRepository.BuscarAsync(filtro);
 
+            if (entidad == null)
+                return NotFound("Entidad no encontrada.");
+
             return Ok(entidad);
         }
     }
