@@ -94,5 +94,77 @@ namespace Socios.Infrastructure.Repositories
                     Estado = x.et.Estado
                 }).ToListAsync();
         }
+
+        public async Task<int> CrearAsync(SocioCrearDto dto)
+        {
+            // Se identifica el TipoEntidad "Socio" para crear su EntidadTipo.
+            var tipoSocio = await _context.TiposEntidad
+                .FirstOrDefaultAsync(t => t.NombreTipoEntidad == "Socio")
+                ?? throw new InvalidOperationException("No existe el TipoEntidad 'Socio'.");
+
+            // Una única instancia de Entidad compartida por las navegaciones: EF la inserta
+            // una sola vez y completa las FK (Socio, EntidadTipo y Contactos).
+            var entidad = new Entidad
+            {
+                Tipo = string.IsNullOrWhiteSpace(dto.TipoDocumento) ? "DNI" : dto.TipoDocumento!.Trim(),
+                Dni = dto.Dni.Trim(),
+                Nombre = dto.Nombre.Trim(),
+                Apellido = dto.Apellido.Trim(),
+                Nacimiento = dto.FechaNacimiento,
+                Id_Ciudad = dto.IdCiudad!.Value,
+                Calle = dto.Calle.Trim(),
+                Altura = dto.Altura,
+                Observacion = dto.Observaciones?.Trim()
+            };
+
+            var socio = new Socio
+            {
+                Entidad = entidad,
+                Id_OS = dto.IdObraSocial,
+                Plan = dto.Plan,
+                Sepelio = dto.Sepelio,
+                Cobrador = dto.Cobrador,
+                Numero_Afiliado = dto.NumeroAfiliado?.Trim()
+            };
+
+            var entidadTipo = new EntidadTipo
+            {
+                Entidad = entidad,
+                Id_Tipo = tipoSocio.Id_Tipo,
+                Fecha_Alta = DateTime.Today,
+                Estado = "ACTIVO"
+            };
+
+            _context.Socios.Add(socio);
+            _context.EntidadTipos.Add(entidadTipo);
+
+            foreach (var telefono in dto.Telefonos)
+            {
+                _context.Contactos.Add(new Contacto
+                {
+                    Entidad = entidad,
+                    Tipo = "Telefono",
+                    ContactoEntidad = telefono.Trim()
+                });
+            }
+
+            if (dto.Emails != null)
+            {
+                foreach (var email in dto.Emails)
+                {
+                    _context.Contactos.Add(new Contacto
+                    {
+                        Entidad = entidad,
+                        Tipo = "Mail",
+                        ContactoEntidad = email.Trim()
+                    });
+                }
+            }
+
+            // Un único SaveChanges = una sola transacción para toda la cascada.
+            await _context.SaveChangesAsync();
+
+            return socio.Id_Socio;
+        }
     }
 }

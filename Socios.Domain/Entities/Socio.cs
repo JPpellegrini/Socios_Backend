@@ -4,7 +4,7 @@ namespace Socios.Domain.Entities
     {
         public int Id_Socio { get; set; }
         public int Id_Entidad { get; set; }
-        public int Id_OS { get; set; }
+        public int? Id_OS { get; set; }
         public string? Plan { get; set; }
         public string? Sepelio { get; set; }
         public string? Cobrador { get; set; }

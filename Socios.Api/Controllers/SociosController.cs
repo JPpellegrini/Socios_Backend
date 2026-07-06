@@ -31,5 +31,19 @@ namespace Socios.Api.Controllers
 
             return Ok(socios);
         }
+
+        /// <summary>
+        /// Da de alta un socio (crea en cascada la Entidad, el Socio, su EntidadTipo
+        /// tipo "Socio" con Estado ACTIVO y los Contactos).
+        /// Las validaciones de los campos las aplica [ApiController] automáticamente
+        /// (devuelve 400 con el detalle si el modelo es inválido).
+        /// </summary>
+        [HttpPost("crear")]
+        public async Task<IActionResult> CrearSocioAsync([FromBody] SocioCrearDto dto)
+        {
+            var idSocio = await _socioRepository.CrearAsync(dto);
+
+            return Created($"/api/v1/socios/{idSocio}", new { idSocio });
+        }
     }
 }
