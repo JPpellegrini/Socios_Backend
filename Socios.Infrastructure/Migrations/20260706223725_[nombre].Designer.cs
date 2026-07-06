@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Socios.Infrastructure.Context;
@@ -11,9 +12,11 @@ using Socios.Infrastructure.Context;
 namespace Socios.Infrastructure.Migrations
 {
     [DbContext(typeof(SociosDbContext))]
-    partial class SociosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260706223725_[nombre]")]
+    partial class nombre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1249,7 +1252,7 @@ namespace Socios.Infrastructure.Migrations
                     b.Property<int>("Id_Entidad")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Id_OS")
+                    b.Property<int>("Id_OS")
                         .HasColumnType("integer");
 
                     b.Property<string>("Numero_Afiliado")
@@ -1733,7 +1736,8 @@ namespace Socios.Infrastructure.Migrations
                     b.HasOne("Socios.Domain.Entities.ObraSocial", "ObraSocial")
                         .WithMany()
                         .HasForeignKey("Id_OS")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Entidad");
 
