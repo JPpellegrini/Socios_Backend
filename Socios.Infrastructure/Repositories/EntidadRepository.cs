@@ -58,6 +58,7 @@ namespace Socios.Infrastructure.Repositories
                 select new { e, c };
 
             var busqueda = filtro.Dni?.Trim();
+
             if (!string.IsNullOrEmpty(busqueda))
                 query = query.Where(x => (x.e.Dni == busqueda));
             

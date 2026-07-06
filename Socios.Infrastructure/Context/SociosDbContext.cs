@@ -545,6 +545,86 @@ namespace Socios.Infrastructure.Context
                     Id_Tipo = 3, 
                     Fecha_Alta = new DateTime(2008,1,18, 0, 0, 0), 
                     Estado = "INACTIVO" 
+                },
+                                new EntidadTipo 
+                {   
+                    Id_EntidadTipo = 4, 
+                    Id_Entidad = 5, 
+                    Id_Tipo = 1, 
+                    Fecha_Alta = new DateTime(1995,1,18, 0, 0, 0), 
+                    Estado = "ACTIVO" 
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 5,
+                    Id_Entidad = 6,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2020, 3, 15),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 6,
+                    Id_Entidad = 7,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2021, 7, 22),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 7,
+                    Id_Entidad = 8,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2022, 11, 5),
+                    Estado = "INACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 8,
+                    Id_Entidad = 9,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2023, 1, 10),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 9,
+                    Id_Entidad = 10,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2024, 6, 18),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 10,
+                    Id_Entidad = 11,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2020, 9, 30),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 11,
+                    Id_Entidad = 12,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2021, 12, 25),
+                    Estado = "INACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 12,
+                    Id_Entidad = 13,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2022, 4, 8),
+                    Estado = "ACTIVO"
+                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 13,
+                    Id_Entidad = 14,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(2025, 2, 14),
+                    Estado = "ACTIVO"
                 }
             );
 
