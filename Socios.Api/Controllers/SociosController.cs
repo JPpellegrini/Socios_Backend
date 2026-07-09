@@ -42,8 +42,8 @@ namespace Socios.Api.Controllers
         public async Task<IActionResult> CrearSocioAsync([FromBody] SocioCrearDto dto)
         {
             var idSocio = await _socioRepository.CrearAsync(dto);
-
-            return Created($"/api/v1/socios/{idSocio}", new { idSocio });
+            
+            return Ok( new { idSocio } );
         }
     }
 }

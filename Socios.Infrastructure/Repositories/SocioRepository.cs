@@ -106,7 +106,7 @@ namespace Socios.Infrastructure.Repositories
             // una sola vez y completa las FK (Socio, EntidadTipo y Contactos).
             var entidad = new Entidad
             {
-                Tipo = string.IsNullOrWhiteSpace(dto.TipoDocumento) ? "DNI" : dto.TipoDocumento!.Trim(),
+                Tipo = "DNI",
                 Dni = dto.Dni.Trim(),
                 Nombre = dto.Nombre.Trim(),
                 Apellido = dto.Apellido.Trim(),

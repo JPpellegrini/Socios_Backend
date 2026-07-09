@@ -15,10 +15,6 @@ namespace Socios.Application.Interfaces
 
         Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
 
-        /// <summary>
-        /// Da de alta un socio en cascada (Entidad + Socio + EntidadTipo + Contactos)
-        /// dentro de una única transacción. Devuelve el Id_Socio generado.
-        /// </summary>
         Task<int> CrearAsync(SocioCrearDto dto);
     }
 }
