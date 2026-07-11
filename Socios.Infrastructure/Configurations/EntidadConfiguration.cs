@@ -26,6 +26,8 @@ namespace Socios.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(e => e.Id_Ciudad)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(e => e.Dni).IsUnique();
         }
     }
 }
