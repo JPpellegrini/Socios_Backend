@@ -97,13 +97,6 @@ namespace Socios.Infrastructure.Repositories
 
         public async Task<int> CrearAsync(SocioCrearDto dto)
         {
-            // Se identifica el TipoEntidad "Socio" para crear su EntidadTipo.
-            var tipoSocio = await _context.TiposEntidad
-                .FirstOrDefaultAsync(t => t.NombreTipoEntidad == "Socio")
-                ?? throw new InvalidOperationException("No existe el TipoEntidad 'Socio'.");
-
-            // Una única instancia de Entidad compartida por las navegaciones: EF la inserta
-            // una sola vez y completa las FK (Socio, EntidadTipo y Contactos).
             var entidad = new Entidad
             {
                 Tipo = "DNI",
@@ -130,7 +123,7 @@ namespace Socios.Infrastructure.Repositories
             var entidadTipo = new EntidadTipo
             {
                 Entidad = entidad,
-                Id_Tipo = tipoSocio.Id_Tipo,
+                Id_Tipo = 1, //Id del tipo "Socio" en la tabla TiposEntidad
                 Fecha_Alta = DateTime.Today,
                 Estado = "ACTIVO"
             };
@@ -143,7 +136,7 @@ namespace Socios.Infrastructure.Repositories
                 _context.Contactos.Add(new Contacto
                 {
                     Entidad = entidad,
-                    Tipo = "Telefono",
+                    Tipo = "TELEFONO",
                     ContactoEntidad = telefono.Trim()
                 });
             }
@@ -155,13 +148,12 @@ namespace Socios.Infrastructure.Repositories
                     _context.Contactos.Add(new Contacto
                     {
                         Entidad = entidad,
-                        Tipo = "Mail",
+                        Tipo = "MAIL",
                         ContactoEntidad = email.Trim()
                     });
                 }
             }
 
-            // Un único SaveChanges = una sola transacción para toda la cascada.
             await _context.SaveChangesAsync();
 
             return socio.Id_Socio;
