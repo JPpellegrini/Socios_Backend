@@ -41,9 +41,19 @@ namespace Socios.Api.Controllers
         [HttpPost("crear")]
         public async Task<IActionResult> CrearSocioAsync([FromBody] SocioCrearDto dto)
         {
-            var idSocio = await _socioRepository.CrearAsync(dto);
-            
-            return Ok( new { idSocio } );
+            try
+            {
+                var idSocio = await _socioRepository.CrearAsync(dto);
+
+                return Ok(new { idSocio });
+            }
+            catch(Exception ex)
+            {
+                if(ex.InnerException.Message.Contains("23505"))
+                    return BadRequest("El socio ya existe.");
+
+                return BadRequest("Error inesperado al crear el socio.");
+            }
         }
     }
 }
