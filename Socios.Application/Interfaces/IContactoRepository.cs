@@ -11,5 +11,8 @@ namespace Socios.Application.Interfaces
         Task<Contacto> AddAsync(Contacto contacto);
         Task UpdateAsync(Contacto contacto);
         Task DeleteAsync(int idContacto);
+
+        /// <summary>Marca el contacto para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
+        void Agregar(Contacto contacto);
     }
 }

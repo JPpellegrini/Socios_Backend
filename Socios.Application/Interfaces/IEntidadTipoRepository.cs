@@ -11,5 +11,8 @@ namespace Socios.Application.Interfaces
         Task<EntidadTipo> AddAsync(EntidadTipo entidadTipo);
         Task UpdateAsync(EntidadTipo entidadTipo);
         Task DeleteAsync(int idEntidad, int idTipo);
+
+        /// <summary>Marca el registro para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
+        void Agregar(EntidadTipo entidadTipo);
     }
 }

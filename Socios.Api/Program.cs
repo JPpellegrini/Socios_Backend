@@ -4,6 +4,10 @@ using Socios.Infrastructure.Context;
 using Socios.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Socios.Api.Authentication;
+using Socios.Api.Middleware;
+using Socios.Application.Abstractions;
+using Socios.Application.UseCases.Socios;
+using Socios.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,10 +52,18 @@ builder.Services.AddDbContext<SociosDbContext>(options =>
 
 #region Inyecciones de dependencias
 
+// Repositorios (uno por entidad, cada uno se ocupa solo de su tabla)
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
 builder.Services.AddScoped<ISocioRepository, SocioRepository>();
 builder.Services.AddScoped<IEntidadRepository, EntidadRepository>();
+builder.Services.AddScoped<IEntidadTipoRepository, EntidadTipoRepository>();
+builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
+builder.Services.AddScoped<ITipoEntidadRepository, TipoEntidadRepository>();
+
+// Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICrearSocioUseCase, CrearSocioUseCase>();
 
 #endregion
 
@@ -65,6 +77,10 @@ builder.Services.AddAuthentication("BasicAuthentication")
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// Middleware de manejo de errores: va primero (lo más "afuera") para atrapar
+// cualquier excepción que ocurra más adentro y devolver una respuesta prolija.
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

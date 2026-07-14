@@ -48,5 +48,11 @@ namespace Socios.Infrastructure.Repositories
             _context.Update(contacto);
             await _context.SaveChangesAsync();
         }
+
+        public void Agregar(Contacto contacto)
+        {
+            // Solo marca el contacto para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Contactos.Add(contacto);
+        }
     }
 }

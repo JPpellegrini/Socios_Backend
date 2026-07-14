@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using Socios.Application.UseCases.Socios;
 
 namespace Socios.Api.Controllers
 {
@@ -11,10 +12,12 @@ namespace Socios.Api.Controllers
     public class SociosController : ControllerBase
     {
         private readonly ISocioRepository _socioRepository;
+        private readonly ICrearSocioUseCase _crearSocioUseCase;
 
-        public SociosController(ISocioRepository socioRepository)
+        public SociosController(ISocioRepository socioRepository, ICrearSocioUseCase crearSocioUseCase)
         {
             _socioRepository = socioRepository;
+            _crearSocioUseCase = crearSocioUseCase;
         }
 
         /// <summary>
@@ -33,27 +36,20 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
-        /// Da de alta un socio (crea en cascada la Entidad, el Socio, su EntidadTipo
-        /// tipo "Socio" con Estado ACTIVO y los Contactos).
-        /// Las validaciones de los campos las aplica [ApiController] automáticamente
-        /// (devuelve 400 con el detalle si el modelo es inválido).
+        /// Da de alta un socio. La orquestación (crear o reutilizar la entidad, evitar
+        /// duplicados, armar el socio + tipo + contactos y confirmar todo en una sola
+        /// transacción) vive en el caso de uso, no acá.
+        ///
+        /// El controlador solo recibe la solicitud y devuelve la respuesta:
+        ///   - Las validaciones de formato las aplica [ApiController] → 400 automático.
+        ///   - Las reglas de negocio (ej: "ya es socio") las maneja el ExceptionMiddleware → 409.
         /// </summary>
         [HttpPost("crear")]
         public async Task<IActionResult> CrearSocioAsync([FromBody] SocioCrearDto dto)
         {
-            try
-            {
-                var idSocio = await _socioRepository.CrearAsync(dto);
+            var idSocio = await _crearSocioUseCase.EjecutarAsync(dto);
 
-                return Ok(new { idSocio });
-            }
-            catch(Exception ex)
-            {
-                if(ex.InnerException.Message.Contains("23505"))
-                    return BadRequest("El socio ya existe.");
-
-                return BadRequest("Error inesperado al crear el socio.");
-            }
+            return Ok(new { idSocio });
         }
     }
 }
