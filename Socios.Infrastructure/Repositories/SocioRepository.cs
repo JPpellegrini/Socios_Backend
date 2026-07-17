@@ -95,68 +95,16 @@ namespace Socios.Infrastructure.Repositories
                 }).ToListAsync();
         }
 
-        public async Task<int> CrearAsync(SocioCrearDto dto)
+        public async Task<bool> EsSocioAsync(int idEntidad)
         {
-            var entidad = new Entidad
-            {
-                Tipo = "DNI",
-                Dni = dto.Dni.Trim(),
-                Nombre = dto.Nombre.Trim(),
-                Apellido = dto.Apellido.Trim(),
-                Nacimiento = dto.FechaNacimiento,
-                Id_Ciudad = dto.IdCiudad!.Value,
-                Calle = dto.Calle.Trim(),
-                Altura = dto.Altura,
-                Observacion = dto.Observaciones?.Trim()
-            };
+            // Es socio si ya existe una fila en la tabla socios para esa entidad.
+            return await _context.Socios.AnyAsync(s => s.Id_Entidad == idEntidad);
+        }
 
-            var socio = new Socio
-            {
-                Entidad = entidad,
-                Id_OS = dto.IdObraSocial,
-                Plan = dto.Plan,
-                Sepelio = dto.Sepelio,
-                Cobrador = dto.Cobrador,
-                Numero_Afiliado = dto.NumeroAfiliado?.Trim()
-            };
-
-            var entidadTipo = new EntidadTipo
-            {
-                Entidad = entidad,
-                Id_Tipo = 1, //Id del tipo "Socio" en la tabla TiposEntidad
-                Fecha_Alta = DateTime.Today,
-                Estado = "ACTIVO"
-            };
-
+        public void Agregar(Socio socio)
+        {
+            // Solo marca el socio para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Socios.Add(socio);
-            _context.EntidadTipos.Add(entidadTipo);
-
-            foreach (var telefono in dto.Telefonos)
-            {
-                _context.Contactos.Add(new Contacto
-                {
-                    Entidad = entidad,
-                    Tipo = "TELEFONO",
-                    ContactoEntidad = telefono.Trim()
-                });
-            }
-
-            if (dto.Emails != null)
-            {
-                foreach (var email in dto.Emails)
-                {
-                    _context.Contactos.Add(new Contacto
-                    {
-                        Entidad = entidad,
-                        Tipo = "MAIL",
-                        ContactoEntidad = email.Trim()
-                    });
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
-            return socio.Id_Socio;
         }
 
         public async Task DarDeBajaAsync(int idSocio, SocioBajaDto dto)

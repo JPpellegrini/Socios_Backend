@@ -50,6 +50,17 @@ namespace Socios.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Entidad?> ObtenerPorDniAsync(string dni)
+        {
+            return await _context.Entidades.FirstOrDefaultAsync(e => e.Dni == dni);
+        }
+
+        public void Agregar(Entidad entidad)
+        {
+            // Solo marca la entidad para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Entidades.Add(entidad);
+        }
+
         public async Task<EntidadDto?> BuscarAsync(EntidadFiltroDto filtro)
         {
             var query =

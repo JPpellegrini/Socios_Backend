@@ -48,5 +48,11 @@ namespace Socios.Infrastructure.Repositories
             _context.Update(entidadTipo);
             await _context.SaveChangesAsync();
         }
+
+        public void Agregar(EntidadTipo entidadTipo)
+        {
+            // Solo marca el registro para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.EntidadTipos.Add(entidadTipo);
+        }
     }
 }

@@ -19,5 +19,10 @@ namespace Socios.Application.Interfaces
 
         Task DarDeBajaAsync(int idSocio, SocioBajaDto dto);
 
+        /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>
+        Task<bool> EsSocioAsync(int idEntidad);
+
+        /// <summary>Marca el socio para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
+        void Agregar(Socio socio);
     }
 }
