@@ -158,5 +158,34 @@ namespace Socios.Infrastructure.Repositories
 
             return socio.Id_Socio;
         }
+
+        public async Task DarDeBajaAsync(int idSocio, SocioBajaDto dto)
+        {
+            var socio = await (
+                from s in _context.Socios
+                join et in _context.EntidadTipos on s.Id_Entidad equals et.Id_Entidad
+                join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
+                where s.Id_Socio == idSocio && t.NombreTipoEntidad == "Socio"
+                select new { s, et }
+            ).FirstOrDefaultAsync();
+
+            if (socio == null)
+                throw new Exception("No se encontró el socio con ese Id.");
+
+            socio.et.Estado = "INACTIVO";
+
+            var baja = new EntidadBaja
+            {
+                Id_EntidadTipo = socio.et.Id_EntidadTipo,
+                Fecha_Baja = DateTime.Now,
+                Motivo = dto.Motivo
+            };
+
+            _context.EntidadBajas.Add(baja);
+
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 }

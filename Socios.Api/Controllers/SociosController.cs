@@ -55,5 +55,24 @@ namespace Socios.Api.Controllers
                 return BadRequest("Error inesperado al crear el socio.");
             }
         }
+
+        /// <summary>
+        /// Da de baja un socio: cambia su estado a INACTIVO en EntidadTipo
+        /// y registra la baja en EntidadBajas con fecha y motivo.
+        /// </summary>
+        [HttpPost("baja/{idSocio}")]
+        public async Task<IActionResult> DarDeBajaSocioAsync(int idSocio, [FromBody] SocioBajaDto dto)
+        {
+            try
+            {
+                await _socioRepository.DarDeBajaAsync(idSocio, dto);
+                return Ok(new { mensaje = "El socio fue dado de baja correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
     }
 }

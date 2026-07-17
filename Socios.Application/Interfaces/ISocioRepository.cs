@@ -16,5 +16,8 @@ namespace Socios.Application.Interfaces
         Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
 
         Task<int> CrearAsync(SocioCrearDto dto);
+
+        Task DarDeBajaAsync(int idSocio, SocioBajaDto dto);
+
     }
 }
