@@ -499,17 +499,16 @@ namespace Socios.Infrastructure.Context
             // Seed de Socios de prueba
             modelBuilder.Entity<Socio>().HasData(
                 new Socio { Id_Socio = 1, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 4, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 5, Id_Entidad = 1, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 6, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "NO", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 7, Id_Entidad = 1, Id_OS = 1, Plan = "B", Sepelio = "SI", Cobrador = "SI", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 8, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "SI", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 9, Id_Entidad = 1, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 10, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 11, Id_Entidad = 1, Id_OS = 1, Plan = "B", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 12, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 13, Id_Entidad = 1, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" },
-                new Socio { Id_Socio = 14, Id_Entidad = 1, Id_OS = 1, Plan = "A", Sepelio = "NO", Cobrador = "NO", Numero_Afiliado = "" }
+                new Socio { Id_Socio = 4, Id_Entidad = 5, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 5, Id_Entidad = 6, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 6, Id_Entidad = 7, Id_OS = 1, Plan = "A", Sepelio = "NO", Cobrador = "NO", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 7, Id_Entidad = 8, Id_OS = 1, Plan = "B", Sepelio = "SI", Cobrador = "SI", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 8, Id_Entidad = 9, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "SI", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 9, Id_Entidad = 10, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "NO", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 10, Id_Entidad = 11, Id_OS = 1, Plan = "A", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 11, Id_Entidad = 12, Id_OS = 1, Plan = "B", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 12, Id_Entidad = 13, Id_OS = 1, Plan = "A", Sepelio = "SI", Cobrador = "NO", Numero_Afiliado = "" },
+                new Socio { Id_Socio = 13, Id_Entidad = 14, Id_OS = 1, Plan = "B", Sepelio = "NO", Cobrador = "SI", Numero_Afiliado = "" }
             );
 
             // Seed de Codeudores de prueba
