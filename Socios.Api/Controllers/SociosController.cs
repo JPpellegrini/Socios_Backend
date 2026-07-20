@@ -56,18 +56,12 @@ namespace Socios.Api.Controllers
         /// Da de baja un socio: cambia su estado a INACTIVO en EntidadTipo
         /// y registra la baja en EntidadBajas con fecha y motivo.
         /// </summary>
-        [HttpPost("baja/{idSocio}")]
-        public async Task<IActionResult> DarDeBajaSocioAsync(int idSocio, [FromBody] SocioBajaDto dto)
+        [HttpPost("baja")]
+        public async Task<IActionResult> DarDeBajaSocioAsync([FromBody] SocioBajaDto dto)
         {
-            try
-            {
-                await _socioRepository.DarDeBajaAsync(idSocio, dto);
-                return Ok(new { mensaje = "El socio fue dado de baja correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            await _socioRepository.DarDeBajaAsync(dto);
+
+            return Ok(new { mensaje = "El socio fue dado de baja correctamente." });
         }
 
     }

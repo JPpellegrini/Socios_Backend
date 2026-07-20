@@ -107,13 +107,12 @@ namespace Socios.Infrastructure.Repositories
             _context.Socios.Add(socio);
         }
 
-        public async Task DarDeBajaAsync(int idSocio, SocioBajaDto dto)
+        public async Task DarDeBajaAsync(SocioBajaDto dto)
         {
             var socio = await (
                 from s in _context.Socios
                 join et in _context.EntidadTipos on s.Id_Entidad equals et.Id_Entidad
-                join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
-                where s.Id_Socio == idSocio && t.NombreTipoEntidad == "Socio"
+                where s.Id_Socio == dto.IdSocio && et.Id_Tipo == 1
                 select new { s, et }
             ).FirstOrDefaultAsync();
 
@@ -130,6 +129,7 @@ namespace Socios.Infrastructure.Repositories
             };
 
             _context.EntidadBajas.Add(baja);
+            _context.EntidadTipos.Update(socio.et);
 
             await _context.SaveChangesAsync();
         }
