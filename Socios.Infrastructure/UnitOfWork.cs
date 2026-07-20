@@ -1,4 +1,4 @@
-using Socios.Application.Abstractions;
+using Socios.Application.Interfaces;
 using Socios.Infrastructure.Context;
 
 namespace Socios.Infrastructure

@@ -5,7 +5,6 @@ using Socios.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
-using Socios.Application.Abstractions;
 using Socios.Application.UseCases.Socios;
 using Socios.Infrastructure;
 

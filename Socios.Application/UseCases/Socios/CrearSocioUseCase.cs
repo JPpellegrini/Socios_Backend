@@ -1,4 +1,3 @@
-using Socios.Application.Abstractions;
 using Socios.Application.DTOs;
 using Socios.Application.Exceptions;
 using Socios.Application.Interfaces;
@@ -55,21 +54,31 @@ namespace Socios.Application.UseCases.Socios
             if (entidad is null)
             {
                 // No existe → la creamos a partir de los datos del formulario.
-                entidad = ConstruirEntidad(dto, dni);
+                entidad = new Entidad
+                {
+                    Tipo = "DNI",
+                    Dni = dni,
+                    Nombre = dto.Nombre.Trim(),
+                    Apellido = dto.Apellido.Trim(),
+                    Nacimiento = dto.FechaNacimiento,
+                    Id_Ciudad = dto.IdCiudad!.Value,
+                    Calle = dto.Calle.Trim(),
+                    Altura = dto.Altura,
+                    Observacion = dto.Observaciones?.Trim()
+                };
+
                 _entidades.Agregar(entidad);
             }
-            else if (await _socios.EsSocioAsync(entidad.Id_Entidad))
+
+            var esSocio = await _socios.EsSocioAsync(entidad.Id_Entidad);
+
+            if (esSocio)
             {
                 // Existe y ya es socio → no se puede dar de alta dos veces.
                 throw new ReglaNegocioException("Ya existe un socio registrado con ese DNI.");
             }
-            // (Si existe pero NO es socio, la reutilizamos tal cual: no se duplica la entidad.)
 
-            // 2) Buscamos el id del tipo "Socio" en vez de dejar un número mágico en el código.
-            var idTipoSocio = await _tiposEntidad.ObtenerIdPorNombreAsync("Socio")
-                ?? throw new InvalidOperationException("No está configurado el tipo de entidad 'Socio'.");
-
-            // 3) Colgamos de esa entidad el socio, su tipo (ACTIVO) y los contactos.
+            // 2) Colgamos de esa entidad el socio, su tipo (ACTIVO) y los contactos.
             //    Al compartir la misma instancia de 'entidad', EF resuelve solo las claves foráneas.
             var socio = new Socio
             {
@@ -85,33 +94,19 @@ namespace Socios.Application.UseCases.Socios
             _entidadesTipo.Agregar(new EntidadTipo
             {
                 Entidad = entidad,
-                Id_Tipo = idTipoSocio,
+                Id_Tipo = 1,
                 Fecha_Alta = DateTime.Today,
                 Estado = "ACTIVO"
             });
 
             AgregarContactos(entidad, dto);
 
-            // 4) Recién acá se confirma TODO junto (una sola transacción: todo o nada).
+            // 3) Recién acá se confirma TODO junto (una sola transacción: todo o nada).
             await _unitOfWork.GuardarCambiosAsync();
 
             // El id se completa después de guardar.
             return socio.Id_Socio;
         }
-
-        /// <summary>Arma una nueva Entidad con los datos del formulario.</summary>
-        private static Entidad ConstruirEntidad(SocioCrearDto dto, string dni) => new()
-        {
-            Tipo = "DNI",
-            Dni = dni,
-            Nombre = dto.Nombre.Trim(),
-            Apellido = dto.Apellido.Trim(),
-            Nacimiento = dto.FechaNacimiento,
-            Id_Ciudad = dto.IdCiudad!.Value,
-            Calle = dto.Calle.Trim(),
-            Altura = dto.Altura,
-            Observacion = dto.Observaciones?.Trim()
-        };
 
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
         private void AgregarContactos(Entidad entidad, SocioCrearDto dto)

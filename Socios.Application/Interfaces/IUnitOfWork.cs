@@ -1,4 +1,4 @@
-namespace Socios.Application.Abstractions
+namespace Socios.Application.Interfaces
 {
     /// <summary>
     /// Representa una "unidad de trabajo".
