@@ -6,20 +6,11 @@ using Socios.Domain.Entities;
 namespace Socios.Application.UseCases.Socios
 {
     /// <summary>
-    /// Orquesta el alta de un socio respetando las reglas del negocio.
-    ///
-    /// Reglas que aplica:
-    ///   - Si la entidad (la persona) NO existe todavía  → la crea.
-    ///   - Si la entidad YA existe y todavía NO es socio → la reutiliza (no la duplica).
-    ///   - Si la entidad YA existe y YA es socio         → corta con un error de negocio.
-    ///
-    /// En todos los casos, al final crea el Socio, su registro de tipo "Socio" (ACTIVO)
-    /// y los contactos, y confirma TODO junto en una única transacción.
-    ///
-    /// Fijate que esta clase decide y coordina, pero NO habla con la base de datos:
-    /// eso se lo delega a los repositorios y a la unidad de trabajo. Cada uno en lo suyo.
+    /// Reúne los casos de uso del socio. Cada método coordina QUÉ hay que hacer,
+    /// pero NO habla directamente con la base de datos: eso se lo delega a los
+    /// repositorios y a la unidad de trabajo. Cada capa en lo suyo.
     /// </summary>
-    public class CrearSocioUseCase : ICrearSocioUseCase
+    public class SocioUseCase : ISocioUseCase
     {
         private readonly IEntidadRepository _entidades;
         private readonly ISocioRepository _socios;
@@ -28,7 +19,7 @@ namespace Socios.Application.UseCases.Socios
         private readonly ITipoEntidadRepository _tiposEntidad;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CrearSocioUseCase(
+        public SocioUseCase(
             IEntidadRepository entidades,
             ISocioRepository socios,
             IEntidadTipoRepository entidadesTipo,
@@ -44,7 +35,15 @@ namespace Socios.Application.UseCases.Socios
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<int> EjecutarAsync(SocioCrearDto dto)
+        /// <summary>
+        /// Alta de socio. Reglas:
+        ///   - Si la entidad (persona) NO existe → la crea.
+        ///   - Si YA existe y todavía NO es socio → la reutiliza (no la duplica).
+        ///   - Si YA existe y YA es socio → corta con un error de negocio.
+        /// Al final crea el Socio, su tipo "Socio" (ACTIVO) y los contactos, y confirma
+        /// TODO junto en una única transacción.
+        /// </summary>
+        public async Task<int> CrearAsync(SocioCrearDto dto)
         {
             var dni = dto.Dni.Trim();
 
@@ -89,6 +88,7 @@ namespace Socios.Application.UseCases.Socios
                 Cobrador = dto.Cobrador,
                 Numero_Afiliado = dto.NumeroAfiliado?.Trim()
             };
+
             _socios.Agregar(socio);
 
             _entidadesTipo.Agregar(new EntidadTipo
@@ -106,6 +106,16 @@ namespace Socios.Application.UseCases.Socios
 
             // El id se completa después de guardar.
             return socio.Id_Socio;
+        }
+
+        /// <summary>
+        /// Visualizar un socio. Es una lectura pura: no hay reglas ni transacción, así que
+        /// el trabajo (la consulta que arma el detalle) vive en el repositorio. Acá solo
+        /// se delega, para mantener un único punto de entrada de las operaciones del socio.
+        /// </summary>
+        public async Task<SocioDetalleDto?> VisualizarAsync(int idSocio)
+        {
+            return await _socios.ObtenerDetalleAsync(idSocio);
         }
 
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>

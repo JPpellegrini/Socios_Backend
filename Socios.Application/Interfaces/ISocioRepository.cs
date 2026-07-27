@@ -15,6 +15,9 @@ namespace Socios.Application.Interfaces
 
         Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
 
+        /// <summary>Trae todos los datos de un socio para visualizarlo, o null si no existe.</summary>
+        Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio);
+
         Task DarDeBajaAsync(SocioBajaDto dto);
 
         /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>

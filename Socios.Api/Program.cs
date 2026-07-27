@@ -62,7 +62,7 @@ builder.Services.AddScoped<ITipoEntidadRepository, TipoEntidadRepository>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICrearSocioUseCase, CrearSocioUseCase>();
+builder.Services.AddScoped<ISocioUseCase, SocioUseCase>();
 
 #endregion
 
