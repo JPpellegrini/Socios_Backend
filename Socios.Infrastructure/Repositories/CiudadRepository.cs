@@ -30,7 +30,7 @@ namespace Socios.Infrastructure.Repositories
                 return new List<CiudadListadoDto>();
 
             return await _context.Ciudades
-                .Where(c => EF.Functions.Like(c.Nombre, $"%{filtro.Busqueda.Trim()}%"))
+                .Where(c => EF.Functions.Like(c.Nombre.ToUpper(), $"%{filtro.Busqueda.Trim().ToUpper()}%"))
                 .Select(c => new CiudadListadoDto
                 {
                     Id_Ciudad = c.Id_Ciudad,
