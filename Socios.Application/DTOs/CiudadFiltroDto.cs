@@ -8,5 +8,10 @@ namespace Socios.Application.DTOs
     {
         /// <summary>Texto que busca (contiene) por Nombre de ciudad.</summary>
         public string? Busqueda { get; set; }
+
+        public class ErrorResponseDto
+        {
+            public string Mensaje { get; set; } = string.Empty;
+        }
     }
 }
