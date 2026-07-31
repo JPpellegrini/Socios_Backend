@@ -25,9 +25,6 @@ namespace Socios.Infrastructure.Repositories
         }
         public async Task<List<ObraSocialListadoDto>> BuscarAsync(ObraSocialFiltroDto filtro)
         {
-            if (string.IsNullOrEmpty(filtro.Busqueda))
-                return new List<ObraSocialListadoDto>();
-
             return await _context.ObraSocial
                 .Where(c => EF.Functions.Like(c.NombreObraSocial.ToUpper(), $"%{filtro.Busqueda.Trim().ToUpper()}%"))
                 .Select(c => new ObraSocialListadoDto

@@ -20,13 +20,12 @@ namespace Socios.Api.Controllers
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarObrasSocialesAsync([FromQuery] ObraSocialFiltroDto filtro)
         {
-            var listaObrasSociales = await _obraSocialRepository.BuscarAsync(filtro);
             // Caso 1: no se ingresó nada
             if (string.IsNullOrWhiteSpace(filtro.Busqueda))
             {
                 return BadRequest(new { mensaje = "Debe ingresar un valor de búsqueda." });
             }
-
+            var listaObrasSociales = await _obraSocialRepository.BuscarAsync(filtro);
             // Caso 2: se ingresó un valor, pero no hay coincidencias
 
             if (listaObrasSociales == null || !listaObrasSociales.Any())
