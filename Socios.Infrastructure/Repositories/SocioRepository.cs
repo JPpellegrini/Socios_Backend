@@ -107,6 +107,53 @@ namespace Socios.Infrastructure.Repositories
             _context.Socios.Add(socio);
         }
 
+        public async Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio)
+        {
+            return await (
+                from s in _context.Socios
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras 
+                from os in obras.DefaultIfEmpty()
+                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas 
+                from eb in bajas.DefaultIfEmpty()
+                where s.Id_Socio == idSocio && et.Id_Tipo == 1
+                select new SocioDetalleDto
+                {
+                    IdSocio = s.Id_Socio,
+                    TipoDocumento = e.Tipo,
+                    Dni = e.Dni,
+                    Nombre = e.Nombre,
+                    Apellido = e.Apellido,
+                    FechaNacimiento = e.Nacimiento,
+                    Sexo = e.Sexo,
+                    IdCiudad = e.Id_Ciudad,
+                    Ciudad = c.Nombre,
+                    Calle = e.Calle,
+                    Altura = e.Altura,
+                    Observaciones = e.Observacion,
+                    IdObraSocial = s.Id_OS,
+                    ObraSocial = os != null ? os.NombreObraSocial : null,
+                    NumeroAfiliado = s.Numero_Afiliado,
+                    Plan = s.Plan,
+                    Sepelio = s.Sepelio,
+                    Cobrador = s.Cobrador,
+                    Estado = et.Estado,
+                    FechaAlta = et.Fecha_Alta,
+                    FechaBaja = eb != null ? eb.Fecha_Baja : null,
+                    Telefonos = _context.Contactos
+                        .Where(x => x.Id_Entidad == e.Id_Entidad && x.Tipo == "TELEFONO")
+                        .Select(x => x.ContactoEntidad)
+                        .ToList(),
+                    Emails = _context.Contactos
+                        .Where(x => x.Id_Entidad == e.Id_Entidad && x.Tipo == "MAIL")
+                        .Select(x => x.ContactoEntidad)
+                        .ToList()
+                }
+            ).FirstOrDefaultAsync();
+        }
+
         public async Task DarDeBajaAsync(SocioBajaDto dto)
         {
             var socio = await (
@@ -117,7 +164,7 @@ namespace Socios.Infrastructure.Repositories
             ).FirstOrDefaultAsync();
 
             if (socio == null)
-                throw new Exception("No se encontró el socio con ese Id.");
+                throw new Exception("No se encontro el socio con ese Id.");
 
             socio.et.Estado = "INACTIVO";
 

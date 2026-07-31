@@ -12,12 +12,12 @@ namespace Socios.Api.Controllers
     public class SociosController : ControllerBase
     {
         private readonly ISocioRepository _socioRepository;
-        private readonly ICrearSocioUseCase _crearSocioUseCase;
+        private readonly ISocioUseCase _socioUseCase;
 
-        public SociosController(ISocioRepository socioRepository, ICrearSocioUseCase crearSocioUseCase)
+        public SociosController(ISocioRepository socioRepository, ISocioUseCase socioUseCase)
         {
             _socioRepository = socioRepository;
-            _crearSocioUseCase = crearSocioUseCase;
+            _socioUseCase = socioUseCase;
         }
 
         /// <summary>
@@ -47,9 +47,24 @@ namespace Socios.Api.Controllers
         [HttpPost("crear")]
         public async Task<IActionResult> CrearSocioAsync([FromBody] SocioCrearDto dto)
         {
-            var idSocio = await _crearSocioUseCase.EjecutarAsync(dto);
+            var idSocio = await _socioUseCase.CrearAsync(dto);
 
             return Ok(new { idSocio });
+        }
+
+        /// <summary>
+        /// Trae un socio por su Id con todos sus datos, para cargar la pantalla de alta
+        /// en modo visualizar/modificar. Devuelve 404 si el socio no existe.
+        /// </summary>
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> VisualizarSocioAsync(int id)
+        {
+            var socio = await _socioUseCase.VisualizarAsync(id);
+
+            if (socio is null)
+                return NotFound(new { mensaje = "No se encontró el socio solicitado." });
+
+            return Ok(socio);
         }
 
         /// <summary>
