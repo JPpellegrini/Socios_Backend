@@ -33,5 +33,20 @@ namespace Socios.Api.Controllers
 
             return Ok(entidad);
         }
+
+        /// <summary>
+        /// Busca una entidad por DNI, Nombre o Apellido.
+        /// Devuelve únicamente Nombre, Apellido y DNI.
+        /// </summary>
+        [HttpGet("buscar")]
+        public async Task<IActionResult> BuscarEntidadPorFiltroAsync([FromQuery] EntidadFiltroBasicoDto filtro)
+        {
+            var entidad = await _entidadRepository.BuscarBasicoAsync(filtro);
+
+            if (entidad == null)
+                return NotFound("Entidad no encontrada.");
+
+            return Ok(entidad);
+        }
     }
 }

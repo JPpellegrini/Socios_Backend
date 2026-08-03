@@ -12,9 +12,9 @@ namespace Socios.Api.Controllers
     {
         private readonly IObraSocialRepository _obraSocialRepository;
 
-        public ObrasSocialesController(IObraSocialRepository obraRepository)
+        public ObrasSocialesController(IObraSocialRepository obraSocialRepository)
         {
-            _obraSocialRepository = obraRepository;
+            _obraSocialRepository = obraSocialRepository;
         }
 
         [HttpGet("buscar")]

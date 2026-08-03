@@ -92,5 +92,26 @@ namespace Socios.Infrastructure.Repositories
                 Observacion = x.e.Observacion
             }).FirstOrDefaultAsync();
         }
+
+        public async Task<EntidadBasicaDto?> BuscarBasicoAsync(EntidadFiltroBasicoDto filtro)
+        {
+            var query = _context.Entidades.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filtro.Busqueda))
+            {
+                var patron = $"%{filtro.Busqueda.Trim()}%";
+                query = query.Where(e =>
+                    (e.Nombre != null && EF.Functions.Like(e.Nombre, patron)) ||
+                    (e.Apellido != null && EF.Functions.Like(e.Apellido, patron)) ||
+                    (e.Dni != null && EF.Functions.Like(e.Dni, patron)));
+            }
+
+            return await query.Select(e => new EntidadBasicaDto
+            {
+                Nombre = e.Nombre,
+                Apellido = e.Apellido,
+                Dni = e.Dni
+            }).FirstOrDefaultAsync();
+        }
     }
 }
