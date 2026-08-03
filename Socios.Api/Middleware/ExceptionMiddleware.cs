@@ -9,8 +9,9 @@ namespace Socios.Api.Middleware
     /// o un caso de uso cae acá y se traduce a una respuesta HTTP prolija (un JSON con el mensaje),
     /// en vez de devolverle al cliente un error 500 crudo con el stack trace.
     ///
-    ///   - ReglaNegocioException  → 409 Conflict (situación esperable, se le muestra al usuario).
-    ///   - Cualquier otra          → 500 (error inesperado; se registra en el log).
+    ///   - RecursoNoEncontradoException → 404 Not Found (se pidió algo que no existe).
+    ///   - ReglaNegocioException        → 409 Conflict (situación esperable, se le muestra al usuario).
+    ///   - Cualquier otra               → 500 (error inesperado; se registra en el log).
     /// </summary>
     public class ExceptionMiddleware
     {
@@ -28,6 +29,11 @@ namespace Socios.Api.Middleware
             try
             {
                 await _next(context);
+            }
+            catch (RecursoNoEncontradoException ex)
+            {
+                // Se pidió un recurso que no existe → 404.
+                await EscribirRespuesta(context, StatusCodes.Status404NotFound, ex.Message);
             }
             catch (ReglaNegocioException ex)
             {

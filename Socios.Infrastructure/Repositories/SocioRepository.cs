@@ -107,6 +107,14 @@ namespace Socios.Infrastructure.Repositories
             _context.Socios.Add(socio);
         }
 
+        public async Task<int?> ObtenerIdEntidadAsync(int idSocio)
+        {
+            return await _context.Socios
+                .Where(s => s.Id_Socio == idSocio)
+                .Select(s => (int?)s.Id_Entidad)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio)
         {
             return await (
@@ -153,34 +161,6 @@ namespace Socios.Infrastructure.Repositories
                 }
             ).FirstOrDefaultAsync();
         }
-
-        public async Task DarDeBajaAsync(SocioBajaDto dto)
-        {
-            var socio = await (
-                from s in _context.Socios
-                join et in _context.EntidadTipos on s.Id_Entidad equals et.Id_Entidad
-                where s.Id_Socio == dto.IdSocio && et.Id_Tipo == 1
-                select new { s, et }
-            ).FirstOrDefaultAsync();
-
-            if (socio == null)
-                throw new Exception("No se encontro el socio con ese Id.");
-
-            socio.et.Estado = "INACTIVO";
-
-            var baja = new EntidadBaja
-            {
-                Id_EntidadTipo = socio.et.Id_EntidadTipo,
-                Fecha_Baja = DateTime.Now,
-                Motivo = dto.Motivo
-            };
-
-            _context.EntidadBajas.Add(baja);
-            _context.EntidadTipos.Update(socio.et);
-
-            await _context.SaveChangesAsync();
-        }
-
 
     }
 }

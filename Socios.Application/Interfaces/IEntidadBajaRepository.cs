@@ -11,5 +11,6 @@ namespace Socios.Application.Interfaces
         Task<EntidadBaja> AddAsync(EntidadBaja entidadBaja);
         Task UpdateAsync(EntidadBaja entidadBaja);
         Task DeleteAsync(int idBaja);
+        void Agregar(EntidadBaja entidadBaja);
     }
 }
