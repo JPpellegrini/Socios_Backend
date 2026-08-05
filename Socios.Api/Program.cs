@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
 using Socios.Application.UseCases.Socios;
+using Socios.Application.UseCases.Codeudores;
+using Socios.Application.UseCases.Entidades;
 using Socios.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +66,8 @@ builder.Services.AddScoped<IEntidadBajaRepository, EntidadBajaRepository>();
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ISocioUseCase, SocioUseCase>();
+builder.Services.AddScoped<IEntidadUseCase, EntidadUseCase>();
+builder.Services.AddScoped<ICodeudorUseCase, CodeudorUseCase>();
 
 #endregion
 
