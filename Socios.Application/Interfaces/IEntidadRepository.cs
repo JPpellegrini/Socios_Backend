@@ -18,7 +18,7 @@ namespace Socios.Application.Interfaces
         Task<Entidad?> ObtenerPorDniAsync(string dni);
 
         /// <summary>Trae la entidad que tenga exactamente ese DNI, nombre o apellido.</summary>
-        Task<EntidadBasicaDto?> BuscarBasicoAsync(EntidadFiltroBasicoDto filtro);
+        Task<List<EntidadBasicaDto?>> BuscarBasicoAsync(EntidadFiltroBasicoDto filtro);
 
         /// <summary>Marca la entidad para ser insertada. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Entidad entidad);

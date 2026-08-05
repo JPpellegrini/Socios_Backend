@@ -72,7 +72,7 @@ namespace Socios.Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(busqueda))
                 query = query.Where(x => (x.e.Dni == busqueda));
-            
+
             return await query.Select(x => new EntidadDto
             {
                 Id_Entidad = x.e.Id_Entidad,
@@ -93,25 +93,30 @@ namespace Socios.Infrastructure.Repositories
             }).FirstOrDefaultAsync();
         }
 
-        public async Task<EntidadBasicaDto?> BuscarBasicoAsync(EntidadFiltroBasicoDto filtro)
+        public async Task<List<EntidadBasicaDto?>> BuscarBasicoAsync(EntidadFiltroBasicoDto filtro)
         {
             var query = _context.Entidades.AsQueryable();
 
             if (!string.IsNullOrEmpty(filtro.Busqueda))
             {
-                var patron = $"%{filtro.Busqueda.Trim()}%";
+                var patron = $"%{filtro.Busqueda.Trim().ToUpper()}%";
                 query = query.Where(e =>
-                    (e.Nombre != null && EF.Functions.Like(e.Nombre, patron)) ||
-                    (e.Apellido != null && EF.Functions.Like(e.Apellido, patron)) ||
-                    (e.Dni != null && EF.Functions.Like(e.Dni, patron)));
+                (e.Nombre != null && EF.Functions.Like(e.Nombre.ToUpper(), patron)) ||
+                (e.Apellido != null && EF.Functions.Like(e.Apellido.ToUpper(), patron)) ||
+                (e.Dni != null && EF.Functions.Like(e.Dni.ToUpper(), patron)));
             }
 
-            return await query.Select(e => new EntidadBasicaDto
+            // 🔒 Excluir registros donde todos los campos son null
+                query = query.Where(e => e.Nombre != null && e.Apellido != null && e.Dni != null);
+
+            var resultado = await query.Select(e => new EntidadBasicaDto
             {
                 Nombre = e.Nombre,
                 Apellido = e.Apellido,
                 Dni = e.Dni
-            }).FirstOrDefaultAsync();
+            }).ToListAsync();
+
+            return resultado.Any() ? resultado : null;
         }
     }
 }
