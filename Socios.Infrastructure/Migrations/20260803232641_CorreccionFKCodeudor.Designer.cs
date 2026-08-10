@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Socios.Infrastructure.Context;
@@ -11,9 +12,11 @@ using Socios.Infrastructure.Context;
 namespace Socios.Infrastructure.Migrations
 {
     [DbContext(typeof(SociosDbContext))]
-    partial class SociosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260803232641_CorreccionFKCodeudor")]
+    partial class CorreccionFKCodeudor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,8 +88,8 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 1,
                             Id_MetodoPago = 2,
                             Monto = 13500m,
-                            Observacion = "PAGO CUOTA MAYO",
-                            Tipo_Movimiento = "INGRESO"
+                            Observacion = "Pago Cuota Mayo",
+                            Tipo_Movimiento = "Ingreso"
                         },
                         new
                         {
@@ -98,8 +101,8 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 3,
                             Id_MetodoPago = 1,
                             Monto = 42500.47m,
-                            Observacion = "PAGO GAS MES JUNIO",
-                            Tipo_Movimiento = "EGRESO"
+                            Observacion = "Pago Gas Mes Junio",
+                            Tipo_Movimiento = "Egreso"
                         },
                         new
                         {
@@ -111,8 +114,8 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 4,
                             Id_MetodoPago = 1,
                             Monto = 30000m,
-                            Observacion = "COLABORACIÓN PODOLOGÍA",
-                            Tipo_Movimiento = "INGRESO"
+                            Observacion = "Colaboración Podología",
+                            Tipo_Movimiento = "Ingreso"
                         });
                 });
 
@@ -155,7 +158,7 @@ namespace Socios.Infrastructure.Migrations
                             Fechor = new DateTime(2026, 3, 31, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             Id_Usuario = 3,
                             Mes_Periodo = 3,
-                            Tipo = "MENSUAL"
+                            Tipo = "Mensual"
                         },
                         new
                         {
@@ -163,7 +166,7 @@ namespace Socios.Infrastructure.Migrations
                             Anio_Periodo = 2025,
                             Fechor = new DateTime(2026, 1, 10, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             Id_Usuario = 2,
-                            Tipo = "ANUAL"
+                            Tipo = "Anual"
                         });
                 });
 
@@ -188,17 +191,17 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Ciudad = 1,
-                            Nombre = "ROLDÁN"
+                            Nombre = "Roldán"
                         },
                         new
                         {
                             Id_Ciudad = 2,
-                            Nombre = "FUNES"
+                            Nombre = "Funes"
                         },
                         new
                         {
                             Id_Ciudad = 3,
-                            Nombre = "ROSARIO"
+                            Nombre = "Rosario"
                         });
                 });
 
@@ -297,28 +300,28 @@ namespace Socios.Infrastructure.Migrations
                             Id_Contacto = 1,
                             ContactoEntidad = "3413458966",
                             Id_Entidad = 1,
-                            Tipo = "TELÉFONO"
+                            Tipo = "Celular"
                         },
                         new
                         {
                             Id_Contacto = 2,
                             ContactoEntidad = "luciano@gmail",
                             Id_Entidad = 1,
-                            Tipo = "MAIL"
+                            Tipo = "Mail"
                         },
                         new
                         {
                             Id_Contacto = 3,
                             ContactoEntidad = "3413485977",
                             Id_Entidad = 4,
-                            Tipo = "TELÉFONO"
+                            Tipo = "Celular"
                         },
                         new
                         {
                             Id_Contacto = 4,
                             ContactoEntidad = "08007775427",
                             Id_Entidad = 3,
-                            Tipo = "TELÉFONO"
+                            Tipo = "Emergencia"
                         });
                 });
 
@@ -351,22 +354,22 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Cuenta = 1,
-                            Estado = "ACTIVA",
-                            NombreCuenta = "EFECTIVO",
+                            Estado = "Activa",
+                            NombreCuenta = "Efectivo",
                             NroCuenta = 0
                         },
                         new
                         {
                             Id_Cuenta = 2,
-                            Estado = "ACTIVA",
-                            NombreCuenta = "BANCO MACRO",
+                            Estado = "Activa",
+                            NombreCuenta = "Banco Macro",
                             NroCuenta = 789012
                         },
                         new
                         {
                             Id_Cuenta = 3,
-                            Estado = "INACTIVA",
-                            NombreCuenta = "BANCO NACION",
+                            Estado = "Inactiva",
+                            NombreCuenta = "Banco Macro 2",
                             NroCuenta = 712906
                         });
                 });
@@ -466,32 +469,32 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Detmov = 1,
-                            NombreDetalleMovimiento = "CUOTA SOCIO"
+                            NombreDetalleMovimiento = "Cuota Socio"
                         },
                         new
                         {
                             Id_Detmov = 2,
-                            NombreDetalleMovimiento = "CUOTA SEPELIO"
+                            NombreDetalleMovimiento = "Cuota Sepelio"
                         },
                         new
                         {
                             Id_Detmov = 3,
-                            NombreDetalleMovimiento = "AJUSTE DIFERENCIA CAJA"
+                            NombreDetalleMovimiento = "Ajuste Diferencia Caja"
                         },
                         new
                         {
                             Id_Detmov = 4,
-                            NombreDetalleMovimiento = "COLABORACIÓN"
+                            NombreDetalleMovimiento = "Colaboración"
                         },
                         new
                         {
                             Id_Detmov = 5,
-                            NombreDetalleMovimiento = "PAGO A PROVEEDOR"
+                            NombreDetalleMovimiento = "Pago a Proveedor"
                         },
                         new
                         {
                             Id_Detmov = 6,
-                            NombreDetalleMovimiento = "TRANSFERENCIA"
+                            NombreDetalleMovimiento = "Transferencia"
                         });
                 });
 
@@ -563,52 +566,52 @@ namespace Socios.Infrastructure.Migrations
                         {
                             Id_Entidad = 1,
                             Altura = 250,
-                            Apellido = "OLDAN",
-                            Calle = "INDEPENDENCIA",
+                            Apellido = "Oldan",
+                            Calle = "Independencia",
                             CuitCuil = "20321270574",
                             Dni = "32127057",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1959, 7, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Nombre = "LUCIANO",
-                            Sexo = "HOMBRE",
+                            Nombre = "Luciano",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
                         {
                             Id_Entidad = 2,
                             Altura = 458,
-                            Apellido = "PÉREZ",
-                            Calle = "GALINDO",
+                            Apellido = "Pérez",
+                            Calle = "Galindo",
                             Dni = "32185166",
                             Id_Ciudad = 2,
                             Nacimiento = new DateTime(1998, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Nombre = "JUAN",
-                            Sexo = "HOMBRE",
+                            Nombre = "Juan",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
                         {
                             Id_Entidad = 3,
                             Altura = 166,
-                            Calle = "MITRE",
+                            Calle = "Mitre",
                             CuitCuil = "30657866330",
                             Id_Ciudad = 3,
                             Nacimiento = new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RazonSocial = "LITORAL GAS S.A",
-                            Sexo = "PERSONA JURIDICA",
+                            RazonSocial = "Litoral Gas S.A",
+                            Sexo = "Persona Juridica",
                             Tipo = "DNI"
                         },
                         new
                         {
                             Id_Entidad = 4,
                             Altura = 347,
-                            Apellido = "LÓPEZ",
-                            Calle = "LAS HERAS",
+                            Apellido = "López",
+                            Calle = "Las Heras",
                             Dni = "55406681",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1987, 12, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Nombre = "MARÍA",
-                            Sexo = "MUJER",
+                            Nombre = "María",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         },
                         new
@@ -616,12 +619,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 5,
                             Altura = 417,
                             Apellido = "AVILA",
-                            Calle = "SALTA",
+                            Calle = "Salta",
                             Dni = "6166108",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1958, 4, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "EDUARDO",
-                            Sexo = "HOMBRE",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
@@ -629,12 +632,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 6,
                             Altura = 270,
                             Apellido = "MASABEU",
-                            Calle = "INDEPENDENCIA",
+                            Calle = "Independencia",
                             Dni = "6164804",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1960, 7, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "RUTILIO ALFREDO",
-                            Sexo = "HOMBRE",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
@@ -642,12 +645,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 7,
                             Altura = 684,
                             Apellido = "MASABEU",
-                            Calle = "MENDOZA",
+                            Calle = "Mendoza",
                             Dni = "14658096",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1955, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "ALFREDO",
-                            Sexo = "HOMBRE",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
@@ -655,12 +658,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 8,
                             Altura = 867,
                             Apellido = "MEYADO",
-                            Calle = "CORRIENTES",
+                            Calle = "Corrientes",
                             Dni = "4989850",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1962, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "JOSÉ MOISÉS",
-                            Sexo = "HOMBRE",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
@@ -668,12 +671,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 9,
                             Altura = 1044,
                             Apellido = "IPPOLITI",
-                            Calle = "MENDOZA",
+                            Calle = "Mendoza",
                             Dni = "6176088",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1959, 9, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "HUGO",
-                            Sexo = "HOMBRE",
+                            Sexo = "Hombre",
                             Tipo = "DNI"
                         },
                         new
@@ -681,12 +684,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 10,
                             Altura = 417,
                             Apellido = "FLORIÁN DE AVILA",
-                            Calle = "SALTA",
+                            Calle = "Salta",
                             Dni = "3247480",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1961, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "SUSANA",
-                            Sexo = "MUJER",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         },
                         new
@@ -694,12 +697,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 11,
                             Altura = 292,
                             Apellido = "HERRERA",
-                            Calle = "1 DE MAYO",
+                            Calle = "1 de Mayo",
                             Dni = "3962438",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1956, 12, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "LUCY",
-                            Sexo = "MUJER",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         },
                         new
@@ -707,12 +710,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 12,
                             Altura = 369,
                             Apellido = "MURATTURE",
-                            Calle = "MITRE",
+                            Calle = "Mitre",
                             Dni = "4105793",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1957, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "IRIS A.",
-                            Sexo = "MUJER",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         },
                         new
@@ -720,12 +723,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 13,
                             Altura = 455,
                             Apellido = "VILLAREAL",
-                            Calle = "JUJUY",
+                            Calle = "Jujuy",
                             Dni = "12266301",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1963, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "RAQUEL",
-                            Sexo = "MUJER",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         },
                         new
@@ -733,12 +736,12 @@ namespace Socios.Infrastructure.Migrations
                             Id_Entidad = 14,
                             Altura = 953,
                             Apellido = "BRAVO DE PONTI",
-                            Calle = "JUJUY",
+                            Calle = "Jujuy",
                             Dni = "4645560",
                             Id_Ciudad = 1,
                             Nacimiento = new DateTime(1964, 10, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "ANA MARÍA",
-                            Sexo = "MUJER",
+                            Sexo = "Mujer",
                             Tipo = "DNI"
                         });
                 });
@@ -961,7 +964,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Usuario = 1,
                             Nro_Caja = 1,
                             Saldo = 100000m,
-                            Tipo = "APERTURA"
+                            Tipo = "Apertura"
                         },
                         new
                         {
@@ -970,7 +973,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Usuario = 1,
                             Nro_Caja = 1,
                             Saldo = 142000m,
-                            Tipo = "CIERRE"
+                            Tipo = "Cierre"
                         },
                         new
                         {
@@ -979,7 +982,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Usuario = 2,
                             Nro_Caja = 2,
                             Saldo = 78000m,
-                            Tipo = "APERTURA"
+                            Tipo = "Apertura"
                         },
                         new
                         {
@@ -988,7 +991,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Usuario = 2,
                             Nro_Caja = 2,
                             Saldo = 250000m,
-                            Tipo = "CIERRE"
+                            Tipo = "Cierre"
                         });
                 });
 
@@ -1013,12 +1016,12 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_MetodoPago = 1,
-                            NombreMetodoPago = "EFECTIVO"
+                            NombreMetodoPago = "Efectivo"
                         },
                         new
                         {
                             Id_MetodoPago = 2,
-                            NombreMetodoPago = "TRANSFERENCIA BANCARIA"
+                            NombreMetodoPago = "Transferencia Bancaria"
                         });
                 });
 
@@ -1178,22 +1181,22 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Prestacion = 1,
-                            NombrePrestacion = "PODOLOGÍA"
+                            NombrePrestacion = "Podología"
                         },
                         new
                         {
                             Id_Prestacion = 2,
-                            NombrePrestacion = "CARDIOLOGÍA"
+                            NombrePrestacion = "Cardiología"
                         },
                         new
                         {
                             Id_Prestacion = 3,
-                            NombrePrestacion = "ALQUILER SALÓN"
+                            NombrePrestacion = "Alquiler Salón"
                         },
                         new
                         {
                             Id_Prestacion = 4,
-                            NombrePrestacion = "COMISIÓN COBRADOR"
+                            NombrePrestacion = "Comisión Cobrador"
                         });
                 });
 
@@ -1223,14 +1226,14 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Rol = 1,
-                            Descripcion = "SECRETARIA QUE MANEJA TODO EL SISTEMA",
-                            RolNombre = "SECRETARIA"
+                            Descripcion = "Secretaria que maneja todo el sistema",
+                            RolNombre = "Secretaria"
                         },
                         new
                         {
                             Id_Rol = 2,
-                            Descripcion = "SOLO POSEE ACCESO AL MÓDULO DE INFORMES",
-                            RolNombre = "CONSULTOR"
+                            Descripcion = "Solo posee acceso al módulo de informes",
+                            RolNombre = "Consultor"
                         });
                 });
 
@@ -1483,22 +1486,22 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Tipo = 1,
-                            NombreTipoEntidad = "SOCIO"
+                            NombreTipoEntidad = "Socio"
                         },
                         new
                         {
                             Id_Tipo = 2,
-                            NombreTipoEntidad = "PROVEEDOR"
+                            NombreTipoEntidad = "Proveedor"
                         },
                         new
                         {
                             Id_Tipo = 3,
-                            NombreTipoEntidad = "COLABORADOR"
+                            NombreTipoEntidad = "Colaborador"
                         },
                         new
                         {
                             Id_Tipo = 4,
-                            NombreTipoEntidad = "EMPLEADO"
+                            NombreTipoEntidad = "Empleado"
                         });
                 });
 
@@ -1602,7 +1605,7 @@ namespace Socios.Infrastructure.Migrations
                             Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
-                            UsuarioNombre = "ADRIANA"
+                            UsuarioNombre = "Adriana"
                         },
                         new
                         {
@@ -1610,7 +1613,7 @@ namespace Socios.Infrastructure.Migrations
                             Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
-                            UsuarioNombre = "MARCELA"
+                            UsuarioNombre = "Marcela"
                         });
                 });
 

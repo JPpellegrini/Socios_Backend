@@ -54,5 +54,10 @@ namespace Socios.Infrastructure.Repositories
             // Solo marca el registro para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.EntidadTipos.Add(entidadTipo);
         }
+
+        public async Task<EntidadTipo?> ObtenerPorEntidadYTipoAsync(int idEntidad, int idTipo)
+        {
+            return await _context.EntidadTipos.FirstOrDefaultAsync(et => et.Id_Entidad == idEntidad && et.Id_Tipo == idTipo);
+        }
     }
 }

@@ -48,5 +48,10 @@ namespace Socios.Infrastructure.Repositories
             _context.Update(entidadBaja);
             await _context.SaveChangesAsync();
         }
+
+        public void Agregar(EntidadBaja entidadBaja)
+        {
+            _context.EntidadBajas.Add(entidadBaja);
+        }
     }
 }

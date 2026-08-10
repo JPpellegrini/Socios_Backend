@@ -17,8 +17,7 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Trae todos los datos de un socio para visualizarlo, o null si no existe.</summary>
         Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio);
-
-        Task DarDeBajaAsync(SocioBajaDto dto);
+        Task<int?> ObtenerIdEntidadAsync(int idSocio);
 
         /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>
         Task<bool> EsSocioAsync(int idEntidad);

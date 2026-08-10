@@ -19,5 +19,6 @@ namespace Socios.Application.UseCases.Socios
         /// Devuelve null si no existe.
         /// </summary>
         Task<SocioDetalleDto?> VisualizarAsync(int idSocio);
+        Task BajaAsync(SocioBajaDto dto);
     }
 }

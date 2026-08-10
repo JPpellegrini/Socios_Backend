@@ -17,6 +17,7 @@ namespace Socios.Application.UseCases.Socios
         private readonly IEntidadTipoRepository _entidadesTipo;
         private readonly IContactoRepository _contactos;
         private readonly ITipoEntidadRepository _tiposEntidad;
+        private readonly IEntidadBajaRepository _entidadesBaja;
         private readonly IUnitOfWork _unitOfWork;
 
         public SocioUseCase(
@@ -25,6 +26,7 @@ namespace Socios.Application.UseCases.Socios
             IEntidadTipoRepository entidadesTipo,
             IContactoRepository contactos,
             ITipoEntidadRepository tiposEntidad,
+            IEntidadBajaRepository entidadesBaja,
             IUnitOfWork unitOfWork)
         {
             _entidades = entidades;
@@ -32,6 +34,7 @@ namespace Socios.Application.UseCases.Socios
             _entidadesTipo = entidadesTipo;
             _contactos = contactos;
             _tiposEntidad = tiposEntidad;
+            _entidadesBaja = entidadesBaja;
             _unitOfWork = unitOfWork;
         }
 
@@ -116,6 +119,38 @@ namespace Socios.Application.UseCases.Socios
         public async Task<SocioDetalleDto?> VisualizarAsync(int idSocio)
         {
             return await _socios.ObtenerDetalleAsync(idSocio);
+        }
+
+        public async Task BajaAsync(SocioBajaDto dto)
+        {
+            // 1) Ubicar la entidad del socio.
+            var idEntidad = await _socios.ObtenerIdEntidadAsync(dto.IdSocio)?? 
+                throw new RecursoNoEncontradoException("No se encontró el socio indicado.");
+
+            // 2) Ubicar su fila de tipo "Socio" (sin números mágicos).
+            var idTipoSocio = await _tiposEntidad.ObtenerIdPorNombreAsync("Socio")
+                ?? throw new InvalidOperationException("No está configurado el tipo de entidad 'Socio'.");
+
+            var entidadTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(idEntidad, idTipoSocio)
+                ?? throw new RecursoNoEncontradoException("El socio no tiene un registro de tipo 'Socio'.");
+
+            // 3) Regla de negocio: no se puede dar de baja dos veces.
+            if (entidadTipo.Estado == "INACTIVO")
+                throw new ReglaNegocioException("El socio ya está dado de baja.");
+
+            // 4) Cambiar el estado y registrar la baja.
+            //    'entidadTipo' viene trackeado, así que basta con modificarlo.
+            entidadTipo.Estado = "INACTIVO";
+
+            _entidadesBaja.Agregar(new EntidadBaja
+            {
+                Id_EntidadTipo = entidadTipo.Id_EntidadTipo,
+                Fecha_Baja = DateTime.Today,
+                Motivo = dto.Motivo
+            });
+
+            // 5) Confirmar ambos cambios juntos (una sola transacción).
+            await _unitOfWork.GuardarCambiosAsync();
         }
 
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>

@@ -14,5 +14,6 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Marca el registro para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(EntidadTipo entidadTipo);
+        Task<EntidadTipo?> ObtenerPorEntidadYTipoAsync(int idEntidad, int idTipo);
     }
 }
