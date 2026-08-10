@@ -9,6 +9,7 @@ using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.Codeudores;
 using Socios.Application.UseCases.Entidades;
 using Socios.Infrastructure;
+using Nichos.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IEntidadTipoRepository, EntidadTipoRepository>();
 builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
 builder.Services.AddScoped<ITipoEntidadRepository, TipoEntidadRepository>();
 builder.Services.AddScoped<IEntidadBajaRepository, EntidadBajaRepository>();
+builder.Services.AddScoped<INichoRepository, NichoRepository>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -92,7 +94,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
