@@ -20,5 +20,8 @@ namespace Socios.Application.UseCases.Socios
         /// </summary>
         Task<SocioDetalleDto?> VisualizarAsync(int idSocio);
         Task BajaAsync(SocioBajaDto dto);
+
+        /// <summary>Modifica los datos editables de un socio (domicilio, datos de socio y contactos).</summary>
+        Task ModificarAsync(SocioModificarDto dto);
     }
 }

@@ -7,17 +7,17 @@ namespace Socios.Application.Interfaces
 {
     public interface ISocioRepository
     {
-        Task<IEnumerable<Socio>> GetAllAsync();
-        Task<Socio?> GetByIdAsync(int idEntidad);
-        Task<Socio> AddAsync(Socio socio);
-        Task UpdateAsync(Socio socio);
-        Task DeleteAsync(int idEntidad);
-
         Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
 
         /// <summary>Trae todos los datos de un socio para visualizarlo, o null si no existe.</summary>
         Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio);
         Task<int?> ObtenerIdEntidadAsync(int idSocio);
+
+        /// <summary>
+        /// Trae el socio (con su entidad asociada) trackeado por EF, para poder modificarlo.
+        /// Devuelve null si no existe.
+        /// </summary>
+        Task<Socio?> ObtenerConEntidadAsync(int idSocio);
 
         /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>
         Task<bool> EsSocioAsync(int idEntidad);

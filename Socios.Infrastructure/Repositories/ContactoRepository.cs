@@ -54,5 +54,19 @@ namespace Socios.Infrastructure.Repositories
             // Solo marca el contacto para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Contactos.Add(contacto);
         }
+
+        public async Task<List<Contacto>> ObtenerPorEntidadAsync(int idEntidad)
+        {
+            // Trackeados (sin AsNoTracking) para que puedan marcarse como eliminados.
+            return await _context.Contactos
+                .Where(c => c.Id_Entidad == idEntidad)
+                .ToListAsync();
+        }
+
+        public void Eliminar(Contacto contacto)
+        {
+            // Solo marca el contacto para eliminar. El guardado real lo dispara la unidad de trabajo.
+            _context.Contactos.Remove(contacto);
+        }
     }
 }

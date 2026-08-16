@@ -17,39 +17,6 @@ namespace Socios.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Socio> AddAsync(Socio socio)
-        {
-            _context.Add(socio);
-            await _context.SaveChangesAsync();
-            return socio;
-        }
-
-        public async Task DeleteAsync(int idEntidad)
-        {
-            var socio = await _context.Set<Socio>().FindAsync(idEntidad);
-            if (socio != null)
-            {
-                _context.Remove(socio);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<IEnumerable<Socio>> GetAllAsync()
-        {
-            return await _context.Set<Socio>().Include(s => s.ObraSocial).Include(s => s.Entidad).ToListAsync();
-        }
-
-        public async Task<Socio?> GetByIdAsync(int idEntidad)
-        {
-            return await _context.Set<Socio>().Include(s => s.ObraSocial).Include(s => s.Entidad).FirstOrDefaultAsync(s => s.Id_Entidad == idEntidad);
-        }
-
-        public async Task UpdateAsync(Socio socio)
-        {
-            _context.Update(socio);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro)
         {
             // El Estado del socio vive en EntidadTipo (fila cuyo tipo es "Socio"),
@@ -113,6 +80,15 @@ namespace Socios.Infrastructure.Repositories
                 .Where(s => s.Id_Socio == idSocio)
                 .Select(s => (int?)s.Id_Entidad)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Socio?> ObtenerConEntidadAsync(int idSocio)
+        {
+            // Se traen socio + entidad trackeados (sin AsNoTracking) para que el caso de uso
+            // pueda modificar ambos y la unidad de trabajo confirme los cambios.
+            return await _context.Socios
+                .Include(s => s.Entidad)
+                .FirstOrDefaultAsync(s => s.Id_Socio == idSocio);
         }
 
         public async Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio)

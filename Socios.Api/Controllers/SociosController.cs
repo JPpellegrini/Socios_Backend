@@ -75,5 +75,19 @@ namespace Socios.Api.Controllers
             return Ok(new { mensaje = "El socio fue dado de baja correctamente." });
         }
 
+        /// <summary>
+        /// Modifica los datos editables de un socio (domicilio, datos de socio y contactos).
+        /// La orquestación vive en el caso de uso; acá solo se recibe la solicitud.
+        ///   - Validaciones de formato → 400 (via [ApiController]).
+        ///   - Socio inexistente       → 404 (RecursoNoEncontradoException → ExceptionMiddleware).
+        /// </summary>
+        [HttpPut("modificar")]
+        public async Task<IActionResult> ModificarSocioAsync([FromBody] SocioModificarDto dto)
+        {
+            await _socioUseCase.ModificarAsync(dto);
+
+            return Ok(new { mensaje = "El socio fue modificado correctamente." });
+        }
+
     }
 }

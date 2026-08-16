@@ -109,7 +109,7 @@ namespace Socios.Application.UseCases.Socios
                 Estado = "ACTIVO"
             });
 
-            AgregarContactos(entidad, dto);
+            AgregarContactos(entidad, dto.Telefonos, dto.Emails);
 
             // 3) Relación con los codeudores. El id con el que se da de alta es el Id_Entidad del
             //    socio (el avalado) y el Id_EntidadCodeudor de la persona que avala: hasta acá la
@@ -177,10 +177,50 @@ namespace Socios.Application.UseCases.Socios
             await _unitOfWork.GuardarCambiosAsync();
         }
 
-        /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
-        private void AgregarContactos(Entidad entidad, SocioCrearDto dto)
+        /// <summary>
+        /// Modificar un socio. Solo se tocan domicilio, datos de socio y contactos:
+        /// la identidad (DNI, nombre, apellido, nacimiento) NO se modifica acá.
+        ///
+        /// Los contactos se reemplazan por completo: se borran los actuales y se cargan
+        /// los que vienen en el dto. Todo se confirma en una única transacción.
+        /// </summary>
+        public async Task ModificarAsync(SocioModificarDto dto)
         {
-            foreach (var telefono in dto.Telefonos)
+            // 1) Ubicar el socio junto con su entidad (ambos trackeados para poder modificarlos).
+            var socio = await _socios.ObtenerConEntidadAsync(dto.IdSocio)
+                ?? throw new RecursoNoEncontradoException("No se encontró el socio indicado.");
+
+            var entidad = socio.Entidad
+                ?? throw new InvalidOperationException("El socio no tiene una entidad asociada.");
+
+            // 2) Datos de domicilio (viven en la entidad).
+            entidad.Id_Ciudad = dto.IdCiudad!.Value;
+            entidad.Calle = dto.Calle.Trim();
+            entidad.Altura = dto.Altura;
+            entidad.Observacion = dto.Observaciones?.Trim();
+
+            // 3) Datos propios del socio.
+            socio.Id_OS = dto.IdObraSocial;
+            socio.Numero_Afiliado = dto.NumeroAfiliado?.Trim();
+            socio.Plan = dto.Plan;
+            socio.Sepelio = dto.Sepelio;
+            socio.Cobrador = dto.Cobrador;
+
+            // 4) Reemplazar los contactos: se eliminan los actuales y se cargan los nuevos.
+            var contactosActuales = await _contactos.ObtenerPorEntidadAsync(entidad.Id_Entidad);
+            foreach (var contacto in contactosActuales)
+                _contactos.Eliminar(contacto);
+
+            AgregarContactos(entidad, dto.Telefonos, dto.Emails);
+
+            // 5) Confirmar todo junto (una sola transacción: todo o nada).
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
+        /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
+        private void AgregarContactos(Entidad entidad, List<string> telefonos, List<string>? emails)
+        {
+            foreach (var telefono in telefonos)
             {
                 _contactos.Agregar(new Contacto
                 {
@@ -190,9 +230,9 @@ namespace Socios.Application.UseCases.Socios
                 });
             }
 
-            if (dto.Emails is not null)
+            if (emails is not null)
             {
-                foreach (var email in dto.Emails)
+                foreach (var email in emails)
                 {
                     _contactos.Agregar(new Contacto
                     {
