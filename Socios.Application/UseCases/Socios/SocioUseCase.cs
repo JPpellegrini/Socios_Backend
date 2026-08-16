@@ -18,6 +18,7 @@ namespace Socios.Application.UseCases.Socios
         private readonly IContactoRepository _contactos;
         private readonly ITipoEntidadRepository _tiposEntidad;
         private readonly IEntidadBajaRepository _entidadesBaja;
+        private readonly ICodeudorRepository _codeudores;
         private readonly IUnitOfWork _unitOfWork;
 
         public SocioUseCase(
@@ -27,6 +28,7 @@ namespace Socios.Application.UseCases.Socios
             IContactoRepository contactos,
             ITipoEntidadRepository tiposEntidad,
             IEntidadBajaRepository entidadesBaja,
+            ICodeudorRepository codeudores,
             IUnitOfWork unitOfWork)
         {
             _entidades = entidades;
@@ -35,6 +37,7 @@ namespace Socios.Application.UseCases.Socios
             _contactos = contactos;
             _tiposEntidad = tiposEntidad;
             _entidadesBaja = entidadesBaja;
+            _codeudores = codeudores;
             _unitOfWork = unitOfWork;
         }
 
@@ -43,11 +46,15 @@ namespace Socios.Application.UseCases.Socios
         ///   - Si la entidad (persona) NO existe → la crea.
         ///   - Si YA existe y todavía NO es socio → la reutiliza (no la duplica).
         ///   - Si YA existe y YA es socio → corta con un error de negocio.
-        /// Al final crea el Socio, su tipo "Socio" (ACTIVO) y los contactos, y confirma
-        /// TODO junto en una única transacción.
+        /// Al final crea el Socio, su tipo "Socio" (ACTIVO), los contactos y la relación con
+        /// sus codeudores (al menos uno), y confirma TODO junto en una única transacción.
         /// </summary>
         public async Task<int> CrearAsync(SocioCrearDto dto)
         {
+            // Regla de negocio: un socio no puede darse de alta sin al menos un codeudor.
+            if (dto.Codeudores is null || dto.Codeudores.Count == 0)
+                throw new ReglaNegocioException("Debe asignar al menos un codeudor para dar de alta el socio.");
+
             var dni = dto.Dni.Trim();
 
             // 1) ¿Ya existe una entidad (persona) con ese DNI?
@@ -104,7 +111,24 @@ namespace Socios.Application.UseCases.Socios
 
             AgregarContactos(entidad, dto);
 
-            // 3) Recién acá se confirma TODO junto (una sola transacción: todo o nada).
+            // 3) Relación con los codeudores. El id con el que se da de alta es el Id_Entidad del
+            //    socio (el avalado) y el Id_EntidadCodeudor de la persona que avala: hasta acá la
+            //    relación no existe. Al compartir la instancia 'entidad', EF resuelve la clave del
+            //    socio aunque todavía no esté guardada.
+            foreach (var idEntidadCodeudor in dto.Codeudores)
+            {
+                // El codeudor tiene que ser una entidad que ya exista.
+                if (!await _entidades.ExisteAsync(idEntidadCodeudor))
+                    throw new ReglaNegocioException($"No existe una entidad con el Id {idEntidadCodeudor} para asignar como codeudor.");
+
+                _codeudores.Agregar(new Codeudor
+                {
+                    Entidad = entidad,                          // el socio avalado
+                    Id_EntidadCodeudor = idEntidadCodeudor      // la persona que avala (ya existe)
+                });
+            }
+
+            // 4) Recién acá se confirma TODO junto (una sola transacción: todo o nada).
             await _unitOfWork.GuardarCambiosAsync();
 
             // El id se completa después de guardar.

@@ -49,5 +49,13 @@ namespace Socios.Application.DTOs
 
         [EmailsValidos]
         public List<string>? Emails { get; set; }
+
+        /// <summary>
+        /// Codeudores que avalan al socio. Un socio no puede darse de alta sin al menos uno.
+        /// Cada valor es el Id_Entidad de una persona (codeudor) que ya existe.
+        /// </summary>
+        [Required(ErrorMessage = "Debe asignar al menos un codeudor.")]
+        [MinLength(1, ErrorMessage = "Debe asignar al menos un codeudor.")]
+        public List<int> Codeudores { get; set; } = new();
     }
 }

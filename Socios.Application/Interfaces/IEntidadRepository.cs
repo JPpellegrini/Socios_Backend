@@ -17,6 +17,9 @@ namespace Socios.Application.Interfaces
         /// <summary>Trae la entidad que tenga exactamente ese DNI, o null si no existe.</summary>
         Task<Entidad?> ObtenerPorDniAsync(string dni);
 
+        /// <summary>Indica si existe una entidad con ese Id.</summary>
+        Task<bool> ExisteAsync(int id);
+
         /// <summary>Marca la entidad para ser insertada. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Entidad entidad);
     }

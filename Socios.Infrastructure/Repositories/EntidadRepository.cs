@@ -55,6 +55,11 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Entidades.FirstOrDefaultAsync(e => e.Dni == dni);
         }
 
+        public async Task<bool> ExisteAsync(int id)
+        {
+            return await _context.Entidades.AnyAsync(e => e.Id_Entidad == id);
+        }
+
         public void Agregar(Entidad entidad)
         {
             // Solo marca la entidad para insertar. El guardado real lo dispara la unidad de trabajo.
