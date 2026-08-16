@@ -23,6 +23,12 @@ namespace Socios.Infrastructure.Repositories
             return codeudor;
         }
 
+        /// <summary>Marca la relación socio↔codeudor para ser insertada. NO guarda: eso lo hace la unidad de trabajo.</summary>
+        public void Agregar(Codeudor codeudor)
+        {
+            _context.Add(codeudor);
+        }
+
         public async Task DeleteAsync(int idEntidad, int idEntidadCodeudor)
         {
             var key = new { Id_Entidad_Codeudor = idEntidadCodeudor, Id_Entidad = idEntidad };
