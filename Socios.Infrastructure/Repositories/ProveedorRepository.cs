@@ -86,5 +86,14 @@ namespace Socios.Infrastructure.Repositories
             // Solo marca el proveedor para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Proveedores.Add(proveedor);
         }
+
+        public async Task<Proveedor?> ObtenerConEntidadPorEntidadAsync(int idEntidad)
+        {
+            // Se traen proveedor + entidad trackeados (sin AsNoTracking) para que el caso de uso
+            // pueda modificar ambos y la unidad de trabajo confirme los cambios.
+            return await _context.Proveedores
+                .Include(p => p.Entidad)
+                .FirstOrDefaultAsync(p => p.Id_Entidad == idEntidad);
+        }
     }
 }

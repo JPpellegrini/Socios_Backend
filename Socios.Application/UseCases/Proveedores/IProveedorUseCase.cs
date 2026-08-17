@@ -15,5 +15,8 @@ namespace Socios.Application.UseCases.Proveedores
 
         /// <summary>Da de baja un proveedor (pasa su estado a INACTIVO).</summary>
         Task BajaAsync(ProveedorBajaDto dto);
+
+        /// <summary>Modifica los datos editables de un proveedor (razón social, servicio, domicilio y contactos).</summary>
+        Task ModificarAsync(ProveedorModificarDto dto);
     }
 }

@@ -13,6 +13,12 @@ namespace Socios.Application.Interfaces
         /// <summary>Indica si la entidad indicada ya está registrada como proveedor.</summary>
         Task<bool> EsProveedorAsync(int idEntidad);
 
+        /// <summary>
+        /// Trae el proveedor (con su entidad asociada) de una entidad, trackeado por EF
+        /// para poder modificarlo. Devuelve null si esa entidad no es proveedor.
+        /// </summary>
+        Task<Proveedor?> ObtenerConEntidadPorEntidadAsync(int idEntidad);
+
         /// <summary>Marca el proveedor para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Proveedor proveedor);
     }

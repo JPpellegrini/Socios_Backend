@@ -63,5 +63,19 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El proveedor fue dado de baja correctamente." });
         }
+
+        /// <summary>
+        /// Modifica los datos editables de un proveedor (razón social, servicio prestado,
+        /// domicilio y contactos). La identidad no se modifica acá.
+        ///   - Validaciones de formato → 400 (via [ApiController]).
+        ///   - Entidad sin proveedor   → 404 (RecursoNoEncontradoException).
+        /// </summary>
+        [HttpPut("modificar")]
+        public async Task<IActionResult> ModificarProveedorAsync([FromBody] ProveedorModificarDto dto)
+        {
+            await _proveedorUseCase.ModificarAsync(dto);
+
+            return Ok(new { mensaje = "El proveedor fue modificado correctamente." });
+        }
     }
 }

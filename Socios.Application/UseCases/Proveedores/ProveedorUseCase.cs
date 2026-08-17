@@ -139,6 +139,47 @@ namespace Socios.Application.UseCases.Proveedores
             await _unitOfWork.GuardarCambiosAsync();
         }
 
+        /// <summary>
+        /// Modificar un proveedor. Solo se tocan razón social, servicio prestado, domicilio y
+        /// contactos: la identidad (tipo de documento y documento) NO se modifica acá.
+        ///
+        /// Los contactos se reemplazan por completo: se borran los actuales y se cargan los
+        /// que vienen en el dto. Todo se confirma en una única transacción.
+        /// </summary>
+        public async Task ModificarAsync(ProveedorModificarDto dto)
+        {
+            // Ubicar el proveedor junto con su entidad (ambos trackeados para poder modificarlos).
+            var proveedor = await _proveedores.ObtenerConEntidadPorEntidadAsync(dto.IdEntidad)
+                ?? throw new RecursoNoEncontradoException("No se encontró un proveedor para la entidad indicada.");
+
+            var entidad = proveedor.Entidad
+                ?? throw new InvalidOperationException("El proveedor no tiene una entidad asociada.");
+
+            // El servicio prestado (prestación) tiene que existir.
+            if (!await _prestaciones.ExisteAsync(dto.IdPrestacion!.Value))
+                throw new ReglaNegocioException($"No existe una prestación con el Id {dto.IdPrestacion} para asignar como servicio prestado.");
+
+            // Datos de la entidad (empresa/persona) y domicilio.
+            entidad.RazonSocial = dto.RazonSocial.Trim();
+            entidad.Id_Ciudad = dto.IdCiudad!.Value;
+            entidad.Calle = dto.Calle.Trim();
+            entidad.Altura = dto.Altura;
+            entidad.Observacion = dto.Observaciones?.Trim();
+
+            // Servicio prestado.
+            proveedor.Id_Prestacion = dto.IdPrestacion!.Value;
+
+            // Reemplazar los contactos: se eliminan los actuales y se cargan los nuevos.
+            var contactosActuales = await _contactos.ObtenerPorEntidadAsync(entidad.Id_Entidad);
+            foreach (var contacto in contactosActuales)
+                _contactos.Eliminar(contacto);
+
+            AgregarContactos(entidad, dto.Telefonos, dto.Emails);
+
+            // Confirmar todo junto (una sola transacción: todo o nada).
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
         private void AgregarContactos(Entidad entidad, List<string> telefonos, List<string>? emails)
         {
