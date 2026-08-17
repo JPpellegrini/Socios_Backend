@@ -55,6 +55,11 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Entidades.FirstOrDefaultAsync(e => e.Dni == dni);
         }
 
+        public async Task<Entidad?> ObtenerPorCuitCuilAsync(string cuitCuil)
+        {
+            return await _context.Entidades.FirstOrDefaultAsync(e => e.CuitCuil == cuitCuil);
+        }
+
         public async Task<bool> ExisteAsync(int id)
         {
             return await _context.Entidades.AnyAsync(e => e.Id_Entidad == id);

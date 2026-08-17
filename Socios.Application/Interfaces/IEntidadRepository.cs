@@ -17,6 +17,9 @@ namespace Socios.Application.Interfaces
         /// <summary>Trae la entidad que tenga exactamente ese DNI, o null si no existe.</summary>
         Task<Entidad?> ObtenerPorDniAsync(string dni);
 
+        /// <summary>Trae la entidad que tenga exactamente ese CUIT/CUIL, o null si no existe.</summary>
+        Task<Entidad?> ObtenerPorCuitCuilAsync(string cuitCuil);
+
         /// <summary>Indica si existe una entidad con ese Id.</summary>
         Task<bool> ExisteAsync(int id);
 

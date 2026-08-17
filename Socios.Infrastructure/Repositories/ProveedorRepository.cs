@@ -74,5 +74,17 @@ namespace Socios.Infrastructure.Repositories
                 Estado = x.et.Estado
             }).ToListAsync();
         }
+
+        public async Task<bool> EsProveedorAsync(int idEntidad)
+        {
+            // Es proveedor si ya existe una fila en la tabla proveedores para esa entidad.
+            return await _context.Proveedores.AnyAsync(p => p.Id_Entidad == idEntidad);
+        }
+
+        public void Agregar(Proveedor proveedor)
+        {
+            // Solo marca el proveedor para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Proveedores.Add(proveedor);
+        }
     }
 }
