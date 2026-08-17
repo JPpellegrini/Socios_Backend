@@ -34,6 +34,7 @@ namespace Socios.Infrastructure.Context
         public DbSet<TipoCuota> TiposCuotas { get; set; }
         public DbSet<Cuota> Cuotas { get; set; }
         public DbSet<TipoPlan> TiposPlan { get; set; }
+        public DbSet<Proveedor> Proveedores { get; set; }
 
         /// <summary>
         /// Convención global: todos los DateTime se mapean a 'timestamp without time zone'
@@ -72,6 +73,7 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new TipoCuotaConfiguration());
             modelBuilder.ApplyConfiguration(new CuotaConfiguration());
             modelBuilder.ApplyConfiguration(new TipoPlanConfiguration());
+            modelBuilder.ApplyConfiguration(new ProveedorConfiguration());
 
             // Seed de Rol Secretaria de prueba
             modelBuilder.Entity<Rol>().HasData(new Rol

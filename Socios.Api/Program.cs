@@ -65,6 +65,7 @@ builder.Services.AddScoped<ITipoEntidadRepository, TipoEntidadRepository>();
 builder.Services.AddScoped<IEntidadBajaRepository, EntidadBajaRepository>();
 builder.Services.AddScoped<INichoRepository, NichoRepository>();
 builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
+builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
