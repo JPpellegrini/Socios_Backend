@@ -77,5 +77,18 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El proveedor fue modificado correctamente." });
         }
+
+        /// <summary>
+        /// Reactiva un proveedor dado de baja: recibe el Id de la entidad y pasa su estado a ACTIVO.
+        ///   - Entidad sin proveedor → 404 (RecursoNoEncontradoException).
+        ///   - Proveedor ya activo    → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("reactivar")]
+        public async Task<IActionResult> ReactivarProveedorAsync([FromBody] ProveedorReactivarDto dto)
+        {
+            await _proveedorUseCase.ReactivarAsync(dto);
+
+            return Ok(new { mensaje = "El proveedor fue reactivado correctamente." });
+        }
     }
 }

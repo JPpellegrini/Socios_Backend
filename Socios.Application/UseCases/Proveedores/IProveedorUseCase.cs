@@ -18,5 +18,8 @@ namespace Socios.Application.UseCases.Proveedores
 
         /// <summary>Modifica los datos editables de un proveedor (razón social, servicio, domicilio y contactos).</summary>
         Task ModificarAsync(ProveedorModificarDto dto);
+
+        /// <summary>Reactiva un proveedor dado de baja (pasa su estado a ACTIVO).</summary>
+        Task ReactivarAsync(ProveedorReactivarDto dto);
     }
 }
