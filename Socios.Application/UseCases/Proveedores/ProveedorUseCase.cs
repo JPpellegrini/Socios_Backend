@@ -201,6 +201,16 @@ namespace Socios.Application.UseCases.Proveedores
             await _unitOfWork.GuardarCambiosAsync();
         }
 
+        /// <summary>
+        /// Visualizar un proveedor. Es una lectura pura: no hay reglas ni transacción, así que
+        /// el trabajo (la consulta que arma el detalle) vive en el repositorio. Acá solo se
+        /// delega, para mantener un único punto de entrada de las operaciones del proveedor.
+        /// </summary>
+        public async Task<ProveedorDetalleDto?> VisualizarAsync(int idEntidad)
+        {
+            return await _proveedores.ObtenerDetalleAsync(idEntidad);
+        }
+
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
         private void AgregarContactos(Entidad entidad, List<string> telefonos, List<string>? emails)
         {

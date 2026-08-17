@@ -10,6 +10,12 @@ namespace Socios.Application.Interfaces
         /// <summary>Lista los proveedores aplicando los filtros recibidos.</summary>
         Task<List<ProveedorListadoDto>> BuscarAsync(ProveedorFiltroDto filtro);
 
+        /// <summary>
+        /// Trae todos los datos de un proveedor (por Id de entidad) para visualizarlo,
+        /// o null si esa entidad no es proveedor.
+        /// </summary>
+        Task<ProveedorDetalleDto?> ObtenerDetalleAsync(int idEntidad);
+
         /// <summary>Indica si la entidad indicada ya está registrada como proveedor.</summary>
         Task<bool> EsProveedorAsync(int idEntidad);
 

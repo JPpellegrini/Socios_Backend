@@ -90,5 +90,20 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El proveedor fue reactivado correctamente." });
         }
+
+        /// <summary>
+        /// Trae un proveedor por el Id de su entidad, con todos sus datos (identidad, domicilio,
+        /// servicio prestado, estado, fechas y contactos). Devuelve 404 si esa entidad no es proveedor.
+        /// </summary>
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> VisualizarProveedorAsync(int id)
+        {
+            var proveedor = await _proveedorUseCase.VisualizarAsync(id);
+
+            if (proveedor is null)
+                return NotFound(new { mensaje = "No se encontró el proveedor solicitado." });
+
+            return Ok(proveedor);
+        }
     }
 }

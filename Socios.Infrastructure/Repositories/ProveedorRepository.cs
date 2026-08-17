@@ -75,6 +75,49 @@ namespace Socios.Infrastructure.Repositories
             }).ToListAsync();
         }
 
+        public async Task<ProveedorDetalleDto?> ObtenerDetalleAsync(int idEntidad)
+        {
+            return await (
+                from p in _context.Proveedores
+                join e in _context.Entidades on p.Id_Entidad equals e.Id_Entidad
+                join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
+                join pr in _context.Prestacion on p.Id_Prestacion equals pr.Id_Prestacion
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas
+                from eb in bajas.DefaultIfEmpty()
+                where p.Id_Entidad == idEntidad && et.Id_Tipo == 2
+                select new ProveedorDetalleDto
+                {
+                    IdProveedor = p.Id_Proveedor,
+                    IdEntidad = e.Id_Entidad,
+                    TipoDocumento = e.Tipo,
+                    Dni = e.Dni,
+                    CuitCuil = e.CuitCuil,
+                    Nombre = e.Nombre,
+                    Apellido = e.Apellido,
+                    RazonSocial = e.RazonSocial,
+                    IdCiudad = e.Id_Ciudad,
+                    Ciudad = c.Nombre,
+                    Calle = e.Calle,
+                    Altura = e.Altura,
+                    Observaciones = e.Observacion,
+                    IdPrestacion = pr.Id_Prestacion,
+                    ServicioPrestado = pr.NombrePrestacion,
+                    Estado = et.Estado,
+                    FechaAlta = et.Fecha_Alta,
+                    FechaBaja = eb != null ? eb.Fecha_Baja : null,
+                    Telefonos = _context.Contactos
+                        .Where(x => x.Id_Entidad == e.Id_Entidad && x.Tipo == "TELEFONO")
+                        .Select(x => x.ContactoEntidad)
+                        .ToList(),
+                    Emails = _context.Contactos
+                        .Where(x => x.Id_Entidad == e.Id_Entidad && x.Tipo == "MAIL")
+                        .Select(x => x.ContactoEntidad)
+                        .ToList()
+                }
+            ).FirstOrDefaultAsync();
+        }
+
         public async Task<bool> EsProveedorAsync(int idEntidad)
         {
             // Es proveedor si ya existe una fila en la tabla proveedores para esa entidad.

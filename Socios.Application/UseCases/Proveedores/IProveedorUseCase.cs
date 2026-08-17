@@ -21,5 +21,11 @@ namespace Socios.Application.UseCases.Proveedores
 
         /// <summary>Reactiva un proveedor dado de baja (pasa su estado a ACTIVO).</summary>
         Task ReactivarAsync(ProveedorReactivarDto dto);
+
+        /// <summary>
+        /// Trae todos los datos de un proveedor (por Id de entidad) para visualizarlo.
+        /// Devuelve null si esa entidad no es proveedor.
+        /// </summary>
+        Task<ProveedorDetalleDto?> VisualizarAsync(int idEntidad);
     }
 }
