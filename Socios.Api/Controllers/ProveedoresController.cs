@@ -50,5 +50,18 @@ namespace Socios.Api.Controllers
 
             return Ok(new { idProveedor });
         }
+
+        /// <summary>
+        /// Da de baja un proveedor: recibe el Id de la entidad y pasa su estado a INACTIVO.
+        ///   - Entidad sin proveedor → 404 (RecursoNoEncontradoException).
+        ///   - Proveedor ya inactivo → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("baja")]
+        public async Task<IActionResult> DarDeBajaProveedorAsync([FromBody] ProveedorBajaDto dto)
+        {
+            await _proveedorUseCase.BajaAsync(dto);
+
+            return Ok(new { mensaje = "El proveedor fue dado de baja correctamente." });
+        }
     }
 }

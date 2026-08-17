@@ -120,6 +120,25 @@ namespace Socios.Application.UseCases.Proveedores
             return proveedor.Id_Proveedor;
         }
 
+        /// <summary>
+        /// Baja de proveedor. Recibe el Id de la entidad, que debe existir y estar ACTIVA
+        /// como proveedor. Solo cambia el estado a INACTIVO (no registra motivo ni baja).
+        /// </summary>
+        public async Task BajaAsync(ProveedorBajaDto dto)
+        {
+            // Ubicar la fila de tipo "Proveedor" de esa entidad (viene trackeada).
+            var entidadTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(dto.IdEntidad, IdTipoProveedor)
+                ?? throw new RecursoNoEncontradoException("No se encontró un proveedor para la entidad indicada.");
+
+            // Regla de negocio: no se puede dar de baja dos veces.
+            if (entidadTipo.Estado == "INACTIVO")
+                throw new ReglaNegocioException("El proveedor ya está dado de baja.");
+
+            entidadTipo.Estado = "INACTIVO";
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
         /// <summary>Agrega los teléfonos y (si hay) los emails como contactos de la entidad.</summary>
         private void AgregarContactos(Entidad entidad, List<string> telefonos, List<string>? emails)
         {

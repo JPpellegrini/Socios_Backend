@@ -12,5 +12,8 @@ namespace Socios.Application.UseCases.Proveedores
     {
         /// <summary>Da de alta un proveedor y devuelve el Id generado.</summary>
         Task<int> CrearAsync(ProveedorCrearDto dto);
+
+        /// <summary>Da de baja un proveedor (pasa su estado a INACTIVO).</summary>
+        Task BajaAsync(ProveedorBajaDto dto);
     }
 }
