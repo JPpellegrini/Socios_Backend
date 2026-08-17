@@ -862,6 +862,43 @@ namespace Socios.Infrastructure.Context
                     Estado = "PENDIENTE"
                 }
             );
+
+            // Seed de Proveedores de prueba. Un proveedor = Entidad + EntidadTipo (Id_Tipo 2)
+            // + fila en proveedores (con su servicio = Id_Prestacion). Se incluyen empresas
+            // (CUIT) y una persona (DNI), en distintas ciudades, y uno INACTIVO para probar
+            // el filtro de inactivos y la reactivación.
+            // Nota: los contactos usan Tipo "TELEFONO"/"MAIL" para que el detalle los muestre
+            // (ObtenerDetalleAsync filtra por esos valores).
+            // Se usan Ids altos (1001+) para no chocar con las secuencias de identidad
+            // (los altas en runtime siguen numerando desde donde va la base).
+            modelBuilder.Entity<Entidad>().HasData(
+                new Entidad { Id_Entidad = 1001, Tipo = "CUIT", Dni = null, CuitCuil = "30711111118", RazonSocial = "Distribuidora del Litoral S.A.", Sexo = "Persona Juridica", Id_Ciudad = 3, Calle = "San Martín", Altura = 1200 },
+                new Entidad { Id_Entidad = 1002, Tipo = "CUIT", Dni = null, CuitCuil = "30722222229", RazonSocial = "Insumos Médicos Rosario S.R.L.", Sexo = "Persona Juridica", Id_Ciudad = 3, Calle = "Córdoba", Altura = 850 },
+                new Entidad { Id_Entidad = 1003, Tipo = "DNI", Dni = "27333444", CuitCuil = null, RazonSocial = "Servicios Integrales Funes", Id_Ciudad = 2, Calle = "Belgrano", Altura = 340 },
+                new Entidad { Id_Entidad = 1004, Tipo = "CUIT", Dni = null, CuitCuil = "30744444441", RazonSocial = "Mantenimiento Roldán S.A.", Sexo = "Persona Juridica", Id_Ciudad = 1, Calle = "Sarmiento", Altura = 55 }
+            );
+
+            modelBuilder.Entity<EntidadTipo>().HasData(
+                new EntidadTipo { Id_EntidadTipo = 1001, Id_Entidad = 1001, Id_Tipo = 2, Fecha_Alta = new DateTime(2023, 5, 10), Estado = "ACTIVO" },
+                new EntidadTipo { Id_EntidadTipo = 1002, Id_Entidad = 1002, Id_Tipo = 2, Fecha_Alta = new DateTime(2024, 2, 20), Estado = "ACTIVO" },
+                new EntidadTipo { Id_EntidadTipo = 1003, Id_Entidad = 1003, Id_Tipo = 2, Fecha_Alta = new DateTime(2022, 11, 5), Estado = "ACTIVO" },
+                new EntidadTipo { Id_EntidadTipo = 1004, Id_Entidad = 1004, Id_Tipo = 2, Fecha_Alta = new DateTime(2021, 7, 15), Estado = "INACTIVO" }
+            );
+
+            modelBuilder.Entity<Proveedor>().HasData(
+                new Proveedor { Id_Proveedor = 1001, Id_Entidad = 1001, Id_Prestacion = 1 },
+                new Proveedor { Id_Proveedor = 1002, Id_Entidad = 1002, Id_Prestacion = 2 },
+                new Proveedor { Id_Proveedor = 1003, Id_Entidad = 1003, Id_Prestacion = 3 },
+                new Proveedor { Id_Proveedor = 1004, Id_Entidad = 1004, Id_Prestacion = 4 }
+            );
+
+            modelBuilder.Entity<Contacto>().HasData(
+                new Contacto { Id_Contacto = 1001, Tipo = "TELEFONO", ContactoEntidad = "3415550001", Id_Entidad = 1001 },
+                new Contacto { Id_Contacto = 1002, Tipo = "MAIL", ContactoEntidad = "ventas@litoral.com", Id_Entidad = 1001 },
+                new Contacto { Id_Contacto = 1003, Tipo = "TELEFONO", ContactoEntidad = "3415550002", Id_Entidad = 1002 },
+                new Contacto { Id_Contacto = 1004, Tipo = "TELEFONO", ContactoEntidad = "3415550003", Id_Entidad = 1003 },
+                new Contacto { Id_Contacto = 1005, Tipo = "TELEFONO", ContactoEntidad = "3415550004", Id_Entidad = 1004 }
+            );
         }
     }
 }
