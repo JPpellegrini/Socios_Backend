@@ -22,6 +22,12 @@ namespace Socios.Application.DTOs
         [RegularExpression(@"^.{3,250}$", ErrorMessage = "La razón social debe tener entre 3 y 250 caracteres.")]
         public string RazonSocial { get; set; } = null!;
 
+        /// <summary>
+        /// Fecha de nacimiento / constitución del proveedor (cuándo se fundó la empresa o
+        /// nació el monotributista). Opcional: puede no informarse.
+        /// </summary>
+        public DateTime? FechaNacimiento { get; set; }
+
         [Required(ErrorMessage = "El servicio prestado es obligatorio.")]
         public int? IdPrestacion { get; set; }
 

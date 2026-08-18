@@ -78,6 +78,7 @@ namespace Socios.Application.UseCases.Proveedores
                     Dni = tipoDocumento == "DNI" ? documento : null,
                     CuitCuil = tipoDocumento == "CUIT" ? documento : null,
                     RazonSocial = dto.RazonSocial.Trim(),
+                    Nacimiento = dto.FechaNacimiento,
                     Id_Ciudad = dto.IdCiudad!.Value,
                     Calle = dto.Calle.Trim(),
                     Altura = dto.Altura,
