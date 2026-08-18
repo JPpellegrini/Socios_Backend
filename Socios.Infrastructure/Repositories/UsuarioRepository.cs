@@ -42,5 +42,66 @@ namespace Socios.Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<Usuario>CrearUsuarioAsync(UsuarioCrearDto dto)
+        {
+            // 1. Hashear la contraseña
+            string passwordHasheada = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+            // 2. Crear la entidad Usuario
+            var usuario = new Usuario
+            {
+                UsuarioNombre = dto.UsuarioNombre.ToUpper().Trim(),
+                Password = passwordHasheada,
+                Estado = dto.Estado.ToUpper().Trim(),
+                Id_Rol = dto.Id_Rol
+            };
+
+            // 3. Guardar en la base
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            return usuario;
+        }
+
+        public async Task<Usuario?> DarDeBajaUsuarioAsync(int idUsuario)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id_Usuario == idUsuario);
+            if (usuario == null) return null;
+
+            usuario.Estado = "INACTIVO";
+            await _context.SaveChangesAsync();
+
+            return usuario;
+        }
+
+        public async Task<Usuario?> ModificarUsuarioAsync(int idUsuario, UsuarioModificarDto dto)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id_Usuario == idUsuario);
+
+            if (usuario == null)
+                return null;
+
+            // Si viene nueva contraseña, la hasheamos
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                usuario.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            }
+
+            // Si viene nuevo rol, lo actualizamos
+            if (dto.Id_Rol.HasValue)
+            {
+                usuario.Id_Rol = dto.Id_Rol.Value;
+            }
+
+            // Si viene nuevo estado, lo actualizamos en mayúsculas
+            if (!string.IsNullOrEmpty(dto.Estado))
+            {
+                usuario.Estado = dto.Estado.ToUpper().Trim();
+            }
+
+            await _context.SaveChangesAsync();
+            return usuario;
+        }
     }
 }

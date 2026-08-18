@@ -28,5 +28,34 @@ namespace Socios.Api.Controllers
 
             return Ok(usuario);
         }
+
+        [HttpPost("alta")]
+        public async Task<IActionResult> CrearUsuarioAsync([FromBody] UsuarioCrearDto dto)
+        {
+            var usuario = await _usuarioRepository.CrearUsuarioAsync(dto);
+            return Ok(usuario);
+        }
+
+        [HttpPost("baja/{id}")]
+        public async Task<IActionResult> BajaUsuario(int id)
+        {
+            var usuario = await _usuarioRepository.DarDeBajaUsuarioAsync(id);
+
+            if (usuario == null)
+                return NotFound(new { mensaje = "No se encontró el usuario con ese Id." });
+
+            return Ok(new { mensaje = "Usuario dado de baja correctamente", usuario });
+        }
+
+        [HttpPut("modificar/{id}")]
+        public async Task<IActionResult> ModificarUsuario(int id, [FromBody] UsuarioModificarDto dto)
+        {
+            var usuario = await _usuarioRepository.ModificarUsuarioAsync(id, dto);
+
+            if (usuario == null)
+                return NotFound(new { mensaje = "No se encontró el usuario con ese Id." });
+
+            return Ok(new { mensaje = "Usuario modificado correctamente", usuario });
+        }
     }
 }

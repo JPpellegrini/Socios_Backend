@@ -78,8 +78,8 @@ namespace Socios.Infrastructure.Context
             new Rol
             {
                 Id_Rol = 1,
-                RolNombre = "SECRETARIA",
-                Descripcion = "SECRETARIA QUE MANEJA TODO EL SISTEMA"
+                RolNombre = "ADMINISTRATIVO",
+                Descripcion = "ADMINISTRATIVO QUE MANEJA TODO EL SISTEMA"
             },
             new Rol
             {
@@ -95,7 +95,7 @@ namespace Socios.Infrastructure.Context
                 Id_Usuario = 1,
                 UsuarioNombre = "CJR",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "ACTIVO",
                 Id_Rol = 2
             },
             new Usuario
@@ -103,7 +103,7 @@ namespace Socios.Infrastructure.Context
                 Id_Usuario = 2,
                 UsuarioNombre = "ADRIANA",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "ACTIVO",
                 Id_Rol = 1
             },
             new Usuario
@@ -111,7 +111,7 @@ namespace Socios.Infrastructure.Context
                 Id_Usuario = 3,
                 UsuarioNombre = "MARCELA",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "INACTIVO",
                 Id_Rol = 1
             }
             );

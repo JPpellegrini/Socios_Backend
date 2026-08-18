@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Socios.Infrastructure.Context;
@@ -11,9 +12,11 @@ using Socios.Infrastructure.Context;
 namespace Socios.Infrastructure.Migrations
 {
     [DbContext(typeof(SociosDbContext))]
-    partial class SociosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816231656_UPPER")]
+    partial class UPPER
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1591,7 +1594,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 1,
-                            Estado = "ACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 2,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "CJR"
@@ -1599,7 +1602,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 2,
-                            Estado = "ACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "ADRIANA"
@@ -1607,7 +1610,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 3,
-                            Estado = "INACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "MARCELA"
