@@ -140,8 +140,9 @@ namespace Socios.Application.UseCases.Proveedores
         }
 
         /// <summary>
-        /// Modificar un proveedor. Solo se tocan razón social, servicio prestado, domicilio y
-        /// contactos: la identidad (tipo de documento y documento) NO se modifica acá.
+        /// Modificar un proveedor. Solo se tocan razón social, fecha de nacimiento, servicio
+        /// prestado, domicilio y contactos: la identidad (tipo de documento y documento) NO se
+        /// modifica acá.
         ///
         /// Los contactos se reemplazan por completo: se borran los actuales y se cargan los
         /// que vienen en el dto. Todo se confirma en una única transacción.
@@ -161,6 +162,7 @@ namespace Socios.Application.UseCases.Proveedores
 
             // Datos de la entidad (empresa/persona) y domicilio.
             entidad.RazonSocial = dto.RazonSocial.Trim();
+            entidad.Nacimiento = dto.FechaNacimiento;
             entidad.Id_Ciudad = dto.IdCiudad!.Value;
             entidad.Calle = dto.Calle.Trim();
             entidad.Altura = dto.Altura;
