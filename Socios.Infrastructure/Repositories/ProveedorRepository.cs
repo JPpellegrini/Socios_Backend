@@ -96,6 +96,7 @@ namespace Socios.Infrastructure.Repositories
                     Nombre = e.Nombre,
                     Apellido = e.Apellido,
                     RazonSocial = e.RazonSocial,
+                    FechaNacimiento = e.Nacimiento,
                     IdCiudad = e.Id_Ciudad,
                     Ciudad = c.Nombre,
                     Calle = e.Calle,

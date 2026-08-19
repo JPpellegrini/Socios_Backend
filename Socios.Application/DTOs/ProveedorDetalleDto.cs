@@ -22,6 +22,7 @@ namespace Socios.Application.DTOs
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
         public string? RazonSocial { get; set; }
+        public DateTime? FechaNacimiento { get; set; }   // nacimiento / constitución
 
         // Domicilio
         public int IdCiudad { get; set; }
