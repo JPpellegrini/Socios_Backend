@@ -29,7 +29,7 @@ namespace Socios.Infrastructure.Repositories
                 join pr in _context.Prestacion on p.Id_Prestacion equals pr.Id_Prestacion
                 join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
                 join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
-                where t.NombreTipoEntidad == "Proveedor"
+                where t.NombreTipoEntidad == "PROVEEDOR"
                 select new { p, e, c, pr, et };
 
             var busqueda = filtro.Busqueda?.Trim();
