@@ -76,17 +76,18 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new ProveedorConfiguration());
 
             // Seed de Rol Secretaria de prueba
-            modelBuilder.Entity<Rol>().HasData(new Rol
+            modelBuilder.Entity<Rol>().HasData(
+            new Rol
             {
                 Id_Rol = 1,
-                RolNombre = "Secretaria",
-                Descripcion = "Secretaria que maneja todo el sistema"
+                RolNombre = "ADMINISTRATIVO",
+                Descripcion = "ADMINISTRATIVO QUE MANEJA TODO EL SISTEMA"
             },
             new Rol
             {
                 Id_Rol = 2,
-                RolNombre = "Consultor",
-                Descripcion = "Solo posee acceso al módulo de informes"
+                RolNombre = "CONSULTOR",
+                Descripcion = "SOLO POSEE ACCESO AL MÓDULO DE INFORMES"
             }
             );
 
@@ -96,32 +97,32 @@ namespace Socios.Infrastructure.Context
                 Id_Usuario = 1,
                 UsuarioNombre = "CJR",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "ACTIVO",
                 Id_Rol = 2
             },
-            new Usuario          
+            new Usuario
             {
                 Id_Usuario = 2,
-                UsuarioNombre = "Adriana",
+                UsuarioNombre = "ADRIANA",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "ACTIVO",
                 Id_Rol = 1
             },
             new Usuario
             {
                 Id_Usuario = 3,
-                UsuarioNombre = "Marcela",
+                UsuarioNombre = "MARCELA",
                 Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay", // hash de "1234"
-                Estado = "Activo",
+                Estado = "INACTIVO",
                 Id_Rol = 1
             }
             );
 
             // Seed de Ciudades de prueba
             modelBuilder.Entity<Ciudad>().HasData(
-                new Ciudad { Id_Ciudad = 1, Nombre = "Roldán" },
-                new Ciudad { Id_Ciudad = 2, Nombre = "Funes" },
-                new Ciudad { Id_Ciudad = 3, Nombre = "Rosario" }
+                new Ciudad { Id_Ciudad = 1, Nombre = "ROLDÁN" },
+                new Ciudad { Id_Ciudad = 2, Nombre = "FUNES" },
+                new Ciudad { Id_Ciudad = 3, Nombre = "ROSARIO" }
             );
 
             // Seed de Entidades de ejemplo
@@ -132,13 +133,13 @@ namespace Socios.Infrastructure.Context
                     Tipo = "DNI",
                     Dni = "32127057",
                     CuitCuil = "20321270574",
-                    Nombre = "Luciano",
-                    Apellido = "Oldan",
+                    Nombre = "LUCIANO",
+                    Apellido = "OLDAN",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1959, 7, 12, 0, 0, 0),
                     Id_Ciudad = 1,
-                    Calle = "Independencia",
+                    Calle = "INDEPENDENCIA",
                     Altura = 250,
                     Observacion = null
                 },
@@ -148,13 +149,13 @@ namespace Socios.Infrastructure.Context
                     Tipo = "DNI",
                     Dni = "32185166",
                     CuitCuil = null,
-                    Nombre = "Juan",
-                    Apellido = "Pérez",
+                    Nombre = "JUAN",
+                    Apellido = "PÉREZ",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1998, 3, 1),
                     Id_Ciudad = 2,
-                    Calle = "Galindo",
+                    Calle = "GALINDO",
                     Altura = 458,
                     Observacion = null
                 },
@@ -166,11 +167,11 @@ namespace Socios.Infrastructure.Context
                     CuitCuil = "30657866330",
                     Nombre = null,
                     Apellido = null,
-                    RazonSocial = "Litoral Gas S.A",
-                    Sexo = "Persona Juridica",
+                    RazonSocial = "LITORAL GAS S.A",
+                    Sexo = "PERSONA JURIDICA",
                     Nacimiento = new DateTime(1980, 1, 1),
                     Id_Ciudad = 3,
-                    Calle = "Mitre",
+                    Calle = "MITRE",
                     Altura = 166,
                     Observacion = null
                 },
@@ -180,13 +181,13 @@ namespace Socios.Infrastructure.Context
                     Tipo = "DNI",
                     Dni = "55406681",
                     CuitCuil = null,
-                    Nombre = "María",
-                    Apellido = "López",
+                    Nombre = "MARÍA",
+                    Apellido = "LÓPEZ",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1987, 12, 11),
                     Id_Ciudad = 1,
-                    Calle = "Las Heras",
+                    Calle = "LAS HERAS",
                     Altura = 347,
                     Observacion = null
                 },
@@ -199,10 +200,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "EDUARDO",
                     Apellido = "AVILA",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1958, 4, 12),
                     Id_Ciudad = 1,
-                    Calle = "Salta",
+                    Calle = "SALTA",
                     Altura = 417,
                     Observacion = null
                 },
@@ -215,10 +216,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "RUTILIO ALFREDO",
                     Apellido = "MASABEU",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1960, 7, 25),
                     Id_Ciudad = 1,
-                    Calle = "Independencia",
+                    Calle = "INDEPENDENCIA",
                     Altura = 270,
                     Observacion = null
                 },
@@ -231,10 +232,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "ALFREDO",
                     Apellido = "MASABEU",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1955, 11, 3),
                     Id_Ciudad = 1,
-                    Calle = "Mendoza",
+                    Calle = "MENDOZA",
                     Altura = 684,
                     Observacion = null
                 },
@@ -247,10 +248,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "JOSÉ MOISÉS",
                     Apellido = "MEYADO",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1962, 2, 18),
                     Id_Ciudad = 1,
-                    Calle = "Corrientes",
+                    Calle = "CORRIENTES",
                     Altura = 867,
                     Observacion = null
                 },
@@ -263,10 +264,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "HUGO",
                     Apellido = "IPPOLITI",
                     RazonSocial = null,
-                    Sexo = "Hombre",
+                    Sexo = "HOMBRE",
                     Nacimiento = new DateTime(1959, 9, 30),
                     Id_Ciudad = 1,
-                    Calle = "Mendoza",
+                    Calle = "MENDOZA",
                     Altura = 1044,
                     Observacion = null
                 },
@@ -279,10 +280,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "SUSANA",
                     Apellido = "FLORIÁN DE AVILA",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1961, 5, 5),
                     Id_Ciudad = 1,
-                    Calle = "Salta",
+                    Calle = "SALTA",
                     Altura = 417,
                     Observacion = null
                 },
@@ -295,10 +296,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "LUCY",
                     Apellido = "HERRERA",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1956, 12, 4),
                     Id_Ciudad = 1,
-                    Calle = "1 de Mayo",
+                    Calle = "1 DE MAYO",
                     Altura = 292,
                     Observacion = null
                 },
@@ -311,10 +312,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "IRIS A.",
                     Apellido = "MURATTURE",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1957, 5, 5),
                     Id_Ciudad = 1,
-                    Calle = "Mitre",
+                    Calle = "MITRE",
                     Altura = 369,
                     Observacion = null
                 },
@@ -327,10 +328,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "RAQUEL",
                     Apellido = "VILLAREAL",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1963, 4, 6),
                     Id_Ciudad = 1,
-                    Calle = "Jujuy",
+                    Calle = "JUJUY",
                     Altura = 455,
                     Observacion = null
                 },
@@ -343,10 +344,10 @@ namespace Socios.Infrastructure.Context
                     Nombre = "ANA MARÍA",
                     Apellido = "BRAVO DE PONTI",
                     RazonSocial = null,
-                    Sexo = "Mujer",
+                    Sexo = "MUJER",
                     Nacimiento = new DateTime(1964, 10, 8),
                     Id_Ciudad = 1,
-                    Calle = "Jujuy",
+                    Calle = "JUJUY",
                     Altura = 953,
                     Observacion = null
                 }
@@ -354,43 +355,43 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Cuentas de prueba
             modelBuilder.Entity<Cuenta>().HasData(
-                new Cuenta 
-                { 
-                    Id_Cuenta = 1, 
-                    NombreCuenta = "Efectivo", 
-                    NroCuenta = 0, 
-                    Estado = "Activa" 
+                new Cuenta
+                {
+                    Id_Cuenta = 1,
+                    NombreCuenta = "EFECTIVO",
+                    NroCuenta = 0,
+                    Estado = "ACTIVA"
                 },
-                new Cuenta 
-                { 
-                    Id_Cuenta = 2, 
-                    NombreCuenta = "Banco Macro", 
-                    NroCuenta = 789012, 
-                    Estado = "Activa" 
+                new Cuenta
+                {
+                    Id_Cuenta = 2,
+                    NombreCuenta = "BANCO MACRO",
+                    NroCuenta = 789012,
+                    Estado = "ACTIVA"
                 },
-                new Cuenta 
-                { 
-                    Id_Cuenta = 3, 
-                    NombreCuenta = "Banco Macro 2", 
-                    NroCuenta = 712906, 
-                    Estado = "Inactiva" 
+                new Cuenta
+                {
+                    Id_Cuenta = 3,
+                    NombreCuenta = "BANCO NACION",
+                    NroCuenta = 712906,
+                    Estado = "INACTIVA"
                 }
             );
 
             // Seed de Detalle de Movimientos de prueba
             modelBuilder.Entity<DetalleMovimiento>().HasData(
-                new DetalleMovimiento { Id_Detmov = 1, NombreDetalleMovimiento = "Cuota Socio"},
-                new DetalleMovimiento { Id_Detmov = 2, NombreDetalleMovimiento = "Cuota Sepelio" },
-                new DetalleMovimiento { Id_Detmov = 3, NombreDetalleMovimiento = "Ajuste Diferencia Caja" },
-                new DetalleMovimiento { Id_Detmov = 4, NombreDetalleMovimiento = "Colaboración" },
-                new DetalleMovimiento { Id_Detmov = 5, NombreDetalleMovimiento = "Pago a Proveedor" },
-                new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "Transferencia" }
+                new DetalleMovimiento { Id_Detmov = 1, NombreDetalleMovimiento = "CUOTA SOCIO" },
+                new DetalleMovimiento { Id_Detmov = 2, NombreDetalleMovimiento = "CUOTA SEPELIO" },
+                new DetalleMovimiento { Id_Detmov = 3, NombreDetalleMovimiento = "AJUSTE DIFERENCIA CAJA" },
+                new DetalleMovimiento { Id_Detmov = 4, NombreDetalleMovimiento = "COLABORACIÓN" },
+                new DetalleMovimiento { Id_Detmov = 5, NombreDetalleMovimiento = "PAGO A PROVEEDOR" },
+                new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "TRANSFERENCIA" }
             );
 
             // Seed de Metodos de Pago de prueba
             modelBuilder.Entity<MetodoPago>().HasData(
-                new MetodoPago { Id_MetodoPago = 1, NombreMetodoPago = "Efectivo" },
-                new MetodoPago { Id_MetodoPago = 2, NombreMetodoPago = "Transferencia Bancaria" }
+                new MetodoPago { Id_MetodoPago = 1, NombreMetodoPago = "EFECTIVO" },
+                new MetodoPago { Id_MetodoPago = 2, NombreMetodoPago = "TRANSFERENCIA BANCARIA" }
             );
 
             // Seed de Obras Sociales de prueba
@@ -401,46 +402,46 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Prestaciones de prueba
             modelBuilder.Entity<Prestacion>().HasData(
-                new Prestacion { Id_Prestacion = 1, NombrePrestacion = "Podología" },
-                new Prestacion { Id_Prestacion = 2, NombrePrestacion = "Cardiología" },
-                new Prestacion { Id_Prestacion = 3, NombrePrestacion = "Alquiler Salón" },
-                new Prestacion { Id_Prestacion = 4, NombrePrestacion = "Comisión Cobrador" }
+                new Prestacion { Id_Prestacion = 1, NombrePrestacion = "PODOLOGÍA" },
+                new Prestacion { Id_Prestacion = 2, NombrePrestacion = "CARDIOLOGÍA" },
+                new Prestacion { Id_Prestacion = 3, NombrePrestacion = "ALQUILER SALÓN" },
+                new Prestacion { Id_Prestacion = 4, NombrePrestacion = "COMISIÓN COBRADOR" }
             );
 
             // Seed de Tipo de Entidad de prueba
             modelBuilder.Entity<TipoEntidad>().HasData(
-                new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "Socio" },
-                new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "Proveedor" },
-                new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "Colaborador" },
-                new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "Empleado" }
+                new TipoEntidad { Id_Tipo = 1, NombreTipoEntidad = "SOCIO" },
+                new TipoEntidad { Id_Tipo = 2, NombreTipoEntidad = "PROVEEDOR" },
+                new TipoEntidad { Id_Tipo = 3, NombreTipoEntidad = "COLABORADOR" },
+                new TipoEntidad { Id_Tipo = 4, NombreTipoEntidad = "EMPLEADO" }
             );
 
             // Seed de EstadoCajaDiaria de prueba
             modelBuilder.Entity<EstadoCajaDiaria>().HasData(
-                new EstadoCajaDiaria 
-                { 
-                    Id_CajaDiaria = 1, 
+                new EstadoCajaDiaria
+                {
+                    Id_CajaDiaria = 1,
                     Nro_Caja = 1,
-                    Id_Usuario = 1, 
-                    Tipo = "Apertura", 
-                    FechaHora = new DateTime(2026, 6, 9, 8, 00, 0), 
-                    Saldo = 100000 
+                    Id_Usuario = 1,
+                    Tipo = "APERTURA",
+                    FechaHora = new DateTime(2026, 6, 9, 8, 00, 0),
+                    Saldo = 100000
                 },
-                new EstadoCajaDiaria 
-                {   
-                    Id_CajaDiaria = 2, 
+                new EstadoCajaDiaria
+                {
+                    Id_CajaDiaria = 2,
                     Nro_Caja = 1,
-                    Id_Usuario = 1, 
-                    Tipo = "Cierre", 
-                    FechaHora = new DateTime(2026, 6, 9, 12, 05, 0), 
-                    Saldo = 142000 
+                    Id_Usuario = 1,
+                    Tipo = "CIERRE",
+                    FechaHora = new DateTime(2026, 6, 9, 12, 05, 0),
+                    Saldo = 142000
                 },
                 new EstadoCajaDiaria
                 {
                     Id_CajaDiaria = 3,
                     Nro_Caja = 2,
                     Id_Usuario = 2,
-                    Tipo = "Apertura",
+                    Tipo = "APERTURA",
                     FechaHora = new DateTime(2026, 6, 9, 8, 10, 0),
                     Saldo = 78000
                 },
@@ -449,7 +450,7 @@ namespace Socios.Infrastructure.Context
                     Id_CajaDiaria = 4,
                     Nro_Caja = 2,
                     Id_Usuario = 2,
-                    Tipo = "Cierre",
+                    Tipo = "CIERRE",
                     FechaHora = new DateTime(2026, 6, 9, 12, 15, 0),
                     Saldo = 250000
                 }
@@ -462,41 +463,41 @@ namespace Socios.Infrastructure.Context
                     Id_Movimiento = 1,
                     Id_CajaDiaria = 1,
                     FechaHoraMov = new DateTime(2026, 6, 10, 8, 20, 0),
-                    Tipo_Movimiento = "Ingreso",
+                    Tipo_Movimiento = "INGRESO",
                     Id_Entidad = 1,
                     Monto = 13500,
                     Id_MetodoPago = 2,
                     Id_Cuenta = 1,
                     Id_Detmov = 1,
-                    Observacion = "Pago Cuota Mayo"
+                    Observacion = "PAGO CUOTA MAYO"
                 },
                 new Caja
                 {
                     Id_Movimiento = 2,
                     Id_CajaDiaria = 1,
                     FechaHoraMov = new DateTime(2026, 6, 10, 9, 30, 0),
-                    Tipo_Movimiento = "Egreso",
+                    Tipo_Movimiento = "EGRESO",
                     Id_Entidad = 3,
                     Monto = 42500.47m,
                     Id_MetodoPago = 1,
                     Id_Cuenta = 2,
                     Id_Detmov = 5,
-                    Observacion = "Pago Gas Mes Junio"
+                    Observacion = "PAGO GAS MES JUNIO"
                 },
                 new Caja
                 {
                     Id_Movimiento = 3,
                     Id_CajaDiaria = 2,
                     FechaHoraMov = new DateTime(2026, 6, 10, 09, 30, 0),
-                    Tipo_Movimiento = "Ingreso",
+                    Tipo_Movimiento = "INGRESO",
                     Id_Entidad = 4,
                     Monto = 30000,
                     Id_MetodoPago = 1,
                     Id_Cuenta = 2,
                     Id_Detmov = 4,
-                    Observacion = "Colaboración Podología"
+                    Observacion = "COLABORACIÓN PODOLOGÍA"
                 }
-            );    
+            );
 
             // Seed de Socios de prueba
             modelBuilder.Entity<Socio>().HasData(
@@ -515,48 +516,48 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Codeudores de prueba
             modelBuilder.Entity<Codeudor>().HasData(
-                new Codeudor 
-                { 
-                    Id_Codeudor = 1, 
-                    Id_EntidadCodeudor = 1, 
-                    Id_Entidad = 2 
+                new Codeudor
+                {
+                    Id_Codeudor = 1,
+                    Id_EntidadCodeudor = 1,
+                    Id_Entidad = 2
                 }
             );
 
             // Seed de EntidadTipo de prueba
             modelBuilder.Entity<EntidadTipo>().HasData(
-                new EntidadTipo 
-                {   
-                    Id_EntidadTipo = 1, 
-                    Id_Entidad = 1, 
-                    Id_Tipo = 1, 
-                    Fecha_Alta = new DateTime(1995,1,18, 0, 0, 0), 
-                    Estado = "INACTIVO" 
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 1,
+                    Id_Entidad = 1,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(1995, 1, 18, 0, 0, 0),
+                    Estado = "INACTIVO"
                 },
-                new EntidadTipo 
-                { 
-                    Id_EntidadTipo = 2, 
-                    Id_Entidad = 1, 
-                    Id_Tipo = 3, 
-                    Fecha_Alta = new DateTime(2000,11,18, 0, 0, 0), 
-                    Estado = "ACTIVO" 
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 2,
+                    Id_Entidad = 1,
+                    Id_Tipo = 3,
+                    Fecha_Alta = new DateTime(2000, 11, 18, 0, 0, 0),
+                    Estado = "ACTIVO"
                 },
-                new EntidadTipo 
-                { 
-                    Id_EntidadTipo = 3, 
-                    Id_Entidad = 4, 
-                    Id_Tipo = 3, 
-                    Fecha_Alta = new DateTime(2008,1,18, 0, 0, 0), 
-                    Estado = "INACTIVO" 
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 3,
+                    Id_Entidad = 4,
+                    Id_Tipo = 3,
+                    Fecha_Alta = new DateTime(2008, 1, 18, 0, 0, 0),
+                    Estado = "INACTIVO"
                 },
-                                new EntidadTipo 
-                {   
-                    Id_EntidadTipo = 4, 
-                    Id_Entidad = 5, 
-                    Id_Tipo = 1, 
-                    Fecha_Alta = new DateTime(1995,1,18, 0, 0, 0), 
-                    Estado = "ACTIVO" 
-                },
+                                new EntidadTipo
+                                {
+                                    Id_EntidadTipo = 4,
+                                    Id_Entidad = 5,
+                                    Id_Tipo = 1,
+                                    Fecha_Alta = new DateTime(1995, 1, 18, 0, 0, 0),
+                                    Estado = "ACTIVO"
+                                },
                 new EntidadTipo
                 {
                     Id_EntidadTipo = 5,
@@ -633,59 +634,59 @@ namespace Socios.Infrastructure.Context
 
             // Seed de EntidadBajas de prueba
             modelBuilder.Entity<EntidadBaja>().HasData(
-                new EntidadBaja 
-                { 
-                    Id_Baja = 1, 
-                    Id_EntidadTipo = 1, 
-                    Fecha_Baja = new DateTime(2016,1,18, 0, 0, 0), 
-                    Motivo = "MORA" 
+                new EntidadBaja
+                {
+                    Id_Baja = 1,
+                    Id_EntidadTipo = 1,
+                    Fecha_Baja = new DateTime(2016, 1, 18, 0, 0, 0),
+                    Motivo = "MORA"
                 },
-                new EntidadBaja 
-                { 
-                    Id_Baja = 2, 
-                    Id_EntidadTipo = 3, 
-                    Fecha_Baja = new DateTime(2015,12,11, 0, 0, 0), 
-                    Motivo = "RENUNCIA" 
+                new EntidadBaja
+                {
+                    Id_Baja = 2,
+                    Id_EntidadTipo = 3,
+                    Fecha_Baja = new DateTime(2015, 12, 11, 0, 0, 0),
+                    Motivo = "RENUNCIA"
                 }
             );
 
             // Seed de Colaboradores de prueba
             modelBuilder.Entity<Colaborador>().HasData(
-                new Colaborador 
-                { 
-                    Id_Colaborador = 1, 
-                    Id_Prestacion = 2, 
-                    Id_Entidad = 4 
+                new Colaborador
+                {
+                    Id_Colaborador = 1,
+                    Id_Prestacion = 2,
+                    Id_Entidad = 4
                 }
             );
 
             // Seed de Contactos de prueba
             modelBuilder.Entity<Contacto>().HasData(
-                new Contacto 
-                { 
-                    Id_Contacto = 1, 
-                    Tipo = "Celular", 
-                    ContactoEntidad = "3413458966", 
-                    Id_Entidad = 1 
+                new Contacto
+                {
+                    Id_Contacto = 1,
+                    Tipo = "TELÉFONO",
+                    ContactoEntidad = "3413458966",
+                    Id_Entidad = 1
                 },
-                new Contacto 
-                { 
-                    Id_Contacto = 2, 
-                    Tipo = "Mail", 
-                    ContactoEntidad = "luciano@gmail", 
-                    Id_Entidad = 1 
+                new Contacto
+                {
+                    Id_Contacto = 2,
+                    Tipo = "MAIL",
+                    ContactoEntidad = "luciano@gmail",
+                    Id_Entidad = 1
                 },
                 new Contacto
                 {
                     Id_Contacto = 3,
-                    Tipo = "Celular",
+                    Tipo = "TELÉFONO",
                     ContactoEntidad = "3413485977",
                     Id_Entidad = 4
                 },
                 new Contacto
                 {
                     Id_Contacto = 4,
-                    Tipo = "Emergencia",
+                    Tipo = "TELÉFONO",
                     ContactoEntidad = "08007775427",
                     Id_Entidad = 3
                 }
@@ -808,7 +809,7 @@ namespace Socios.Infrastructure.Context
                 new CierreContable
                 {
                     Id_Cierre = 1,
-                    Tipo = "Mensual",
+                    Tipo = "MENSUAL",
                     Mes_Periodo = 3,
                     Anio_Periodo = 2026,
                     Fechor = new DateTime(2026, 3, 31, 9, 0, 0),
@@ -817,7 +818,7 @@ namespace Socios.Infrastructure.Context
                 new CierreContable
                 {
                     Id_Cierre = 2,
-                    Tipo = "Anual",
+                    Tipo = "ANUAL",
                     Mes_Periodo = null,
                     Anio_Periodo = 2025,
                     Fechor = new DateTime(2026, 1, 10, 8, 30, 0),

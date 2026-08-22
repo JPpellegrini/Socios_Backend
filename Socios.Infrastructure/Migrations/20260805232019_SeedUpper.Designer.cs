@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Socios.Infrastructure.Context;
@@ -11,9 +12,11 @@ using Socios.Infrastructure.Context;
 namespace Socios.Infrastructure.Migrations
 {
     [DbContext(typeof(SociosDbContext))]
-    partial class SociosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260805232019_SeedUpper")]
+    partial class SeedUpper
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,6 +213,9 @@ namespace Socios.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Codeudor"));
 
+                    b.Property<int?>("EntidadCodeudorId_Entidad")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Id_Entidad")
                         .HasColumnType("integer");
 
@@ -218,7 +224,7 @@ namespace Socios.Infrastructure.Migrations
 
                     b.HasKey("Id_Codeudor");
 
-                    b.HasIndex("Id_Entidad");
+                    b.HasIndex("EntidadCodeudorId_Entidad");
 
                     b.HasIndex("Id_EntidadCodeudor");
 
@@ -318,42 +324,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Contacto = 4,
                             ContactoEntidad = "08007775427",
                             Id_Entidad = 3,
-                            Tipo = "Emergencia"
-                        },
-                        new
-                        {
-                            Id_Contacto = 1001,
-                            ContactoEntidad = "3415550001",
-                            Id_Entidad = 1001,
-                            Tipo = "TELEFONO"
-                        },
-                        new
-                        {
-                            Id_Contacto = 1002,
-                            ContactoEntidad = "ventas@litoral.com",
-                            Id_Entidad = 1001,
-                            Tipo = "MAIL"
-                        },
-                        new
-                        {
-                            Id_Contacto = 1003,
-                            ContactoEntidad = "3415550002",
-                            Id_Entidad = 1002,
-                            Tipo = "TELEFONO"
-                        },
-                        new
-                        {
-                            Id_Contacto = 1004,
-                            ContactoEntidad = "3415550003",
-                            Id_Entidad = 1003,
-                            Tipo = "TELEFONO"
-                        },
-                        new
-                        {
-                            Id_Contacto = 1005,
-                            ContactoEntidad = "3415550004",
-                            Id_Entidad = 1004,
-                            Tipo = "TELEFONO"
+                            Tipo = "TELÉFONO"
                         });
                 });
 
@@ -775,49 +746,6 @@ namespace Socios.Infrastructure.Migrations
                             Nombre = "ANA MARÍA",
                             Sexo = "MUJER",
                             Tipo = "DNI"
-                        },
-                        new
-                        {
-                            Id_Entidad = 1001,
-                            Altura = 1200,
-                            Calle = "San Martín",
-                            CuitCuil = "30711111118",
-                            Id_Ciudad = 3,
-                            RazonSocial = "Distribuidora del Litoral S.A.",
-                            Sexo = "Persona Juridica",
-                            Tipo = "CUIT"
-                        },
-                        new
-                        {
-                            Id_Entidad = 1002,
-                            Altura = 850,
-                            Calle = "Córdoba",
-                            CuitCuil = "30722222229",
-                            Id_Ciudad = 3,
-                            RazonSocial = "Insumos Médicos Rosario S.R.L.",
-                            Sexo = "Persona Juridica",
-                            Tipo = "CUIT"
-                        },
-                        new
-                        {
-                            Id_Entidad = 1003,
-                            Altura = 340,
-                            Calle = "Belgrano",
-                            Dni = "27333444",
-                            Id_Ciudad = 2,
-                            RazonSocial = "Servicios Integrales Funes",
-                            Tipo = "DNI"
-                        },
-                        new
-                        {
-                            Id_Entidad = 1004,
-                            Altura = 55,
-                            Calle = "Sarmiento",
-                            CuitCuil = "30744444441",
-                            Id_Ciudad = 1,
-                            RazonSocial = "Mantenimiento Roldán S.A.",
-                            Sexo = "Persona Juridica",
-                            Tipo = "CUIT"
                         });
                 });
 
@@ -997,38 +925,6 @@ namespace Socios.Infrastructure.Migrations
                             Fecha_Alta = new DateTime(2025, 2, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Id_Entidad = 14,
                             Id_Tipo = 1
-                        },
-                        new
-                        {
-                            Id_EntidadTipo = 1001,
-                            Estado = "ACTIVO",
-                            Fecha_Alta = new DateTime(2023, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Id_Entidad = 1001,
-                            Id_Tipo = 2
-                        },
-                        new
-                        {
-                            Id_EntidadTipo = 1002,
-                            Estado = "ACTIVO",
-                            Fecha_Alta = new DateTime(2024, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Id_Entidad = 1002,
-                            Id_Tipo = 2
-                        },
-                        new
-                        {
-                            Id_EntidadTipo = 1003,
-                            Estado = "ACTIVO",
-                            Fecha_Alta = new DateTime(2022, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Id_Entidad = 1003,
-                            Id_Tipo = 2
-                        },
-                        new
-                        {
-                            Id_EntidadTipo = 1004,
-                            Estado = "INACTIVO",
-                            Fecha_Alta = new DateTime(2021, 7, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Id_Entidad = 1004,
-                            Id_Tipo = 2
                         });
                 });
 
@@ -1307,55 +1203,6 @@ namespace Socios.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Socios.Domain.Entities.Proveedor", b =>
-                {
-                    b.Property<int>("Id_Proveedor")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Proveedor"));
-
-                    b.Property<int>("Id_Entidad")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Id_Prestacion")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id_Proveedor");
-
-                    b.HasIndex("Id_Entidad");
-
-                    b.HasIndex("Id_Prestacion");
-
-                    b.ToTable("proveedores", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id_Proveedor = 1001,
-                            Id_Entidad = 1001,
-                            Id_Prestacion = 1
-                        },
-                        new
-                        {
-                            Id_Proveedor = 1002,
-                            Id_Entidad = 1002,
-                            Id_Prestacion = 2
-                        },
-                        new
-                        {
-                            Id_Proveedor = 1003,
-                            Id_Entidad = 1003,
-                            Id_Prestacion = 3
-                        },
-                        new
-                        {
-                            Id_Proveedor = 1004,
-                            Id_Entidad = 1004,
-                            Id_Prestacion = 4
-                        });
-                });
-
             modelBuilder.Entity("Socios.Domain.Entities.Rol", b =>
                 {
                     b.Property<int>("Id_Rol")
@@ -1382,8 +1229,8 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Rol = 1,
-                            Descripcion = "ADMINISTRATIVO QUE MANEJA TODO EL SISTEMA",
-                            RolNombre = "ADMINISTRATIVO"
+                            Descripcion = "SECRETARIA QUE MANEJA TODO EL SISTEMA",
+                            RolNombre = "SECRETARIA"
                         },
                         new
                         {
@@ -1750,7 +1597,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 1,
-                            Estado = "ACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 2,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "CJR"
@@ -1758,7 +1605,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 2,
-                            Estado = "ACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "ADRIANA"
@@ -1766,7 +1613,7 @@ namespace Socios.Infrastructure.Migrations
                         new
                         {
                             Id_Usuario = 3,
-                            Estado = "INACTIVO",
+                            Estado = "Activo",
                             Id_Rol = 1,
                             Password = "$2a$11$5.O9NB.FFBZ98GrE24jq7et8c0ACOkRVsSueihm78or/JNZmjVGay",
                             UsuarioNombre = "MARCELA"
@@ -1829,13 +1676,11 @@ namespace Socios.Infrastructure.Migrations
 
             modelBuilder.Entity("Socios.Domain.Entities.Codeudor", b =>
                 {
-                    b.HasOne("Socios.Domain.Entities.Entidad", "Entidad")
-                        .WithMany()
-                        .HasForeignKey("Id_Entidad")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Socios.Domain.Entities.Entidad", "EntidadCodeudor")
+                        .WithMany()
+                        .HasForeignKey("EntidadCodeudorId_Entidad");
+
+                    b.HasOne("Socios.Domain.Entities.Entidad", "Entidad")
                         .WithMany()
                         .HasForeignKey("Id_EntidadCodeudor")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1981,25 +1826,6 @@ namespace Socios.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Entidad");
-                });
-
-            modelBuilder.Entity("Socios.Domain.Entities.Proveedor", b =>
-                {
-                    b.HasOne("Socios.Domain.Entities.Entidad", "Entidad")
-                        .WithMany()
-                        .HasForeignKey("Id_Entidad")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Socios.Domain.Entities.Prestacion", "Prestacion")
-                        .WithMany()
-                        .HasForeignKey("Id_Prestacion")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Entidad");
-
-                    b.Navigation("Prestacion");
                 });
 
             modelBuilder.Entity("Socios.Domain.Entities.Socio", b =>

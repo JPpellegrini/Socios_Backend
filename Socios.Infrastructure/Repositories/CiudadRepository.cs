@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
 using Socios.Domain.Entities;
 using Socios.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace Socios.Infrastructure.Repositories
 {
@@ -22,6 +23,20 @@ namespace Socios.Infrastructure.Repositories
         public async Task<Ciudad?> GetByIdAsync(int id)
         {
             return await _context.Ciudades.FindAsync(id);
+        }
+        public async Task<List<CiudadListadoDto>> BuscarAsync(CiudadFiltroDto filtro)
+        {
+            if (string.IsNullOrEmpty(filtro.Busqueda))
+                return new List<CiudadListadoDto>();
+
+            return await _context.Ciudades
+                .Where(c => EF.Functions.Like(c.Nombre.ToUpper(), $"%{filtro.Busqueda.Trim().ToUpper()}%"))
+                .Select(c => new CiudadListadoDto
+                {
+                    Id_Ciudad = c.Id_Ciudad,
+                    Nombre = c.Nombre
+                })
+                .ToListAsync();
         }
     }
 }

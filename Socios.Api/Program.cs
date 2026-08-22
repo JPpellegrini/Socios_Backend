@@ -63,6 +63,8 @@ builder.Services.AddScoped<IEntidadRepository, EntidadRepository>();
 builder.Services.AddScoped<IEntidadTipoRepository, EntidadTipoRepository>();
 builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
 builder.Services.AddScoped<ITipoEntidadRepository, TipoEntidadRepository>();
+builder.Services.AddScoped<IObraSocialRepository, ObraSocialRepository>();
+builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
 builder.Services.AddScoped<IEntidadBajaRepository, EntidadBajaRepository>();
 builder.Services.AddScoped<INichoRepository, NichoRepository>();
 builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();

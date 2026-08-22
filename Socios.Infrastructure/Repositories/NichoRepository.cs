@@ -28,7 +28,8 @@ namespace Nichos.Infrastructure.Repositories
             {
                 query = query.Where(x => x.e != null &&
                     (x.e.Nombre.Contains(filtro.Busqueda) ||
-                    x.e.Apellido.Contains(filtro.Busqueda)));
+                    x.e.Apellido.Contains(filtro.Busqueda) ||
+                    x.e.Dni.Contains(filtro.Busqueda)));
             }
 
             return await query.Select(x => new NichoListadoDto

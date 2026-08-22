@@ -26,8 +26,8 @@ namespace Socios.Api.Controllers
         {
             var nicho = await _nichoRepository.BuscarNichoAsync(filtro);
 
-            if (nicho == null)
-                return NotFound("Nicho no encontrado.");
+            if (nicho == null || !nicho.Any())
+                return NotFound("Este socio no tiene ningún nicho asignado.");
 
             return Ok(nicho);
         }

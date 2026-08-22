@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
+using Socios.Application.Interfaces;
 using Socios.Application.UseCases.Codeudores;
 
 namespace Socios.Api.Controllers
