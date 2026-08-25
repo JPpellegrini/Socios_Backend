@@ -23,13 +23,31 @@ namespace Nichos.Infrastructure.Repositories
                 from e in ne.DefaultIfEmpty()
                 select new { n, e };
 
-            // 🔎 Filtro por nombre y/o apellido
-            if (!string.IsNullOrEmpty(filtro.Busqueda))
+            // 🔎 Búsqueda del socio: nombre, apellido o DNI. Si viene vacío, no filtra.
+            // ILIKE = case-insensitive; el Trim ignora espacios al inicio/fin.
+            if (!string.IsNullOrWhiteSpace(filtro.Busqueda))
             {
+                var termino = $"%{filtro.Busqueda.Trim()}%";
                 query = query.Where(x => x.e != null &&
-                    (x.e.Nombre.Contains(filtro.Busqueda) ||
-                    x.e.Apellido.Contains(filtro.Busqueda) ||
-                    x.e.Dni.Contains(filtro.Busqueda)));
+                    (EF.Functions.ILike(x.e.Nombre, termino) ||
+                     EF.Functions.ILike(x.e.Apellido, termino) ||
+                     EF.Functions.ILike(x.e.Dni, termino)));
+            }
+
+            // 🔎 Búsqueda del nicho: sector o número. Si viene vacío, no filtra.
+            if (!string.IsNullOrWhiteSpace(filtro.SectorNumero))
+            {
+                var nicho = $"%{filtro.SectorNumero.Trim()}%";
+                query = query.Where(x =>
+                    EF.Functions.ILike(x.n.Sector, nicho) ||
+                    EF.Functions.ILike(x.n.NroNicho, nicho));
+            }
+
+            // ☑ Ocupación: Ocupado se persiste como "SI"/"NO".
+            // false = solo libres; true = todos (incluye ocupados, no filtra).
+            if (!filtro.Ocupado)
+            {
+                query = query.Where(x => x.n.Ocupado == "NO");
             }
 
             return await query.Select(x => new NichoListadoDto

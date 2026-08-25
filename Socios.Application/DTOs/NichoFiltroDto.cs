@@ -6,6 +6,22 @@ namespace Socios.Application.DTOs
     /// </summary>
     public class NichoFiltroDto
     {
+        /// <summary>
+        /// Campo de búsqueda del socio. Matchea contra nombre, apellido o DNI.
+        /// Si viene vacío, no filtra.
+        /// </summary>
         public string? Busqueda { get; set; }
+
+        /// <summary>
+        /// Campo de búsqueda del nicho. Matchea contra sector o número.
+        /// Si viene vacío, no filtra.
+        /// </summary>
+        public string? SectorNumero { get; set; }
+
+        /// <summary>
+        /// Filtro de ocupación para el checkbox del front.
+        /// false = solo libres, true = todos (incluye ocupados).
+        /// </summary>
+        public bool Ocupado { get; set; }
     }
 }

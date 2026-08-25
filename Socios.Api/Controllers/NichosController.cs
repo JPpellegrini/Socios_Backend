@@ -18,18 +18,16 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
-        /// Busca nicho según el criterio especificado (Nombre y Apellido del Socio).
+        /// Busca nichos aplicando filtros opcionales: socio (nombre, apellido o DNI),
+        /// nicho (sector o número) y estado de ocupación.
         /// </summary>
-        
-        [HttpGet("buscar")]
+        [HttpGet]
         public async Task<IActionResult> BuscarNichoAsync([FromQuery] NichoFiltroDto filtro)
         {
-            var nicho = await _nichoRepository.BuscarNichoAsync(filtro);
+            var listaNichos = await _nichoRepository.BuscarNichoAsync(filtro);
 
-            if (nicho == null || !nicho.Any())
-                return NotFound("Este socio no tiene ningún nicho asignado.");
-
-            return Ok(nicho);
+            // Una búsqueda sin coincidencias es un resultado válido: 200 con lista vacía.
+            return Ok(listaNichos);
         }
     }
 }
