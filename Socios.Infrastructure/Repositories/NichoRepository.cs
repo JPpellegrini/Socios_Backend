@@ -74,10 +74,22 @@ namespace Nichos.Infrastructure.Repositories
                 n.Sector == sector && n.NroNicho == nroNicho);
         }
 
+        public async Task<Socios.Domain.Entities.Nicho?> ObtenerPorIdAsync(int idNicho)
+        {
+            // Trackeado (sin AsNoTracking) para que el caso de uso pueda eliminarlo.
+            return await _context.Nichos.FirstOrDefaultAsync(n => n.Id_Nicho == idNicho);
+        }
+
         public void Agregar(Socios.Domain.Entities.Nicho nicho)
         {
             // Solo marca el nicho para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Nichos.Add(nicho);
+        }
+
+        public void Eliminar(Socios.Domain.Entities.Nicho nicho)
+        {
+            // Solo marca el nicho para eliminar. El borrado real lo dispara la unidad de trabajo.
+            _context.Nichos.Remove(nicho);
         }
     }
 }

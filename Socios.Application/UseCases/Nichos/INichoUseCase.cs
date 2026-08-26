@@ -10,5 +10,8 @@ namespace Socios.Application.UseCases.Nichos
     {
         /// <summary>Da de alta un nicho (solo sector y número) y devuelve el Id generado.</summary>
         Task<int> CrearAsync(NichoCrearDto dto);
+
+        /// <summary>Da de baja un nicho (borrado físico). Solo se puede si el nicho no está ocupado.</summary>
+        Task BajaAsync(NichoBajaDto dto);
     }
 }

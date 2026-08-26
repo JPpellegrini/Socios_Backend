@@ -46,5 +46,18 @@ namespace Socios.Api.Controllers
 
             return Ok(new { idNicho });
         }
+
+        /// <summary>
+        /// Da de baja un nicho (borrado físico). Solo procede si el nicho no está ocupado.
+        ///   - Nicho inexistente → 404 (RecursoNoEncontradoException).
+        ///   - Nicho ocupado     → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("baja")]
+        public async Task<IActionResult> DarDeBajaNichoAsync([FromBody] NichoBajaDto dto)
+        {
+            await _nichoUseCase.BajaAsync(dto);
+
+            return Ok(new { mensaje = "El nicho fue eliminado correctamente." });
+        }
     }
 }

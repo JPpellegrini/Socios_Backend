@@ -50,5 +50,24 @@ namespace Socios.Application.UseCases.Nichos
             // El id se completa después de guardar.
             return nicho.Id_Nicho;
         }
+
+        /// <summary>
+        /// Da de baja un nicho (borrado físico). Reglas:
+        ///   - El nicho tiene que existir.
+        ///   - No se puede eliminar un nicho ocupado (Ocupado = "SI").
+        /// </summary>
+        public async Task BajaAsync(NichoBajaDto dto)
+        {
+            var nicho = await _nichos.ObtenerPorIdAsync(dto.IdNicho)
+                ?? throw new RecursoNoEncontradoException("No se encontró el nicho solicitado.");
+
+            // Regla de negocio: un nicho ocupado no se elimina.
+            if (nicho.Ocupado == "SI")
+                throw new ReglaNegocioException("No se puede eliminar un nicho que está ocupado.");
+
+            _nichos.Eliminar(nicho);
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
     }
 }
