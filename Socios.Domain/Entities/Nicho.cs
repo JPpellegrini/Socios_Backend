@@ -7,7 +7,7 @@ namespace Socios.Domain.Entities
         public Entidad? Entidad { get; set; }
         public string Sector { get; set; } = null!;
         public string NroNicho { get; set; } = null!;
-        public decimal ValorNicho { get; set; }
+        public decimal? ValorNicho { get; set; }
         public decimal? ValorLapida { get; set; }
         public string ConLapida { get; set; } = null!;
         public string Ocupado { get; set; } = null!;

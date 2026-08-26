@@ -67,5 +67,17 @@ namespace Nichos.Infrastructure.Repositories
                 InteresMensual = x.n.InteresMensual
             }).ToListAsync();
         }
+
+        public async Task<bool> ExisteSectorNumeroAsync(string sector, string nroNicho)
+        {
+            return await _context.Nichos.AnyAsync(n =>
+                n.Sector == sector && n.NroNicho == nroNicho);
+        }
+
+        public void Agregar(Socios.Domain.Entities.Nicho nicho)
+        {
+            // Solo marca el nicho para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Nichos.Add(nicho);
+        }
     }
 }

@@ -16,8 +16,12 @@ namespace Socios.Infrastructure.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Property(n => n.Sector).IsRequired().HasMaxLength(100);
             builder.Property(n => n.NroNicho).IsRequired().HasMaxLength(50);
-            builder.Property(n => n.ValorNicho).IsRequired();
+            // ValorNicho es opcional: se completa recién al asignar el nicho a un socio.
+            builder.Property(n => n.ValorNicho);
             builder.Property(n => n.ValorLapida);
+
+            // Un nicho se identifica por sector + número: la combinación no se puede repetir.
+            builder.HasIndex(n => new { n.Sector, n.NroNicho }).IsUnique();
             builder.Property(n => n.ConLapida).IsRequired().HasMaxLength(2);
             builder.Property(n => n.Ocupado).IsRequired().HasMaxLength(2);
             builder.Property(n => n.Cuotas).HasColumnType("int");
