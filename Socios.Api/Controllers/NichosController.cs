@@ -59,5 +59,19 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El nicho fue eliminado correctamente." });
         }
+
+        /// <summary>
+        /// Asigna un nicho libre a un socio, cargando valor, cuotas, interés y lápida.
+        ///   - Validaciones de formato → 400 (via [ApiController]).
+        ///   - Nicho inexistente       → 404 (RecursoNoEncontradoException).
+        ///   - Nicho ocupado, entidad no socio o falta valor de lápida → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("asignar")]
+        public async Task<IActionResult> AsignarNichoAsync([FromBody] NichoAsignarDto dto)
+        {
+            await _nichoUseCase.AsignarAsync(dto);
+
+            return Ok(new { mensaje = "El nicho fue asignado correctamente." });
+        }
     }
 }

@@ -13,5 +13,8 @@ namespace Socios.Application.UseCases.Nichos
 
         /// <summary>Da de baja un nicho (borrado físico). Solo se puede si el nicho no está ocupado.</summary>
         Task BajaAsync(NichoBajaDto dto);
+
+        /// <summary>Asigna un nicho libre a un socio, cargando valor, financiación y lápida.</summary>
+        Task AsignarAsync(NichoAsignarDto dto);
     }
 }
