@@ -9,6 +9,12 @@ namespace Socios.Application.Interfaces
     {
         Task<List<SocioListadoDto>> BuscarAsync(SocioFiltroDto filtro);
 
+        /// <summary>
+        /// Busca socios elegibles para asignarles un nicho: solo ACTIVOS y con sepelio ("SI").
+        /// El texto (opcional) matchea, en un solo parámetro, por Nombre, Apellido o DNI.
+        /// </summary>
+        Task<List<SocioAsignableNichoDto>> BuscarAsignablesNichoAsync(string? busqueda);
+
         /// <summary>Trae todos los datos de un socio para visualizarlo, o null si no existe.</summary>
         Task<SocioDetalleDto?> ObtenerDetalleAsync(int idSocio);
         Task<int?> ObtenerIdEntidadAsync(int idSocio);

@@ -62,6 +62,39 @@ namespace Socios.Infrastructure.Repositories
                 }).ToListAsync();
         }
 
+        public async Task<List<SocioAsignableNichoDto>> BuscarAsignablesNichoAsync(string? busqueda)
+        {
+            // Regla de negocio: solo se puede asignar un nicho a socios ACTIVOS y con sepelio.
+            var query =
+                from s in _context.Socios
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
+                where t.NombreTipoEntidad == "SOCIO"
+                    && et.Estado == "ACTIVO"
+                    && s.Sepelio == "SI"
+                select new { s, e };
+
+            // Campo único: matchea por Nombre, Apellido o DNI (ILIKE = case-insensitive, con Trim).
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var patron = $"%{busqueda.Trim()}%";
+                query = query.Where(x =>
+                    (x.e.Nombre != null && EF.Functions.ILike(x.e.Nombre, patron)) ||
+                    (x.e.Apellido != null && EF.Functions.ILike(x.e.Apellido, patron)) ||
+                    (x.e.Dni != null && EF.Functions.ILike(x.e.Dni, patron)));
+            }
+
+            return await query.Select(x => new SocioAsignableNichoDto
+            {
+                IdSocio = x.s.Id_Socio,
+                IdEntidad = x.e.Id_Entidad,
+                Nombre = x.e.Nombre,
+                Apellido = x.e.Apellido,
+                Dni = x.e.Dni
+            }).ToListAsync();
+        }
+
         public async Task<bool> EsSocioAsync(int idEntidad)
         {
             // Es socio si ya existe una fila en la tabla socios para esa entidad.

@@ -36,6 +36,19 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
+        /// Busca socios elegibles para asignarles un nicho: solo ACTIVOS y con sepelio ("SI").
+        /// El parámetro 'busqueda' (opcional) matchea, en un solo campo, por Nombre, Apellido o DNI.
+        /// Sin coincidencias devuelve 200 con lista vacía.
+        /// </summary>
+        [HttpGet("asignables-nicho")]
+        public async Task<IActionResult> BuscarAsignablesNichoAsync([FromQuery] string? busqueda)
+        {
+            var socios = await _socioRepository.BuscarAsignablesNichoAsync(busqueda);
+
+            return Ok(socios);
+        }
+
+        /// <summary>
         /// Da de alta un socio. La orquestación (crear o reutilizar la entidad, evitar
         /// duplicados, armar el socio + tipo + contactos y confirmar todo en una sola
         /// transacción) vive en el caso de uso, no acá.
