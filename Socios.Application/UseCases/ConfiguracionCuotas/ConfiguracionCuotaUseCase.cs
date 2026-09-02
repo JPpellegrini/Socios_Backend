@@ -11,14 +11,20 @@ namespace Socios.Application.UseCases.ConfiguracionCuotas
     public class ConfiguracionCuotaUseCase : IConfiguracionCuotaUseCase
     {
         private readonly ITipoCuotaRepository _tiposCuota;
+        private readonly ITipoPlanRepository _tiposPlan;
         private readonly IUnitOfWork _unitOfWork;
 
-        // Único concepto que este caso de uso tiene permitido modificar.
+        // Conceptos que este caso de uso maneja.
         private const string ConceptoSocio = "SOCIO";
+        private const string ConceptoSepelio = "SEPELIO";
 
-        public ConfiguracionCuotaUseCase(ITipoCuotaRepository tiposCuota, IUnitOfWork unitOfWork)
+        public ConfiguracionCuotaUseCase(
+            ITipoCuotaRepository tiposCuota,
+            ITipoPlanRepository tiposPlan,
+            IUnitOfWork unitOfWork)
         {
             _tiposCuota = tiposCuota;
+            _tiposPlan = tiposPlan;
             _unitOfWork = unitOfWork;
         }
 
@@ -41,6 +47,44 @@ namespace Socios.Application.UseCases.ConfiguracionCuotas
 
             tipoCuota.Importe = dto.Importe!.Value;
             tipoCuota.Fecha_ultimamodif = DateTime.Now;
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
+        /// <summary>
+        /// Modifica la cuota de SEPELIO "hasta el tope". Reglas:
+        ///   - El tipo de cuota tiene que existir.
+        ///   - Tiene que ser del concepto SEPELIO.
+        ///   - Tiene que ser la cuota "hasta el tope" (Tiene_EdadTope = true): la cuota
+        ///     "más de" no tiene tope propio y se edita por su propio endpoint.
+        /// Cambia el importe (en tipo_cuotas) y el tope de edad (en el plan asociado, en
+        /// tipo_planes), y actualiza la fecha de última modificación. Todo en una sola
+        /// transacción.
+        ///
+        /// El tope se guarda una sola vez acá: la cuota "más de" del mismo plan lo hereda,
+        /// así que este cambio también corre la frontera que muestra el "MAS DE n".
+        /// </summary>
+        public async Task ModificarSepelioHastaAsync(SepelioHastaModificarDto dto)
+        {
+            // Trackeado, para poder modificarlo y que la unidad de trabajo lo confirme.
+            var tipoCuota = await _tiposCuota.ObtenerPorIdAsync(dto.Id_TipoCuota!.Value)
+                ?? throw new RecursoNoEncontradoException("No se encontró el tipo de cuota solicitado.");
+
+            // Regla de negocio: este endpoint solo edita cuotas de SEPELIO...
+            if (tipoCuota.Concepto != ConceptoSepelio)
+                throw new ReglaNegocioException("Solo se puede modificar el importe y el tope de cuotas del concepto SEPELIO.");
+
+            // ...y específicamente la cuota "hasta el tope" (la que tiene el límite de edad).
+            if (!tipoCuota.Tiene_EdadTope)
+                throw new ReglaNegocioException("Esta es la cuota 'más de' (sin tope propio): se modifica por el endpoint que solo cambia el importe.");
+
+            // El tope vive en el plan asociado a esta cuota (relación 1 a 1).
+            var tipoPlan = await _tiposPlan.ObtenerPorTipoCuotaAsync(tipoCuota.Id_TipoCuota)
+                ?? throw new InvalidOperationException("La cuota de sepelio no tiene un plan asociado.");
+
+            tipoCuota.Importe = dto.Importe!.Value;
+            tipoCuota.Fecha_ultimamodif = DateTime.Now;
+            tipoPlan.EdadTope = dto.EdadTope!.Value;
 
             await _unitOfWork.GuardarCambiosAsync();
         }

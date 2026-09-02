@@ -49,5 +49,21 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El importe de la cuota de socio fue modificado correctamente." });
         }
+
+        /// <summary>
+        /// Modifica la cuota de SEPELIO "hasta el tope": importe + tope de edad. La fecha de
+        /// última modificación se actualiza automáticamente. El tope editado también corre la
+        /// frontera que muestra la cuota "más de" del mismo plan.
+        ///   - Validaciones de formato                    → 400 (via [ApiController]).
+        ///   - Tipo de cuota inexistente                  → 404 (RecursoNoEncontradoException).
+        ///   - No es SEPELIO, o es la cuota "más de"       → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPut("modificar-sepelio-hasta")]
+        public async Task<IActionResult> ModificarSepelioHastaAsync([FromBody] SepelioHastaModificarDto dto)
+        {
+            await _configuracionCuotaUseCase.ModificarSepelioHastaAsync(dto);
+
+            return Ok(new { mensaje = "La cuota de sepelio (con tope) fue modificada correctamente." });
+        }
     }
 }
