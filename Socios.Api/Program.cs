@@ -10,6 +10,7 @@ using Socios.Application.UseCases.Codeudores;
 using Socios.Application.UseCases.Entidades;
 using Socios.Application.UseCases.Proveedores;
 using Socios.Application.UseCases.Nichos;
+using Socios.Application.UseCases.ConfiguracionCuotas;
 using Socios.Infrastructure;
 using Nichos.Infrastructure.Repositories;
 
@@ -80,6 +81,7 @@ builder.Services.AddScoped<IEntidadUseCase, EntidadUseCase>();
 builder.Services.AddScoped<ICodeudorUseCase, CodeudorUseCase>();
 builder.Services.AddScoped<IProveedorUseCase, ProveedorUseCase>();
 builder.Services.AddScoped<INichoUseCase, NichoUseCase>();
+builder.Services.AddScoped<IConfiguracionCuotaUseCase, ConfiguracionCuotaUseCase>();
 
 #endregion
 

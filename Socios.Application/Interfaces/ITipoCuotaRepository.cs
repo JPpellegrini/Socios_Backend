@@ -9,5 +9,8 @@ namespace Socios.Application.Interfaces
         /// con filtro opcional por concepto.
         /// </summary>
         Task<List<ConfiguracionCuotaListadoDto>> BuscarConfiguracionAsync(ConfiguracionCuotaFiltroDto filtro);
+
+        /// <summary>Trae el tipo de cuota por su Id (trackeado, para poder modificarlo). Null si no existe.</summary>
+        Task<Domain.Entities.TipoCuota?> ObtenerPorIdAsync(int idTipoCuota);
     }
 }

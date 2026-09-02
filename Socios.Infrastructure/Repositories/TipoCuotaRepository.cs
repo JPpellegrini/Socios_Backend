@@ -94,5 +94,11 @@ namespace Socios.Infrastructure.Repositories
                 .OrderBy(r => r.Id_TipoCuota)
                 .ToList();
         }
+
+        public async Task<Socios.Domain.Entities.TipoCuota?> ObtenerPorIdAsync(int idTipoCuota)
+        {
+            // Trackeado (sin AsNoTracking) para que el caso de uso pueda modificarlo.
+            return await _context.TiposCuotas.FirstOrDefaultAsync(tc => tc.Id_TipoCuota == idTipoCuota);
+        }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using Socios.Application.UseCases.ConfiguracionCuotas;
 
 namespace Socios.Api.Controllers
 {
@@ -11,10 +12,14 @@ namespace Socios.Api.Controllers
     public class ConfiguracionCuotasController : ControllerBase
     {
         private readonly ITipoCuotaRepository _tipoCuotaRepository;
+        private readonly IConfiguracionCuotaUseCase _configuracionCuotaUseCase;
 
-        public ConfiguracionCuotasController(ITipoCuotaRepository tipoCuotaRepository)
+        public ConfiguracionCuotasController(
+            ITipoCuotaRepository tipoCuotaRepository,
+            IConfiguracionCuotaUseCase configuracionCuotaUseCase)
         {
             _tipoCuotaRepository = tipoCuotaRepository;
+            _configuracionCuotaUseCase = configuracionCuotaUseCase;
         }
 
         /// <summary>
@@ -28,6 +33,21 @@ namespace Socios.Api.Controllers
 
             // Una búsqueda sin coincidencias es un resultado válido: 200 con lista vacía.
             return Ok(configuracion);
+        }
+
+        /// <summary>
+        /// Modifica el importe de la cuota del concepto SOCIO. La fecha de última
+        /// modificación se actualiza automáticamente.
+        ///   - Validaciones de formato          → 400 (via [ApiController]).
+        ///   - Tipo de cuota inexistente        → 404 (RecursoNoEncontradoException).
+        ///   - El tipo de cuota no es de SOCIO   → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPut("modificar-socio")]
+        public async Task<IActionResult> ModificarImporteSocioAsync([FromBody] ConfiguracionCuotaModificarDto dto)
+        {
+            await _configuracionCuotaUseCase.ModificarImporteSocioAsync(dto);
+
+            return Ok(new { mensaje = "El importe de la cuota de socio fue modificado correctamente." });
         }
     }
 }
