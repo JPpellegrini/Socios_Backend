@@ -71,6 +71,7 @@ builder.Services.AddScoped<INichoRepository, NichoRepository>();
 builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
 builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IPrestacionRepository, PrestacionRepository>();
+builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
