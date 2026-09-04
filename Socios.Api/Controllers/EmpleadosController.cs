@@ -1,43 +1,100 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
 
-namespace Socios.Api.Controllers
+namespace Socios.API.Controllers
 {
     [ApiController]
-    [Route("api/v1/empleados")]
-    [Authorize]
+    [Route("api/v1/[controller]")]
     public class EmpleadosController : ControllerBase
     {
-        private readonly IEmpleadoRepository _empleadoRepository;
-        public EmpleadosController(IEmpleadoRepository empleadoRepository)
+        private readonly IEmpleadoUseCase _empleados;
+
+        public EmpleadosController(IEmpleadoUseCase empleados)
         {
-            _empleadoRepository = empleadoRepository;
+            _empleados = empleados;
         }
 
-        [HttpGet("listar")]
-        public async Task<IActionResult> ListarEmpleadosAsync([FromQuery] EntidadFiltroBasicoDto filtro)
+        /// <summary>
+        /// Alta de empleado
+        /// </summary>
+        [HttpPost("alta")]
+        public async Task<IActionResult> CrearEmpleadoAsync([FromBody] EmpleadoCrearDto dto)
         {
-            var empleados = await _empleadoRepository.ListarEmpleadosAsync(filtro);
-            if (empleados == null || !empleados.Any())
-                return NotFound(new { mensaje = $"No se encontraron empleados con el parámetro de búsqueda '{filtro.Busqueda}'." });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            return Ok(empleados);
+            try
+            {
+                var idEntidad = await _empleados.CrearAsync(dto);
+
+                return CreatedAtAction(nameof(ObtenerEmpleadoAsync),
+                    new { id = idEntidad },
+                    new { mensaje = $"Empleado {dto.Nombre} {dto.Apellido} creado correctamente.", idEntidad });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Devuelve un 409 Conflict con el mensaje de la excepción
+                return Conflict(new { mensaje = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // breakpoint aquí o log
+                return StatusCode(500, new { mensaje = ex.Message, detalle = ex.StackTrace });
+            }
         }
 
-        // Endpoint para dar de baja un empleado
+        /// <summary>
+        /// Visualizar un empleado por IdEntidad
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObtenerEmpleadoAsync(int id)
+        {
+            var empleado = await _empleados.VisualizarAsync(id);
+
+            if (empleado is null)
+                return NotFound(new { mensaje = $"No se encontró el empleado con IdEntidad {id}." });
+
+            return Ok(empleado);
+        }
+
+        /// <summary>
+        /// Baja de empleado
+        /// </summary>
         [HttpPut("baja/{idEntidadTipo}")]
         public async Task<IActionResult> DarDeBajaEmpleadoAsync(int idEntidadTipo)
         {
-            var empleado = await _empleadoRepository.DarDeBajaEmpleadoAsync(idEntidadTipo);
+            var resultado = await _empleados.BajaAsync(idEntidadTipo);
 
-            if (empleado == null)
-                return NotFound(new { mensaje = $"No se encontró un empleado activo con IdEntidadTipo = {idEntidadTipo}." });
+            if (!resultado)
+                return NotFound(new { mensaje = $"No se encontró un empleado activo con IdEntidadTipo {idEntidadTipo}." });
 
-            return Ok(new { mensaje = $"El empleado fue dado de baja correctamente." });
+            return Ok(new { mensaje = "El empleado fue dado de baja correctamente." });
+        }
 
+        /// <summary>
+        /// Modificar empleado
+        /// </summary>
+        [HttpPut("modificar")]
+        public async Task<IActionResult> ModificarEmpleadoAsync([FromBody] EmpleadoModificarDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _empleados.ModificarAsync(dto);
+
+            return Ok(new { mensaje = $"Empleado {dto.IdEntidad} modificado correctamente." });
+        }
+
+        [HttpGet("buscar")]
+        public async Task<IActionResult> BuscarEmpleadoAsync([FromQuery] string? busqueda)
+        {
+            var empleados = await _empleados.BuscarAsync(busqueda);
+
+            if (empleados == null || !empleados.Any())
+                return NotFound(new { mensaje = "No se encontraron empleados con ese filtro." });
+
+            return Ok(empleados);
         }
     }
 }

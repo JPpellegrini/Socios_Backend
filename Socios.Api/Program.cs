@@ -1,17 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using Socios.Application.Interfaces;
-using Socios.Infrastructure.Context;
-using Socios.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using Nichos.Infrastructure.Repositories;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
-using Socios.Application.UseCases.Socios;
+using Socios.Application.Interfaces;
 using Socios.Application.UseCases.Codeudores;
+using Socios.Application.UseCases.Empleados;
 using Socios.Application.UseCases.Entidades;
-using Socios.Application.UseCases.Proveedores;
 using Socios.Application.UseCases.Nichos;
+using Socios.Application.UseCases.Proveedores;
+using Socios.Application.UseCases.Socios;
 using Socios.Infrastructure;
-using Nichos.Infrastructure.Repositories;
+using Socios.Infrastructure.Context;
+using Socios.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,10 +73,10 @@ builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
 builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IPrestacionRepository, PrestacionRepository>();
 builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ISocioUseCase, SocioUseCase>();
 builder.Services.AddScoped<IEntidadUseCase, EntidadUseCase>();
 builder.Services.AddScoped<ICodeudorUseCase, CodeudorUseCase>();
 builder.Services.AddScoped<IProveedorUseCase, ProveedorUseCase>();

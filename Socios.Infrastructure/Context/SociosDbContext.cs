@@ -75,6 +75,11 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new TipoPlanConfiguration());
             modelBuilder.ApplyConfiguration(new ProveedorConfiguration());
 
+            modelBuilder.Entity<Entidad>()
+                .HasMany(e => e.Contactos)
+                .WithOne(c => c.Entidad)
+                .HasForeignKey(c => c.Id_Entidad);
+
             // Seed de Rol Secretaria de prueba
             modelBuilder.Entity<Rol>().HasData(
             new Rol
