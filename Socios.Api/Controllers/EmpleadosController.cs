@@ -21,27 +21,9 @@ namespace Socios.API.Controllers
         [HttpPost("alta")]
         public async Task<IActionResult> CrearEmpleadoAsync([FromBody] EmpleadoCrearDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var idEntidad = await _empleados.CrearAsync(dto);
 
-            try
-            {
-                var idEntidad = await _empleados.CrearAsync(dto);
-
-                return CreatedAtAction(nameof(ObtenerEmpleadoAsync),
-                    new { id = idEntidad },
-                    new { mensaje = $"Empleado {dto.Nombre} {dto.Apellido} creado correctamente.", idEntidad });
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Devuelve un 409 Conflict con el mensaje de la excepción
-                return Conflict(new { mensaje = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                // breakpoint aquí o log
-                return StatusCode(500, new { mensaje = ex.Message, detalle = ex.StackTrace });
-            }
+            return Ok( new {id = idEntidad , mensaje = $"Empleado {dto.Nombre} {dto.Apellido} creado correctamente." });
         }
 
         /// <summary>

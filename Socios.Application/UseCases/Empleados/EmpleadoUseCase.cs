@@ -1,4 +1,5 @@
 using Socios.Application.DTOs;
+using Socios.Application.Exceptions;
 using Socios.Application.Interfaces;
 using Socios.Domain.Entities;
 
@@ -51,7 +52,7 @@ namespace Socios.Application.UseCases.Empleados
 
             // 2) Verificar si ya es empleado
             if (await _empleados.EsEmpleadoAsync(entidad.Id_Entidad))
-                throw new InvalidOperationException("Ya existe un empleado registrado con ese DNI.");
+                throw new ReglaNegocioException("Ya existe un empleado registrado con ese DNI.");
 
             // 3) Colgar tipo "Empleado"
             _empleados.AgregarEntidadTipo(new EntidadTipo
