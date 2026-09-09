@@ -58,12 +58,27 @@ namespace Socios.Api.Controllers
         ///   - Tipo de cuota inexistente                  → 404 (RecursoNoEncontradoException).
         ///   - No es SEPELIO, o es la cuota "más de"       → 409 (ReglaNegocioException).
         /// </summary>
-        [HttpPut("modificar-sepelio-hasta")]
+        [HttpPut("modificar-sepelio-con-tope")]
         public async Task<IActionResult> ModificarSepelioHastaAsync([FromBody] SepelioHastaModificarDto dto)
         {
             await _configuracionCuotaUseCase.ModificarSepelioHastaAsync(dto);
 
             return Ok(new { mensaje = "La cuota de sepelio (con tope) fue modificada correctamente." });
+        }
+
+        /// <summary>
+        /// Modifica la cuota de SEPELIO "más de" (sin tope de edad propio): solo el importe.
+        /// La fecha de última modificación se actualiza automáticamente.
+        ///   - Validaciones de formato                       → 400 (via [ApiController]).
+        ///   - Tipo de cuota inexistente                     → 404 (RecursoNoEncontradoException).
+        ///   - No es SEPELIO, o es la cuota "hasta el tope"   → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPut("modificar-sepelio-sin-tope")]
+        public async Task<IActionResult> ModificarSepelioMasDeAsync([FromBody] SepelioMasDeModificarDto dto)
+        {
+            await _configuracionCuotaUseCase.ModificarSepelioMasDeAsync(dto);
+
+            return Ok(new { mensaje = "La cuota de sepelio (más de) fue modificada correctamente." });
         }
     }
 }

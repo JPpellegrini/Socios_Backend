@@ -88,5 +88,34 @@ namespace Socios.Application.UseCases.ConfiguracionCuotas
 
             await _unitOfWork.GuardarCambiosAsync();
         }
+
+        /// <summary>
+        /// Modifica la cuota de SEPELIO "más de" (sin tope propio). Reglas:
+        ///   - El tipo de cuota tiene que existir.
+        ///   - Tiene que ser del concepto SEPELIO.
+        ///   - Tiene que ser la cuota "más de" (Tiene_EdadTope = false): la cuota "hasta el
+        ///     tope" se edita por su propio endpoint (que además cambia la edad).
+        /// Solo cambia el importe y actualiza la fecha de última modificación. La edad no se
+        /// toca: va desde el tope de su cuota hermana hasta el infinito.
+        /// </summary>
+        public async Task ModificarSepelioMasDeAsync(SepelioMasDeModificarDto dto)
+        {
+            // Trackeado, para poder modificarlo y que la unidad de trabajo lo confirme.
+            var tipoCuota = await _tiposCuota.ObtenerPorIdAsync(dto.Id_TipoCuota!.Value)
+                ?? throw new RecursoNoEncontradoException("No se encontró el tipo de cuota solicitado.");
+
+            // Regla de negocio: este endpoint solo edita cuotas de SEPELIO...
+            if (tipoCuota.Concepto != ConceptoSepelio)
+                throw new ReglaNegocioException("Solo se puede modificar el importe de cuotas del concepto SEPELIO.");
+
+            // ...y específicamente la cuota "más de" (sin tope de edad propio).
+            if (tipoCuota.Tiene_EdadTope)
+                throw new ReglaNegocioException("Esta es la cuota 'hasta el tope': se modifica por el endpoint que también cambia la edad.");
+
+            tipoCuota.Importe = dto.Importe!.Value;
+            tipoCuota.Fecha_ultimamodif = DateTime.Now;
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
     }
 }

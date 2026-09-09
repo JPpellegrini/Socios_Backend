@@ -18,5 +18,11 @@ namespace Socios.Application.UseCases.ConfiguracionCuotas
         /// asociado). Actualiza la fecha de última modificación.
         /// </summary>
         Task ModificarSepelioHastaAsync(SepelioHastaModificarDto dto);
+
+        /// <summary>
+        /// Modifica la cuota de SEPELIO "más de" (sin tope propio): solo el importe.
+        /// Actualiza la fecha de última modificación.
+        /// </summary>
+        Task ModificarSepelioMasDeAsync(SepelioMasDeModificarDto dto);
     }
 }
