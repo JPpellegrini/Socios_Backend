@@ -15,6 +15,10 @@ namespace Socios.Application.Interfaces
         Task<EntidadTipo?> ObtenerEntidadTipoAsync(int idEntidadTipo);
         void ActualizarEntidadTipo(EntidadTipo entidadTipo);
         Task RegistrarBajaAsync(EntidadBaja baja);
+        /// <summary>Indica si la entidad indicada ya está registrada como colaborador.</summary>
+        Task<bool> EsColaboradorAsync(int idEntidad);
+        /// <summary>Marca el colaborador para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
+        void Agregar(Colaborador colaborador);
 
     }
 }

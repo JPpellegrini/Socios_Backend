@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
 using Socios.Application.UseCases.Colaboradores;
@@ -10,9 +11,11 @@ namespace Socios.Api.Controllers
     public class ColaboradoresController : ControllerBase
     {
         private readonly IColaboradorUseCase _colaboradores;
+        private readonly IColaboradorRepository _colaboradorRepository;
 
-        public ColaboradoresController(IColaboradorUseCase colaboradores)
+        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IColaboradorUseCase colaboradores)
         {
+            _colaboradorRepository = colaboradorRepository;
             _colaboradores = colaboradores;
         }
 
@@ -37,6 +40,24 @@ namespace Socios.Api.Controllers
                 return NotFound(new { mensaje = $"No se encontró el colaborador con IdEntidadTipo {idEntidadTipo} o ya estaba inactivo." });
 
             return Ok(new { mensaje = $"Colaborador dado de baja correctamente con motivo: {dto.Motivo}" });
+
+
+        }
+
+
+        /// <summary>
+        /// Da de alta un proveedor. La orquestación (crear o reutilizar la entidad, evitar
+        /// duplicados, armar el proveedor + tipo + contactos y confirmar todo en una sola
+        /// transacción) vive en el caso de uso, no acá.
+        ///   - Validaciones de formato → 400 (via [ApiController]).
+        ///   - Reglas de negocio (ej: "ya es proveedor") → 409 (ExceptionMiddleware).
+        /// </summary>
+        [HttpPost("crear")]
+        public async Task<IActionResult> CrearColaboradorAsync([FromBody] ColaboradorCrearDto dto)
+        {
+            var idColaborador = await _colaboradores.CrearAsync(dto);
+
+            return Ok(new { idColaborador });
         }
     }
 }

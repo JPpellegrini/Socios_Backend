@@ -11,6 +11,10 @@ namespace Socios.Application.Interfaces
         /// </summary>
         Task<bool> BajaAsync(int idEntidadTipo, string motivo);
 
+        /// <summary>Da de alta un colaborador y devuelve el Id generado.</summary>
+        Task<int> CrearAsync(ColaboradorCrearDto dto);
+
+
     }
 
 }

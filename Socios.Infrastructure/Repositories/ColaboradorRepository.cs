@@ -87,5 +87,18 @@ namespace Socios.Infrastructure.Repositories
             await _context.EntidadBajas.AddAsync(baja);
         }
 
+        public void Agregar(Colaborador colaborador)
+        {
+            // Solo marca el colaborador para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Colaboradores.Add(colaborador);
+        }
+
+
+        public async Task<bool> EsColaboradorAsync(int idEntidad)
+        {
+            // Es colaborador si ya existe una fila en la tabla colaboradores para esa entidad.
+            return await _context.Colaboradores.AnyAsync(c => c.Id_Entidad == idEntidad);
+        }
+
     }
 }
