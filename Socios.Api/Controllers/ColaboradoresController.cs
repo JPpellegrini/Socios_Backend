@@ -59,5 +59,32 @@ namespace Socios.Api.Controllers
 
             return Ok(new { idColaborador });
         }
+
+        /// <summary>
+        /// Modifica los datos editables de un colaborador (razón social, servicio prestado,
+        /// domicilio y contactos). La identidad no se modifica acá.
+        ///   - Validaciones de formato → 400 (via [ApiController]).
+        ///   - Entidad sin colaborador   → 404 (RecursoNoEncontradoException).
+        /// </summary>
+        [HttpPut("modificar")]
+        public async Task<IActionResult> ModificarColaboradorAsync([FromBody] ColaboradorModificarDto dto)
+        {
+            await _colaboradores.ModificarAsync(dto);
+
+            return Ok(new { mensaje = "El colaborador fue modificado correctamente." });
+        }
+
+        /// <summary>
+        /// Reactiva un colaborador dado de baja: recibe el Id de la entidad y pasa su estado a ACTIVO.
+        ///   - Entidad sin colaborador → 404 (RecursoNoEncontradoException).
+        ///   - Colaborador ya activo    → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("reactivar")]
+        public async Task<IActionResult> ReactivarColaboradorAsync([FromBody] ColaboradorReactivarDto dto)
+        {
+            await _colaboradores.ReactivarAsync(dto);
+
+            return Ok(new { mensaje = "El colaborador fue reactivado correctamente." });
+        }
     }
 }

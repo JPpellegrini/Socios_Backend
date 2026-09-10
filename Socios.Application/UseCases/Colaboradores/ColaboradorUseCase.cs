@@ -196,6 +196,71 @@ namespace Socios.Application.UseCases.Colaboradores
                     });
                 }
             }
+
+        }
+
+        /// <summary>
+        /// Modificar un colaborador. Solo se tocan razón social, fecha de nacimiento, servicio
+        /// prestado, domicilio y contactos: la identidad (tipo de documento y documento) NO se
+        /// modifica acá.
+        ///
+        /// Los contactos se reemplazan por completo: se borran los actuales y se cargan los
+        /// que vienen en el dto. Todo se confirma en una única transacción.
+        /// </summary>
+        public async Task ModificarAsync(ColaboradorModificarDto dto)
+        {
+            // Ubicar el colaborador junto con su entidad (ambos trackeados para poder modificarlos).
+            var colaborador = await _colaboradores.ObtenerConEntidadPorEntidadAsync(dto.IdEntidad)
+                ?? throw new RecursoNoEncontradoException("No se encontró un colaborador para la entidad indicada.");
+
+            var entidad = colaborador.Entidad
+                ?? throw new InvalidOperationException("El colaborador no tiene una entidad asociada.");
+
+            // El servicio prestado (prestación) tiene que existir.
+            if (!await _prestaciones.ExisteAsync(dto.IdPrestacion!.Value))
+                throw new ReglaNegocioException($"No existe una prestación con el Id {dto.IdPrestacion} para asignar como servicio prestado.");
+
+            // Datos de la entidad (empresa/persona) y domicilio.
+            entidad.Nombre = dto.Nombre.Trim().ToUpperInvariant();
+            entidad.Apellido = dto.Apellido.Trim().ToUpperInvariant();
+            entidad.RazonSocial = dto.RazonSocial?.Trim().ToUpperInvariant();
+            entidad.Nacimiento = dto.FechaNacimiento;
+            entidad.Id_Ciudad = dto.IdCiudad!.Value;
+            entidad.Calle = dto.Calle.Trim().ToUpperInvariant();
+            entidad.Altura = dto.Altura;
+            entidad.Observacion = dto.Observaciones?.Trim().ToUpperInvariant();
+
+            // Servicio prestado.
+            colaborador.Id_Prestacion = dto.IdPrestacion!.Value;
+
+            // Reemplazar los contactos: se eliminan los actuales y se cargan los nuevos.
+            var contactosActuales = await _contactos.ObtenerPorEntidadAsync(entidad.Id_Entidad);
+            foreach (var contacto in contactosActuales)
+                _contactos.Eliminar(contacto);
+
+            AgregarContactos(entidad, dto.Telefonos, dto.Emails);
+
+            // Confirmar todo junto (una sola transacción: todo o nada).
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
+        /// <summary>
+        /// Reactivación de colaborador. Recibe el Id de la entidad, que debe existir y estar
+        /// INACTIVA como colaborador. Solo cambia el estado a ACTIVO.
+        /// </summary>
+        public async Task ReactivarAsync(ColaboradorReactivarDto dto)
+        {
+            // Ubicar la fila de tipo "Colaborador" de esa entidad (viene trackeada).
+            var entidadTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(dto.IdEntidad, IdTipoColaborador)
+                ?? throw new RecursoNoEncontradoException("No se encontró un colaborador para la entidad indicada.");
+
+            // Regla de negocio: no se puede reactivar algo que ya está activo.
+            if (entidadTipo.Estado == "ACTIVO")
+                throw new ReglaNegocioException("El colaborador ya está activo.");
+
+            entidadTipo.Estado = "ACTIVO";
+
+            await _unitOfWork.GuardarCambiosAsync();
         }
     }
 }

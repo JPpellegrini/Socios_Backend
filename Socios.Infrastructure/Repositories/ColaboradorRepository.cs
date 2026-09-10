@@ -100,5 +100,14 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Colaboradores.AnyAsync(c => c.Id_Entidad == idEntidad);
         }
 
+        public async Task<Colaborador?> ObtenerConEntidadPorEntidadAsync(int idEntidad)
+        {
+            // Se traen colaborador + entidad trackeados (sin AsNoTracking) para que el caso de uso
+            // pueda modificar ambos y la unidad de trabajo confirme los cambios.
+            return await _context.Colaboradores
+                .Include(c => c.Entidad)
+                .FirstOrDefaultAsync(c => c.Id_Entidad == idEntidad);
+        }
+
     }
 }

@@ -14,6 +14,11 @@ namespace Socios.Application.Interfaces
         /// <summary>Da de alta un colaborador y devuelve el Id generado.</summary>
         Task<int> CrearAsync(ColaboradorCrearDto dto);
 
+        /// <summary>Modifica los datos editables de un proveedor (razón social, servicio, domicilio y contactos).</summary>
+        Task ModificarAsync(ColaboradorModificarDto dto);
+
+        /// <summary>Reactiva un colaborador dado de baja (pasa su estado a ACTIVO).</summary>
+        Task ReactivarAsync(ColaboradorReactivarDto dto);
 
     }
 
