@@ -14,5 +14,6 @@ namespace Socios.Application.Interfaces
         void ActualizarEntidad(Entidad entidad);
         void ActualizarEntidadTipo(EntidadTipo entidadTipo);
         Task<List<Entidad>> BuscarAsync(string? busqueda);
+        Task RegistrarBajaAsync(EntidadBaja baja);
     }
 }

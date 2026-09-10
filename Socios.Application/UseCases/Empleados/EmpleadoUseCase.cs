@@ -96,21 +96,32 @@ namespace Socios.Application.UseCases.Empleados
                 Ciudad = entidad.Ciudad
             };
         }
-
         /// <summary>
         /// Baja de empleado
         /// </summary>
-        public async Task<bool> BajaAsync(int idEntidadTipo)
+        public async Task<bool> BajaAsync(int idEntidadTipo, string motivo)
         {
             var entidadTipo = await _empleados.ObtenerEntidadTipoAsync(idEntidadTipo);
 
             if (entidadTipo is null || entidadTipo.Estado == "INACTIVO")
                 return false;
 
+            // 1. Cambiar estado
             entidadTipo.Estado = "INACTIVO";
             _empleados.ActualizarEntidadTipo(entidadTipo);
 
+            // 2. Registrar baja en tabla EntidadesBaja
+            var baja = new EntidadBaja
+            {
+                Id_EntidadTipo = idEntidadTipo,
+                Fecha_Baja = DateTime.Now,
+                Motivo = motivo
+            };
+            await _empleados.RegistrarBajaAsync(baja);
+
+            // 3. Guardar cambios
             await _unitOfWork.GuardarCambiosAsync();
+
             return true;
         }
 

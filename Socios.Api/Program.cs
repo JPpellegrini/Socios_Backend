@@ -9,6 +9,7 @@ using Socios.Application.UseCases.Empleados;
 using Socios.Application.UseCases.Entidades;
 using Socios.Application.UseCases.Nichos;
 using Socios.Application.UseCases.Proveedores;
+using Socios.Application.UseCases.Colaboradores;
 using Socios.Application.UseCases.Socios;
 using Socios.Infrastructure;
 using Socios.Infrastructure.Context;
@@ -73,7 +74,8 @@ builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
 builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IPrestacionRepository, PrestacionRepository>();
 builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
-builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
+builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
+
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -81,6 +83,9 @@ builder.Services.AddScoped<IEntidadUseCase, EntidadUseCase>();
 builder.Services.AddScoped<ICodeudorUseCase, CodeudorUseCase>();
 builder.Services.AddScoped<IProveedorUseCase, ProveedorUseCase>();
 builder.Services.AddScoped<INichoUseCase, NichoUseCase>();
+builder.Services.AddScoped<IColaboradorUseCase, ColaboradorUseCase>();
+builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
+
 
 #endregion
 

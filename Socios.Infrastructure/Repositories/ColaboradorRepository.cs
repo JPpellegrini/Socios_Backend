@@ -48,5 +48,44 @@ namespace Socios.Infrastructure.Repositories
             _context.Update(colaborador);
             await _context.SaveChangesAsync();
         }
+
+        public void AgregarEntidad(Entidad entidad) => _context.Entidades.Add(entidad);
+        public void AgregarEntidadTipo(EntidadTipo entidadTipo) => _context.EntidadTipos.Add(entidadTipo);
+        public void ActualizarEntidad(Entidad entidad) => _context.Entidades.Update(entidad);
+        public void ActualizarEntidadTipo(EntidadTipo entidadTipo) => _context.EntidadTipos.Update(entidadTipo);
+        public async Task<EntidadTipo?> ObtenerEntidadTipoAsync(int idEntidadTipo)
+        {
+            return await _context.EntidadTipos
+                .Include(et => et.Entidad)
+                .FirstOrDefaultAsync(et => et.Id_EntidadTipo == idEntidadTipo && et.Id_Tipo == 3);
+        }
+
+        public async Task<List<Entidad>> BuscarAsync(string? busqueda)
+        {
+            var query =
+                from e in _context.Entidades
+                    .Include(e => e.Ciudad)
+                    .Include(e => e.Contactos) // 👈 importante: incluir contactos
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                where et.Id_Tipo == 3 && et.Estado == "ACTIVO"
+                select e;
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                var filtro = busqueda.ToLower();
+                query = query.Where(e =>
+                    e.Dni.ToLower().Contains(filtro) ||
+                    e.Nombre.ToLower().Contains(filtro) ||
+                    e.Apellido.ToLower().Contains(filtro));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task RegistrarBajaAsync(EntidadBaja baja)
+        {
+            await _context.EntidadBajas.AddAsync(baja);
+        }
+
     }
 }

@@ -17,7 +17,7 @@ namespace Socios.Application.Interfaces
         /// <summary>
         /// Dar de baja un empleado por IdEntidadTipo.
         /// </summary>
-        Task<bool> BajaAsync(int idEntidadTipo);
+        Task<bool> BajaAsync(int idEntidadTipo, string motivo);
 
         /// <summary>
         /// Modificar datos de un empleado existente.

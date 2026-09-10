@@ -65,5 +65,10 @@ namespace Socios.Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task RegistrarBajaAsync(EntidadBaja baja)
+        {
+            await _context.EntidadBajas.AddAsync(baja);
+        }
     }
 }

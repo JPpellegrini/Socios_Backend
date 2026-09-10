@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using Socios.Application.UseCases.Empleados;
 
 namespace Socios.API.Controllers
 {
@@ -40,18 +41,15 @@ namespace Socios.API.Controllers
             return Ok(empleado);
         }
 
-        /// <summary>
-        /// Baja de empleado
-        /// </summary>
         [HttpPut("baja/{idEntidadTipo}")]
-        public async Task<IActionResult> DarDeBajaEmpleadoAsync(int idEntidadTipo)
+        public async Task<IActionResult> DarDeBajaEmpleadoAsync(int idEntidadTipo, [FromBody] EmpleadoBajaDto dto)
         {
-            var resultado = await _empleados.BajaAsync(idEntidadTipo);
+            var resultado = await _empleados.BajaAsync(idEntidadTipo, dto.Motivo);
 
             if (!resultado)
-                return NotFound(new { mensaje = $"No se encontró un empleado activo con IdEntidadTipo {idEntidadTipo}." });
+                return NotFound(new { mensaje = $"No se encontró el empleado con IdEntidadTipo {idEntidadTipo} o ya estaba inactivo." });
 
-            return Ok(new { mensaje = "El empleado fue dado de baja correctamente." });
+            return Ok(new { mensaje = $"Empleado dado de baja correctamente con motivo: {dto.Motivo}" });
         }
 
         /// <summary>
