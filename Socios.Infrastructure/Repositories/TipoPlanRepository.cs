@@ -18,5 +18,15 @@ namespace Socios.Infrastructure.Repositories
             // Trackeado (sin AsNoTracking) para que el caso de uso pueda modificar la edad tope.
             return await _context.TiposPlan.FirstOrDefaultAsync(tp => tp.Id_TipoCuota == idTipoCuota);
         }
+
+        public async Task<List<Socios.Domain.Entities.TipoPlan>> ObtenerSepelioPorPlanAsync(string plan)
+        {
+            // Solo lectura; se incluye el tipo de cuota para leer su importe y concepto.
+            return await _context.TiposPlan
+                .AsNoTracking()
+                .Include(tp => tp.TipoCuota)
+                .Where(tp => tp.Tipo_Plan == plan && tp.TipoCuota.Concepto == "SEPELIO")
+                .ToListAsync();
+        }
     }
 }

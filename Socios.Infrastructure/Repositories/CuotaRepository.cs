@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using Socios.Domain.Entities;
 using Socios.Infrastructure.Context;
 
 namespace Socios.Infrastructure.Repositories
@@ -75,6 +76,31 @@ namespace Socios.Infrastructure.Repositories
                     Estado = x.c.Estado
                 })
                 .ToListAsync();
+        }
+
+        public async Task<List<CuotaClaveDto>> ObtenerClavesPeriodoAsync(int idEntidad, int desdeClave, int hastaClave)
+        {
+            // Clave comparable año*100 + mes, para filtrar el rango (año, mes) con una
+            // sola condición ordenable. Se trae concepto (vía tipo de cuota) + mes + año.
+            return await (
+                from c in _context.Cuotas
+                join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                where c.Id_Entidad == idEntidad
+                    && (c.Anio_Periodo * 100 + c.Mes_Periodo) >= desdeClave
+                    && (c.Anio_Periodo * 100 + c.Mes_Periodo) <= hastaClave
+                select new CuotaClaveDto
+                {
+                    Concepto = tc.Concepto,
+                    Mes = c.Mes_Periodo,
+                    Anio = c.Anio_Periodo
+                }
+            ).ToListAsync();
+        }
+
+        public void Agregar(Cuota cuota)
+        {
+            // Solo marca la cuota para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Cuotas.Add(cuota);
         }
     }
 }

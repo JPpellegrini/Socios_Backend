@@ -7,5 +7,12 @@ namespace Socios.Application.Interfaces
         /// edad tope). Null si ese tipo de cuota no tiene plan.
         /// </summary>
         Task<Domain.Entities.TipoPlan?> ObtenerPorTipoCuotaAsync(int idTipoCuota);
+
+        /// <summary>
+        /// Trae los planes de SEPELIO de un plan (A/B) con su tipo de cuota incluido.
+        /// Devuelve las dos filas del plan: la del tramo "hasta" (EdadTope con valor) y la
+        /// del tramo "más de" (EdadTope null). Se usa para elegir el tramo según la edad.
+        /// </summary>
+        Task<List<Domain.Entities.TipoPlan>> ObtenerSepelioPorPlanAsync(string plan);
     }
 }

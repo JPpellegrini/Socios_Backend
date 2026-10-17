@@ -100,5 +100,13 @@ namespace Socios.Infrastructure.Repositories
             // Trackeado (sin AsNoTracking) para que el caso de uso pueda modificarlo.
             return await _context.TiposCuotas.FirstOrDefaultAsync(tc => tc.Id_TipoCuota == idTipoCuota);
         }
+
+        public async Task<Socios.Domain.Entities.TipoCuota?> ObtenerSocioAsync()
+        {
+            // Solo lectura: se usa para leer el importe vigente de la cuota societaria.
+            return await _context.TiposCuotas
+                .AsNoTracking()
+                .FirstOrDefaultAsync(tc => tc.Concepto == "SOCIO");
+        }
     }
 }

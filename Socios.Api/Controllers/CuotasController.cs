@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using Socios.Application.UseCases.Cuotas;
 
 namespace Socios.Api.Controllers
 {
@@ -11,10 +12,12 @@ namespace Socios.Api.Controllers
     public class CuotasController : ControllerBase
     {
         private readonly ICuotaRepository _cuotaRepository;
+        private readonly ICuotaUseCase _cuotaUseCase;
 
-        public CuotasController(ICuotaRepository cuotaRepository)
+        public CuotasController(ICuotaRepository cuotaRepository, ICuotaUseCase cuotaUseCase)
         {
             _cuotaRepository = cuotaRepository;
+            _cuotaUseCase = cuotaUseCase;
         }
 
         /// <summary>
@@ -30,6 +33,23 @@ namespace Socios.Api.Controllers
             var cuotas = await _cuotaRepository.BuscarAsync(filtro);
 
             return Ok(cuotas);
+        }
+
+        /// <summary>
+        /// Genera las cuotas de un socio individual en un rango de períodos (mes/año).
+        /// La societaria se genera en todo el rango; la de sepelio solo hacia adelante y si
+        /// el socio tiene sepelio. No genera duplicados (las que ya existen se omiten).
+        ///   - Validaciones de formato                  → 400 (via [ApiController]).
+        ///   - Socio inexistente                        → 404 (RecursoNoEncontradoException).
+        ///   - Vencimiento no futuro / desde > hasta /
+        ///     sepelio sin plan o sin nacimiento        → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("generar-individual")]
+        public async Task<IActionResult> GenerarIndividualAsync([FromBody] CuotaGenerarDto dto)
+        {
+            var resultado = await _cuotaUseCase.GenerarIndividualAsync(dto);
+
+            return Ok(resultado);
         }
     }
 }
