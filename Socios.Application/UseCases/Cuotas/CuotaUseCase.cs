@@ -12,6 +12,7 @@ namespace Socios.Application.UseCases.Cuotas
     public class CuotaUseCase : ICuotaUseCase
     {
         private readonly ISocioRepository _socios;
+        private readonly IEntidadTipoRepository _entidadesTipo;
         private readonly ITipoCuotaRepository _tiposCuota;
         private readonly ITipoPlanRepository _tiposPlan;
         private readonly ICuotaRepository _cuotas;
@@ -22,14 +23,20 @@ namespace Socios.Application.UseCases.Cuotas
         private const string SepelioSi = "SI";
         private const string EstadoPendiente = "PENDIENTE";
 
+        // Estado y tipo del socio en EntidadTipo (donde vive el ACTIVO/INACTIVO).
+        private const int IdTipoSocio = 1;
+        private const string EstadoActivo = "ACTIVO";
+
         public CuotaUseCase(
             ISocioRepository socios,
+            IEntidadTipoRepository entidadesTipo,
             ITipoCuotaRepository tiposCuota,
             ITipoPlanRepository tiposPlan,
             ICuotaRepository cuotas,
             IUnitOfWork unitOfWork)
         {
             _socios = socios;
+            _entidadesTipo = entidadesTipo;
             _tiposCuota = tiposCuota;
             _tiposPlan = tiposPlan;
             _cuotas = cuotas;
@@ -56,6 +63,12 @@ namespace Socios.Application.UseCases.Cuotas
             // El socio tiene que existir; se trae con su entidad (nacimiento, id de entidad).
             var socio = await _socios.ObtenerConEntidadAsync(dto.IdSocio!.Value)
                 ?? throw new RecursoNoEncontradoException("No se encontró el socio solicitado.");
+
+            // Regla de negocio: a un socio inactivo no se le generan cuotas. El estado vive
+            // en EntidadTipo (fila tipo Socio), no en Socio/Entidad.
+            var socioTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(socio.Id_Entidad, IdTipoSocio);
+            if (socioTipo is null || socioTipo.Estado != EstadoActivo)
+                throw new ReglaNegocioException("El socio no está activo: no se le pueden generar cuotas.");
 
             // Regla de negocio: el vencimiento tiene que ser a futuro.
             if (dto.FechaVencimiento!.Value.Date <= hoy)
