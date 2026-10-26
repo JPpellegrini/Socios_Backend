@@ -106,8 +106,24 @@ namespace Socios.Infrastructure.Repositories
         public async Task<Cuota?> ObtenerPorIdAsync(int idDeuda)
         {
             // Trackeado (sin AsNoTracking) para que el caso de uso pueda anularla y la
-            // unidad de trabajo confirme el cambio.
-            return await _context.Cuotas.FirstOrDefaultAsync(c => c.Id_Deuda == idDeuda);
+            // unidad de trabajo confirme el cambio. Se incluye el tipo de cuota para
+            // conocer el concepto (NICHO dispara la anulación en cascada).
+            return await _context.Cuotas
+                .Include(c => c.TipoCuota)
+                .FirstOrDefaultAsync(c => c.Id_Deuda == idDeuda);
+        }
+
+        public async Task<List<Cuota>> ObtenerLoteNichoAsync(int idEntidad, DateTime fechaHoraGeneracion)
+        {
+            // Trackeado: el caso de uso pasa todas estas cuotas a ANULADA en una transacción.
+            return await (
+                from c in _context.Cuotas
+                join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                where c.Id_Entidad == idEntidad
+                    && tc.Concepto == "NICHO"
+                    && c.FechaHoraGeneracion == fechaHoraGeneracion
+                select c
+            ).ToListAsync();
         }
     }
 }

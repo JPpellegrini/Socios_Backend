@@ -29,6 +29,13 @@ namespace Socios.Application.DTOs
         public decimal? InteresPorCuota { get; set; }
 
         /// <summary>
+        /// Vencimiento de la PRIMERA cuota de nicho. Las siguientes vencen un mes después
+        /// cada una. El caso de uso valida que sea posterior a hoy.
+        /// </summary>
+        [Required(ErrorMessage = "La fecha del primer vencimiento es obligatoria.")]
+        public DateTime? PrimerVencimiento { get; set; }
+
+        /// <summary>
         /// Indica si el nicho lleva lápida. Solo admite "SI" o "NO" (no distingue mayúsculas).
         /// Si es "SI", ValorLapida es obligatorio.
         /// </summary>

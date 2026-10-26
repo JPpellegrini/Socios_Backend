@@ -14,20 +14,27 @@ namespace Socios.Application.UseCases.Nichos
         private readonly INichoRepository _nichos;
         private readonly ISocioRepository _socios;
         private readonly IEntidadTipoRepository _entidadesTipo;
+        private readonly ICuotaRepository _cuotas;
+        private readonly ITipoCuotaRepository _tiposCuota;
         private readonly IUnitOfWork _unitOfWork;
 
         // Id del tipo de entidad "Socio" (catálogo TiposEntidad).
         private const int IdTipoSocio = 1;
+        private const string EstadoPendiente = "PENDIENTE";
 
         public NichoUseCase(
             INichoRepository nichos,
             ISocioRepository socios,
             IEntidadTipoRepository entidadesTipo,
+            ICuotaRepository cuotas,
+            ITipoCuotaRepository tiposCuota,
             IUnitOfWork unitOfWork)
         {
             _nichos = nichos;
             _socios = socios;
             _entidadesTipo = entidadesTipo;
+            _cuotas = cuotas;
+            _tiposCuota = tiposCuota;
             _unitOfWork = unitOfWork;
         }
 
@@ -107,12 +114,20 @@ namespace Socios.Application.UseCases.Nichos
             if (socioTipo is null || socioTipo.Estado != "ACTIVO")
                 throw new ReglaNegocioException("El socio no está activo: no se le puede asignar un nicho.");
 
+            // Regla de negocio: un socio puede tener un solo nicho asignado.
+            if (await _nichos.TieneNichoAsignadoAsync(dto.IdEntidad.Value))
+                throw new ReglaNegocioException("El socio ya tiene un nicho asignado.");
+
             // Normalizamos "si"/"no" (cualquier capitalización) al "SI"/"NO" que se persiste.
             var llevaLapida = dto.ConLapida.Trim().Equals("SI", StringComparison.OrdinalIgnoreCase);
 
             // Si lleva lápida, el valor de la lápida es obligatorio; si no, se ignora.
             if (llevaLapida && dto.ValorLapida is null)
                 throw new ReglaNegocioException("Debe informar el valor de la lápida.");
+
+            // Regla de negocio: el primer vencimiento tiene que ser a futuro.
+            if (dto.PrimerVencimiento!.Value.Date <= DateTime.Today)
+                throw new ReglaNegocioException("La fecha del primer vencimiento debe ser posterior a hoy.");
 
             nicho.Id_Entidad = dto.IdEntidad;
             nicho.ValorNicho = dto.ValorTotal;
@@ -122,7 +137,55 @@ namespace Socios.Application.UseCases.Nichos
             nicho.ValorLapida = llevaLapida ? dto.ValorLapida : null;
             nicho.Ocupado = "SI";
 
+            // Genera las cuotas de nicho (en la misma transacción que la asignación).
+            await GenerarCuotasNichoAsync(dto, llevaLapida);
+
             await _unitOfWork.GuardarCambiosAsync();
+        }
+
+        /// <summary>
+        /// Genera las cuotas mensuales del nicho a partir de la financiación cargada en el
+        /// asignar. Reglas:
+        ///   - Total a financiar = ValorTotal + ValorLápida (si lleva lápida).
+        ///   - Monto de cada cuota = (total / cantidad de cuotas) × (1 + interés%),
+        ///     redondeado a 2 decimales (la suma puede diferir en centavos del total exacto).
+        ///   - La primera cuota es del mes actual; las siguientes, un mes más cada una.
+        ///   - La primera vence en PrimerVencimiento; las siguientes, un mes más cada una.
+        /// Todas las cuotas del lote comparten la misma FechaHoraGeneracion: ese instante
+        /// identifica el lote para la anulación en cascada.
+        /// </summary>
+        private async Task GenerarCuotasNichoAsync(NichoAsignarDto dto, bool llevaLapida)
+        {
+            var tipoNicho = await _tiposCuota.ObtenerNichoAsync()
+                ?? throw new ReglaNegocioException("No está configurada la cuota del concepto NICHO.");
+
+            var cantidad = dto.Cuotas!.Value;
+            var totalFinanciar = dto.ValorTotal!.Value + (llevaLapida ? dto.ValorLapida!.Value : 0m);
+            var factorInteres = 1 + dto.InteresPorCuota!.Value / 100m;
+            var montoCuota = Math.Round(totalFinanciar / cantidad * factorInteres, 2, MidpointRounding.AwayFromZero);
+
+            // Instante único del lote (clave para anular en cascada).
+            var fechaGeneracion = DateTime.Now;
+            var hoy = DateTime.Today;
+            var primerPeriodo = new DateTime(hoy.Year, hoy.Month, 1);
+
+            for (var i = 0; i < cantidad; i++)
+            {
+                var periodo = primerPeriodo.AddMonths(i);
+
+                _cuotas.Agregar(new Cuota
+                {
+                    Id_Entidad = dto.IdEntidad!.Value,
+                    Mes_Periodo = periodo.Month,
+                    Anio_Periodo = periodo.Year,
+                    Id_TipoCuota = tipoNicho.Id_TipoCuota,
+                    Monto = montoCuota,
+                    FechaHoraGeneracion = fechaGeneracion,
+                    FechaVencimiento = dto.PrimerVencimiento!.Value.AddMonths(i),
+                    Estado = EstadoPendiente,
+                    Id_Movimiento = null
+                });
+            }
         }
     }
 }

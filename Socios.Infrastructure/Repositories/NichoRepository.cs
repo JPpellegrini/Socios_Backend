@@ -74,6 +74,11 @@ namespace Nichos.Infrastructure.Repositories
                 n.Sector == sector && n.NroNicho == nroNicho);
         }
 
+        public async Task<bool> TieneNichoAsignadoAsync(int idEntidad)
+        {
+            return await _context.Nichos.AnyAsync(n => n.Id_Entidad == idEntidad);
+        }
+
         public async Task<Socios.Domain.Entities.Nicho?> ObtenerPorIdAsync(int idNicho)
         {
             // Trackeado (sin AsNoTracking) para que el caso de uso pueda eliminarlo.

@@ -20,6 +20,7 @@ namespace Socios.Application.UseCases.Cuotas
 
         private const string ConceptoSocio = "SOCIO";
         private const string ConceptoSepelio = "SEPELIO";
+        private const string ConceptoNicho = "NICHO";
         private const string SepelioSi = "SI";
         private const string EstadoPendiente = "PENDIENTE";
         private const string EstadoPagado = "PAGADO";
@@ -140,9 +141,16 @@ namespace Socios.Application.UseCases.Cuotas
         /// </summary>
         public async Task AnularAsync(CuotaAnularDto dto)
         {
-            // Trackeada, para poder modificarla y que la unidad de trabajo confirme el cambio.
+            // Trackeada (con su tipo de cuota) para poder modificarla y para conocer el concepto.
             var cuota = await _cuotas.ObtenerPorIdAsync(dto.IdCuota!.Value)
                 ?? throw new RecursoNoEncontradoException("No se encontró la cuota solicitada.");
+
+            // Las cuotas de nicho se anulan en cascada: todo el lote generado junto.
+            if (cuota.TipoCuota?.Concepto == ConceptoNicho)
+            {
+                await AnularLoteNichoAsync(cuota);
+                return;
+            }
 
             // Regla de negocio: una cuota paga no se anula.
             if (cuota.Estado == EstadoPagado)
@@ -157,6 +165,36 @@ namespace Socios.Application.UseCases.Cuotas
                 throw new ReglaNegocioException("Solo se puede anular una cuota dentro de la hora de generada.");
 
             cuota.Estado = EstadoAnulada;
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
+        /// <summary>
+        /// Anula en cascada el lote de cuotas de nicho generado junto con la cuota indicada
+        /// (mismo instante de generación). Reglas:
+        ///   - Solo dentro de la hora de generado (todas comparten FechaHoraGeneracion).
+        ///   - Si alguna cuota del lote ya está paga, no se anula ninguna.
+        ///   - Si ya estaban todas anuladas, no hay nada que anular.
+        /// Pasa todas las cuotas del lote a ANULADA en una sola transacción.
+        /// </summary>
+        private async Task AnularLoteNichoAsync(Cuota cuota)
+        {
+            var lote = await _cuotas.ObtenerLoteNichoAsync(cuota.Id_Entidad, cuota.FechaHoraGeneracion);
+
+            // Ventana: todas las del lote comparten el instante de generación; una verificación basta.
+            if (DateTime.Now - cuota.FechaHoraGeneracion > VentanaAnulacion)
+                throw new ReglaNegocioException("Solo se pueden anular las cuotas de nicho dentro de la hora de generadas.");
+
+            // Si cualquiera del lote ya está paga, no se anula ninguna.
+            if (lote.Any(c => c.Estado == EstadoPagado))
+                throw new ReglaNegocioException("No se pueden anular las cuotas del nicho: alguna ya está paga.");
+
+            // Si ya estaban todas anuladas, no hay nada que hacer.
+            if (lote.All(c => c.Estado == EstadoAnulada))
+                throw new ReglaNegocioException("Las cuotas del nicho ya están anuladas.");
+
+            foreach (var c in lote.Where(c => c.Estado != EstadoAnulada))
+                c.Estado = EstadoAnulada;
 
             await _unitOfWork.GuardarCambiosAsync();
         }

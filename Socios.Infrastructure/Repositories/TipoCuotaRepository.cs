@@ -108,5 +108,13 @@ namespace Socios.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(tc => tc.Concepto == "SOCIO");
         }
+
+        public async Task<Socios.Domain.Entities.TipoCuota?> ObtenerNichoAsync()
+        {
+            // Solo lectura: solo se necesita el Id_TipoCuota para clasificar la cuota de nicho.
+            return await _context.TiposCuotas
+                .AsNoTracking()
+                .FirstOrDefaultAsync(tc => tc.Concepto == "NICHO");
+        }
     }
 }

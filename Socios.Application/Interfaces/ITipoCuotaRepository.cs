@@ -17,5 +17,11 @@ namespace Socios.Application.Interfaces
         /// Trae el tipo de cuota del concepto SOCIO (la cuota societaria, única). Null si no existe.
         /// </summary>
         Task<Domain.Entities.TipoCuota?> ObtenerSocioAsync();
+
+        /// <summary>
+        /// Trae el tipo de cuota del concepto NICHO (para clasificar las cuotas de nicho;
+        /// el monto se calcula por nicho, no sale de su importe). Null si no existe.
+        /// </summary>
+        Task<Domain.Entities.TipoCuota?> ObtenerNichoAsync();
     }
 }

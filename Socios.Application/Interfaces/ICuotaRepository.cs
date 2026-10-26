@@ -23,9 +23,16 @@ namespace Socios.Application.Interfaces
         void Agregar(Cuota cuota);
 
         /// <summary>
-        /// Trae la cuota por su Id (Id_Deuda), trackeada para poder modificarla (anular).
-        /// Null si no existe.
+        /// Trae la cuota por su Id (Id_Deuda), con su tipo de cuota incluido (para conocer
+        /// el concepto) y trackeada para poder modificarla (anular). Null si no existe.
         /// </summary>
         Task<Cuota?> ObtenerPorIdAsync(int idDeuda);
+
+        /// <summary>
+        /// Trae el lote de cuotas de NICHO de una entidad generadas en el mismo instante
+        /// (misma FechaHoraGeneracion), trackeadas, para anularlas en cascada. El instante
+        /// compartido identifica las cuotas creadas en una misma asignación de nicho.
+        /// </summary>
+        Task<List<Cuota>> ObtenerLoteNichoAsync(int idEntidad, DateTime fechaHoraGeneracion);
     }
 }
