@@ -102,5 +102,12 @@ namespace Socios.Infrastructure.Repositories
             // Solo marca la cuota para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Cuotas.Add(cuota);
         }
+
+        public async Task<Cuota?> ObtenerPorIdAsync(int idDeuda)
+        {
+            // Trackeado (sin AsNoTracking) para que el caso de uso pueda anularla y la
+            // unidad de trabajo confirme el cambio.
+            return await _context.Cuotas.FirstOrDefaultAsync(c => c.Id_Deuda == idDeuda);
+        }
     }
 }

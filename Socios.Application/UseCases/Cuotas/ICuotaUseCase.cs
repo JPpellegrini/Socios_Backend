@@ -13,5 +13,11 @@ namespace Socios.Application.UseCases.Cuotas
         /// si el socio tiene sepelio. No genera duplicados.
         /// </summary>
         Task<CuotaGeneracionResultadoDto> GenerarIndividualAsync(CuotaGenerarDto dto);
+
+        /// <summary>
+        /// Anula (lógicamente) una cuota: pasa su estado a ANULADA. Solo se permite dentro
+        /// de la hora de generada y si la cuota no está paga.
+        /// </summary>
+        Task AnularAsync(CuotaAnularDto dto);
     }
 }

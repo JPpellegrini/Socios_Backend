@@ -22,6 +22,11 @@ namespace Socios.Application.UseCases.Cuotas
         private const string ConceptoSepelio = "SEPELIO";
         private const string SepelioSi = "SI";
         private const string EstadoPendiente = "PENDIENTE";
+        private const string EstadoPagado = "PAGADO";
+        private const string EstadoAnulada = "ANULADA";
+
+        // Ventana para poder anular una cuota desde que se generó.
+        private static readonly TimeSpan VentanaAnulacion = TimeSpan.FromHours(1);
 
         // Estado y tipo del socio en EntidadTipo (donde vive el ACTIVO/INACTIVO).
         private const int IdTipoSocio = 1;
@@ -123,6 +128,37 @@ namespace Socios.Application.UseCases.Cuotas
                 await _unitOfWork.GuardarCambiosAsync();
 
             return resultado;
+        }
+
+        /// <summary>
+        /// Anula (lógicamente) una cuota. Reglas:
+        ///   - La cuota tiene que existir.
+        ///   - No se puede anular una cuota paga (estado PAGADO).
+        ///   - No se puede volver a anular una cuota ya anulada.
+        ///   - Solo se puede anular dentro de la hora de generada.
+        /// La anulación pasa el estado a ANULADA (no borra la fila).
+        /// </summary>
+        public async Task AnularAsync(CuotaAnularDto dto)
+        {
+            // Trackeada, para poder modificarla y que la unidad de trabajo confirme el cambio.
+            var cuota = await _cuotas.ObtenerPorIdAsync(dto.IdCuota!.Value)
+                ?? throw new RecursoNoEncontradoException("No se encontró la cuota solicitada.");
+
+            // Regla de negocio: una cuota paga no se anula.
+            if (cuota.Estado == EstadoPagado)
+                throw new ReglaNegocioException("No se puede anular una cuota que ya está paga.");
+
+            // Regla de negocio: no tiene sentido anular dos veces.
+            if (cuota.Estado == EstadoAnulada)
+                throw new ReglaNegocioException("La cuota ya está anulada.");
+
+            // Regla de negocio: solo dentro de la hora desde que se generó.
+            if (DateTime.Now - cuota.FechaHoraGeneracion > VentanaAnulacion)
+                throw new ReglaNegocioException("Solo se puede anular una cuota dentro de la hora de generada.");
+
+            cuota.Estado = EstadoAnulada;
+
+            await _unitOfWork.GuardarCambiosAsync();
         }
 
         /// <summary>

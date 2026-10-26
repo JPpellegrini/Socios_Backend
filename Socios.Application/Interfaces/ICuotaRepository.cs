@@ -21,5 +21,11 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Marca la cuota para ser insertada. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Cuota cuota);
+
+        /// <summary>
+        /// Trae la cuota por su Id (Id_Deuda), trackeada para poder modificarla (anular).
+        /// Null si no existe.
+        /// </summary>
+        Task<Cuota?> ObtenerPorIdAsync(int idDeuda);
     }
 }

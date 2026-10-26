@@ -51,5 +51,19 @@ namespace Socios.Api.Controllers
 
             return Ok(resultado);
         }
+
+        /// <summary>
+        /// Anula (lógicamente) una cuota: pasa su estado a ANULADA. No borra la fila.
+        ///   - Validaciones de formato                       → 400 (via [ApiController]).
+        ///   - Cuota inexistente                             → 404 (RecursoNoEncontradoException).
+        ///   - Cuota paga / ya anulada / fuera de la hora    → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("anular")]
+        public async Task<IActionResult> AnularAsync([FromBody] CuotaAnularDto dto)
+        {
+            await _cuotaUseCase.AnularAsync(dto);
+
+            return Ok(new { mensaje = "La cuota fue anulada correctamente." });
+        }
     }
 }
