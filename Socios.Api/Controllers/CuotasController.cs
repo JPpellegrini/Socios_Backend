@@ -39,15 +39,33 @@ namespace Socios.Api.Controllers
         /// Genera las cuotas de un socio individual en un rango de períodos (mes/año).
         /// La societaria se genera en todo el rango; la de sepelio solo hacia adelante y si
         /// el socio tiene sepelio. No genera duplicados (las que ya existen se omiten).
-        ///   - Validaciones de formato                  → 400 (via [ApiController]).
-        ///   - Socio inexistente                        → 404 (RecursoNoEncontradoException).
-        ///   - Vencimiento no futuro / desde > hasta /
-        ///     sepelio sin plan o sin nacimiento        → 409 (ReglaNegocioException).
+        /// Con un error de carga del socio (sepelio sin plan o sin nacimiento) no se genera
+        /// ninguna cuota: responde 200 con el motivo en "inconsistencias".
+        ///   - Validaciones de formato                       → 400 (via [ApiController]).
+        ///   - Socio inexistente                             → 404 (RecursoNoEncontradoException).
+        ///   - Socio inactivo / vencimiento no futuro /
+        ///     desde > hasta                                 → 409 (ReglaNegocioException).
         /// </summary>
         [HttpPost("generar-individual")]
         public async Task<IActionResult> GenerarIndividualAsync([FromBody] CuotaGenerarDto dto)
         {
             var resultado = await _cuotaUseCase.GenerarIndividualAsync(dto);
+
+            return Ok(resultado);
+        }
+
+        /// <summary>
+        /// Genera las cuotas de un mes/año para todos los socios activos: la societaria y,
+        /// si el socio tiene sepelio y el mes es actual o futuro, la de sepelio según su plan
+        /// y edad. Las que ya existen se omiten. A los socios con errores de carga no se les
+        /// genera ninguna cuota y se informan en el resultado (no cortan el proceso).
+        ///   - Validaciones de formato                       → 400 (via [ApiController]).
+        ///   - Vencimiento no futuro / falta config. SOCIO   → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("generar-masiva")]
+        public async Task<IActionResult> GenerarMasivaAsync([FromBody] CuotaGenerarMasivaDto dto)
+        {
+            var resultado = await _cuotaUseCase.GenerarMasivaAsync(dto);
 
             return Ok(resultado);
         }

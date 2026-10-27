@@ -82,14 +82,37 @@ namespace Socios.Infrastructure.Repositories
         {
             // Clave comparable año*100 + mes, para filtrar el rango (año, mes) con una
             // sola condición ordenable. Se trae concepto (vía tipo de cuota) + mes + año.
+            // Las anuladas no cuentan: anular una cuota permite volver a generarla.
             return await (
                 from c in _context.Cuotas
                 join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
                 where c.Id_Entidad == idEntidad
+                    && c.Estado != "ANULADA"
                     && (c.Anio_Periodo * 100 + c.Mes_Periodo) >= desdeClave
                     && (c.Anio_Periodo * 100 + c.Mes_Periodo) <= hastaClave
                 select new CuotaClaveDto
                 {
+                    IdEntidad = c.Id_Entidad,
+                    Concepto = tc.Concepto,
+                    Mes = c.Mes_Periodo,
+                    Anio = c.Anio_Periodo
+                }
+            ).ToListAsync();
+        }
+
+        public async Task<List<CuotaClaveDto>> ObtenerClavesMesAsync(int mes, int anio)
+        {
+            // Una sola consulta para todos los socios del mes (evita una consulta por socio).
+            // Las anuladas no cuentan: anular una cuota permite volver a generarla.
+            return await (
+                from c in _context.Cuotas
+                join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                where c.Mes_Periodo == mes
+                    && c.Anio_Periodo == anio
+                    && c.Estado != "ANULADA"
+                select new CuotaClaveDto
+                {
+                    IdEntidad = c.Id_Entidad,
                     Concepto = tc.Concepto,
                     Mes = c.Mes_Periodo,
                     Anio = c.Anio_Periodo

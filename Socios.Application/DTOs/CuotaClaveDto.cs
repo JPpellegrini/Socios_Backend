@@ -6,6 +6,7 @@ namespace Socios.Application.DTOs
     /// </summary>
     public class CuotaClaveDto
     {
+        public int IdEntidad { get; set; }
         public string Concepto { get; set; } = null!;
         public int Mes { get; set; }
         public int Anio { get; set; }
