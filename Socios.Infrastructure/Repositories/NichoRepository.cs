@@ -79,6 +79,12 @@ namespace Nichos.Infrastructure.Repositories
             return await _context.Nichos.AnyAsync(n => n.Id_Entidad == idEntidad);
         }
 
+        public async Task<List<Socios.Domain.Entities.Nicho>> ObtenerAsignadosAEntidadAsync(int idEntidad)
+        {
+            // Trackeados (sin AsNoTracking) para que el caso de uso pueda liberarlos.
+            return await _context.Nichos.Where(n => n.Id_Entidad == idEntidad).ToListAsync();
+        }
+
         public async Task<Socios.Domain.Entities.Nicho?> ObtenerPorIdAsync(int idNicho)
         {
             // Trackeado (sin AsNoTracking) para que el caso de uso pueda eliminarlo.

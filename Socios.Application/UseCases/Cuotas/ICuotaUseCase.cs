@@ -24,8 +24,9 @@ namespace Socios.Application.UseCases.Cuotas
 
         /// <summary>
         /// Anula (lógicamente) una cuota: pasa su estado a ANULADA. Solo se permite dentro
-        /// de la hora de generada y si la cuota no está paga.
+        /// de la hora de generada y si la cuota no está paga. Si es de nicho, anula todo el
+        /// lote y libera el nicho.
         /// </summary>
-        Task AnularAsync(CuotaAnularDto dto);
+        Task<CuotaAnulacionResultadoDto> AnularAsync(CuotaAnularDto dto);
     }
 }

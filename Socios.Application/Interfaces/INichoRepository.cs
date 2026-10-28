@@ -12,6 +12,13 @@ namespace Socios.Application.Interfaces
         /// <summary>Indica si la entidad (socio) ya tiene un nicho asignado.</summary>
         Task<bool> TieneNichoAsignadoAsync(int idEntidad);
 
+        /// <summary>
+        /// Trae los nichos asignados a una entidad (trackeados, para poder liberarlos).
+        /// Por regla de negocio un socio tiene un solo nicho, pero se devuelve una lista para
+        /// que el caso de uso detecte datos anteriores a esa regla.
+        /// </summary>
+        Task<List<Domain.Entities.Nicho>> ObtenerAsignadosAEntidadAsync(int idEntidad);
+
         /// <summary>Trae el nicho por su Id (trackeado, para poder eliminarlo). Null si no existe.</summary>
         Task<Domain.Entities.Nicho?> ObtenerPorIdAsync(int idNicho);
 

@@ -16,6 +16,7 @@ namespace Socios.Application.UseCases.Cuotas
         private readonly ITipoCuotaRepository _tiposCuota;
         private readonly ITipoPlanRepository _tiposPlan;
         private readonly ICuotaRepository _cuotas;
+        private readonly INichoRepository _nichos;
         private readonly IUnitOfWork _unitOfWork;
 
         private const string ConceptoSocio = "SOCIO";
@@ -39,6 +40,7 @@ namespace Socios.Application.UseCases.Cuotas
             ITipoCuotaRepository tiposCuota,
             ITipoPlanRepository tiposPlan,
             ICuotaRepository cuotas,
+            INichoRepository nichos,
             IUnitOfWork unitOfWork)
         {
             _socios = socios;
@@ -46,6 +48,7 @@ namespace Socios.Application.UseCases.Cuotas
             _tiposCuota = tiposCuota;
             _tiposPlan = tiposPlan;
             _cuotas = cuotas;
+            _nichos = nichos;
             _unitOfWork = unitOfWork;
         }
 
@@ -257,7 +260,7 @@ namespace Socios.Application.UseCases.Cuotas
         ///   - Solo se puede anular dentro de la hora de generada.
         /// La anulación pasa el estado a ANULADA (no borra la fila).
         /// </summary>
-        public async Task AnularAsync(CuotaAnularDto dto)
+        public async Task<CuotaAnulacionResultadoDto> AnularAsync(CuotaAnularDto dto)
         {
             // Trackeada (con su tipo de cuota) para poder modificarla y para conocer el concepto.
             var cuota = await _cuotas.ObtenerPorIdAsync(dto.IdCuota!.Value)
@@ -265,10 +268,7 @@ namespace Socios.Application.UseCases.Cuotas
 
             // Las cuotas de nicho se anulan en cascada: todo el lote generado junto.
             if (cuota.TipoCuota?.Concepto == ConceptoNicho)
-            {
-                await AnularLoteNichoAsync(cuota);
-                return;
-            }
+                return await AnularLoteNichoAsync(cuota);
 
             // Regla de negocio: una cuota paga no se anula.
             if (cuota.Estado == EstadoPagado)
@@ -285,6 +285,12 @@ namespace Socios.Application.UseCases.Cuotas
             cuota.Estado = EstadoAnulada;
 
             await _unitOfWork.GuardarCambiosAsync();
+
+            return new CuotaAnulacionResultadoDto
+            {
+                Mensaje = "La cuota fue anulada correctamente.",
+                CuotasAnuladas = 1
+            };
         }
 
         /// <summary>
@@ -293,9 +299,11 @@ namespace Socios.Application.UseCases.Cuotas
         ///   - Solo dentro de la hora de generado (todas comparten FechaHoraGeneracion).
         ///   - Si alguna cuota del lote ya está paga, no se anula ninguna.
         ///   - Si ya estaban todas anuladas, no hay nada que anular.
-        /// Pasa todas las cuotas del lote a ANULADA en una sola transacción.
+        ///   - El socio tiene que tener exactamente un nicho asignado (el que se libera).
+        /// Pasa todas las cuotas del lote a ANULADA y libera el nicho (vuelve al estado de
+        /// alta: sin socio, desocupado, sin lápida ni financiación), en una sola transacción.
         /// </summary>
-        private async Task AnularLoteNichoAsync(Cuota cuota)
+        private async Task<CuotaAnulacionResultadoDto> AnularLoteNichoAsync(Cuota cuota)
         {
             var lote = await _cuotas.ObtenerLoteNichoAsync(cuota.Id_Entidad, cuota.FechaHoraGeneracion);
 
@@ -311,10 +319,45 @@ namespace Socios.Application.UseCases.Cuotas
             if (lote.All(c => c.Estado == EstadoAnulada))
                 throw new ReglaNegocioException("Las cuotas del nicho ya están anuladas.");
 
-            foreach (var c in lote.Where(c => c.Estado != EstadoAnulada))
+            // La cuota no guarda a qué nicho pertenece: se ubica por el socio, que por regla de
+            // negocio tiene un solo nicho. Si no hay exactamente uno no se sabe cuál liberar, y
+            // no se anula nada (anular sin liberar dejaría el nicho ocupado sin deuda).
+            var nichos = await _nichos.ObtenerAsignadosAEntidadAsync(cuota.Id_Entidad);
+            if (nichos.Count == 0)
+                throw new ReglaNegocioException("No se encontró el nicho asignado al socio: no se pueden anular sus cuotas de nicho.");
+            if (nichos.Count > 1)
+                throw new ReglaNegocioException("El socio tiene más de un nicho asignado: no se puede determinar cuál liberar. Corrija la asignación antes de anular.");
+
+            var aAnular = lote.Where(c => c.Estado != EstadoAnulada).ToList();
+            foreach (var c in aAnular)
                 c.Estado = EstadoAnulada;
 
+            var nicho = nichos[0];
+            LiberarNicho(nicho);
+
             await _unitOfWork.GuardarCambiosAsync();
+
+            return new CuotaAnulacionResultadoDto
+            {
+                Mensaje = $"Se anularon {aAnular.Count} cuotas de nicho y el nicho quedó libre.",
+                CuotasAnuladas = aAnular.Count,
+                IdNichoLiberado = nicho.Id_Nicho
+            };
+        }
+
+        /// <summary>
+        /// Deja el nicho como recién dado de alta: sin socio, desocupado, sin lápida y sin
+        /// valor ni financiación, para que pueda volver a asignarse.
+        /// </summary>
+        private static void LiberarNicho(Nicho nicho)
+        {
+            nicho.Id_Entidad = null;
+            nicho.Ocupado = "NO";
+            nicho.ConLapida = "NO";
+            nicho.ValorLapida = null;
+            nicho.ValorNicho = null;
+            nicho.Cuotas = null;
+            nicho.InteresMensual = null;
         }
 
         /// <summary>

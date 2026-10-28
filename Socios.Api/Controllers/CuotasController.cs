@@ -72,16 +72,18 @@ namespace Socios.Api.Controllers
 
         /// <summary>
         /// Anula (lógicamente) una cuota: pasa su estado a ANULADA. No borra la fila.
+        /// Si es de nicho, anula todo el lote generado en la asignación y libera el nicho.
         ///   - Validaciones de formato                       → 400 (via [ApiController]).
         ///   - Cuota inexistente                             → 404 (RecursoNoEncontradoException).
-        ///   - Cuota paga / ya anulada / fuera de la hora    → 409 (ReglaNegocioException).
+        ///   - Cuota paga / ya anulada / fuera de la hora /
+        ///     nicho del socio no identificable              → 409 (ReglaNegocioException).
         /// </summary>
         [HttpPost("anular")]
         public async Task<IActionResult> AnularAsync([FromBody] CuotaAnularDto dto)
         {
-            await _cuotaUseCase.AnularAsync(dto);
+            var resultado = await _cuotaUseCase.AnularAsync(dto);
 
-            return Ok(new { mensaje = "La cuota fue anulada correctamente." });
+            return Ok(resultado);
         }
     }
 }
