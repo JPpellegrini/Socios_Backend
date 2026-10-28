@@ -16,5 +16,11 @@ namespace Socios.Application.UseCases.Nichos
 
         /// <summary>Asigna un nicho libre a un socio, cargando valor, financiación y lápida.</summary>
         Task AsignarAsync(NichoAsignarDto dto);
+
+        /// <summary>
+        /// Simula las cuotas que generaría el asignar con esa financiación (cantidad, monto y
+        /// vencimiento de cada una), sin grabar nada. Usa el mismo cálculo que el asignar.
+        /// </summary>
+        NichoSimulacionCuotasDto SimularCuotas(NichoFinanciacionDto dto);
     }
 }

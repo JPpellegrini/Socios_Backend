@@ -73,5 +73,21 @@ namespace Socios.Api.Controllers
 
             return Ok(new { mensaje = "El nicho fue asignado correctamente." });
         }
+
+        /// <summary>
+        /// Simula las cuotas del nicho con los mismos datos de financiación del asignar, sin
+        /// grabar nada: devuelve cuántas cuotas, el monto de cada una, sus vencimientos y el
+        /// total a pagar, para que el cliente lo vea antes de asignar. Es el mismo cálculo que
+        /// usa el asignar.
+        ///   - Validaciones de formato                              → 400 (via [ApiController]).
+        ///   - Falta valor de lápida / primer vencimiento no futuro → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("simular-cuotas")]
+        public IActionResult SimularCuotas([FromBody] NichoFinanciacionDto dto)
+        {
+            var simulacion = _nichoUseCase.SimularCuotas(dto);
+
+            return Ok(simulacion);
+        }
     }
 }
