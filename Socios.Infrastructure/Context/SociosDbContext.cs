@@ -75,6 +75,11 @@ namespace Socios.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new TipoPlanConfiguration());
             modelBuilder.ApplyConfiguration(new ProveedorConfiguration());
 
+            modelBuilder.Entity<Entidad>()
+                .HasMany(e => e.Contactos)
+                .WithOne(c => c.Entidad)
+                .HasForeignKey(c => c.Id_Entidad);
+
             // Seed de Rol Secretaria de prueba
             modelBuilder.Entity<Rol>().HasData(
             new Rol
@@ -550,14 +555,14 @@ namespace Socios.Infrastructure.Context
                     Fecha_Alta = new DateTime(2008, 1, 18, 0, 0, 0),
                     Estado = "INACTIVO"
                 },
-                                new EntidadTipo
-                                {
-                                    Id_EntidadTipo = 4,
-                                    Id_Entidad = 5,
-                                    Id_Tipo = 1,
-                                    Fecha_Alta = new DateTime(1995, 1, 18, 0, 0, 0),
-                                    Estado = "ACTIVO"
-                                },
+                new EntidadTipo
+                {
+                    Id_EntidadTipo = 4,
+                    Id_Entidad = 5,
+                    Id_Tipo = 1,
+                    Fecha_Alta = new DateTime(1995, 1, 18, 0, 0, 0),
+                    Estado = "ACTIVO"
+                },
                 new EntidadTipo
                 {
                     Id_EntidadTipo = 5,

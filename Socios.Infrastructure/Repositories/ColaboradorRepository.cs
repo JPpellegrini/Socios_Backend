@@ -48,5 +48,66 @@ namespace Socios.Infrastructure.Repositories
             _context.Update(colaborador);
             await _context.SaveChangesAsync();
         }
+
+        public void AgregarEntidad(Entidad entidad) => _context.Entidades.Add(entidad);
+        public void AgregarEntidadTipo(EntidadTipo entidadTipo) => _context.EntidadTipos.Add(entidadTipo);
+        public void ActualizarEntidad(Entidad entidad) => _context.Entidades.Update(entidad);
+        public void ActualizarEntidadTipo(EntidadTipo entidadTipo) => _context.EntidadTipos.Update(entidadTipo);
+        public async Task<EntidadTipo?> ObtenerEntidadTipoAsync(int idEntidadTipo)
+        {
+            return await _context.EntidadTipos
+                .Include(et => et.Entidad)
+                .FirstOrDefaultAsync(et => et.Id_EntidadTipo == idEntidadTipo && et.Id_Tipo == 3);
+        }
+
+        public async Task<List<Entidad>> BuscarAsync(string? busqueda)
+        {
+            var query =
+                from e in _context.Entidades
+                    .Include(e => e.Ciudad)
+                    .Include(e => e.Contactos) // 👈 importante: incluir contactos
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                where et.Id_Tipo == 3 && et.Estado == "ACTIVO"
+                select e;
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                var filtro = busqueda.ToLower();
+                query = query.Where(e =>
+                    e.Dni.ToLower().Contains(filtro) ||
+                    e.Nombre.ToLower().Contains(filtro) ||
+                    e.Apellido.ToLower().Contains(filtro));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task RegistrarBajaAsync(EntidadBaja baja)
+        {
+            await _context.EntidadBajas.AddAsync(baja);
+        }
+
+        public void Agregar(Colaborador colaborador)
+        {
+            // Solo marca el colaborador para insertar. El guardado real lo dispara la unidad de trabajo.
+            _context.Colaboradores.Add(colaborador);
+        }
+
+
+        public async Task<bool> EsColaboradorAsync(int idEntidad)
+        {
+            // Es colaborador si ya existe una fila en la tabla colaboradores para esa entidad.
+            return await _context.Colaboradores.AnyAsync(c => c.Id_Entidad == idEntidad);
+        }
+
+        public async Task<Colaborador?> ObtenerConEntidadPorEntidadAsync(int idEntidad)
+        {
+            // Se traen colaborador + entidad trackeados (sin AsNoTracking) para que el caso de uso
+            // pueda modificar ambos y la unidad de trabajo confirme los cambios.
+            return await _context.Colaboradores
+                .Include(c => c.Entidad)
+                .FirstOrDefaultAsync(c => c.Id_Entidad == idEntidad);
+        }
+
     }
 }

@@ -4,17 +4,19 @@ using Socios.Infrastructure.Context;
 using Socios.Infrastructure.Repositories;
 using Socios.Infrastructure.Pdf;
 using Microsoft.AspNetCore.Authentication;
+using Nichos.Infrastructure.Repositories;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
-using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.Codeudores;
+using Socios.Application.UseCases.Empleados;
 using Socios.Application.UseCases.Entidades;
-using Socios.Application.UseCases.Proveedores;
 using Socios.Application.UseCases.Nichos;
+using Socios.Application.UseCases.Proveedores;
+using Socios.Application.UseCases.Colaboradores;
+using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.ConfiguracionCuotas;
 using Socios.Application.UseCases.Cuotas;
 using Socios.Infrastructure;
-using Nichos.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +76,8 @@ builder.Services.AddScoped<INichoRepository, NichoRepository>();
 builder.Services.AddScoped<ICodeudorRepository, CodeudorRepository>();
 builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IPrestacionRepository, PrestacionRepository>();
+builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<ITipoCuotaRepository, TipoCuotaRepository>();
 builder.Services.AddScoped<ITipoPlanRepository, TipoPlanRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
@@ -85,11 +89,12 @@ builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ISocioUseCase, SocioUseCase>();
 builder.Services.AddScoped<IEntidadUseCase, EntidadUseCase>();
 builder.Services.AddScoped<ICodeudorUseCase, CodeudorUseCase>();
 builder.Services.AddScoped<IProveedorUseCase, ProveedorUseCase>();
 builder.Services.AddScoped<INichoUseCase, NichoUseCase>();
+builder.Services.AddScoped<IColaboradorUseCase, ColaboradorUseCase>();
+builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
 builder.Services.AddScoped<IConfiguracionCuotaUseCase, ConfiguracionCuotaUseCase>();
 builder.Services.AddScoped<ICuotaUseCase, CuotaUseCase>();
 
