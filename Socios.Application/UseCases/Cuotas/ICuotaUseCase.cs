@@ -28,5 +28,11 @@ namespace Socios.Application.UseCases.Cuotas
         /// lote y libera el nicho.
         /// </summary>
         Task<CuotaAnulacionResultadoDto> AnularAsync(CuotaAnularDto dto);
+
+        /// <summary>
+        /// Genera el PDF de comprobantes de deuda de las cuotas indicadas (uno por cuota).
+        /// Solo para cuotas adeudadas (pendientes o vencidas). Devuelve el contenido del PDF.
+        /// </summary>
+        Task<byte[]> GenerarComprobantesAsync(CuotaComprobanteSolicitudDto dto);
     }
 }

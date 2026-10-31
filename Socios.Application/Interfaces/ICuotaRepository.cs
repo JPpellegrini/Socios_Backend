@@ -40,5 +40,12 @@ namespace Socios.Application.Interfaces
         /// compartido identifica las cuotas creadas en una misma asignación de nicho.
         /// </summary>
         Task<List<Cuota>> ObtenerLoteNichoAsync(int idEntidad, DateTime fechaHoraGeneracion);
+
+        /// <summary>
+        /// Trae los datos para imprimir el comprobante de cada cuota indicada: la cuota, el
+        /// socio (nombre, domicilio, plan) y la ubicación de su nicho si tiene. Solo lectura.
+        /// Las cuotas inexistentes simplemente no vienen en el resultado.
+        /// </summary>
+        Task<List<CuotaComprobanteDto>> ObtenerParaComprobanteAsync(IReadOnlyCollection<int> idsCuota);
     }
 }

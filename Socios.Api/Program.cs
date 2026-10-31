@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Socios.Application.Interfaces;
 using Socios.Infrastructure.Context;
 using Socios.Infrastructure.Repositories;
+using Socios.Infrastructure.Pdf;
 using Microsoft.AspNetCore.Authentication;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
@@ -76,6 +77,11 @@ builder.Services.AddScoped<IPrestacionRepository, PrestacionRepository>();
 builder.Services.AddScoped<ITipoCuotaRepository, TipoCuotaRepository>();
 builder.Services.AddScoped<ITipoPlanRepository, TipoPlanRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
+
+// Comprobantes de cuotas en PDF (QuestPDF). Encabezado/leyenda opcionales en la sección
+// "Comprobante" del appsettings; si no están, se usan los datos del Centro.
+builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection("Comprobante"));
+builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

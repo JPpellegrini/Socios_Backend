@@ -136,6 +136,43 @@ namespace Socios.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.Id_Deuda == idDeuda);
         }
 
+        public async Task<List<CuotaComprobanteDto>> ObtenerParaComprobanteAsync(IReadOnlyCollection<int> idsCuota)
+        {
+            // La cuota apunta a la entidad; de ahí salen el socio (Id, plan) y sus datos
+            // personales. La ciudad va con LEFT JOIN para no perder el comprobante si falta.
+            // El nicho del socio (uno solo por regla de negocio) se trae como "sector-número".
+            return await (
+                from c in _context.Cuotas
+                join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                join s in _context.Socios on c.Id_Entidad equals s.Id_Entidad
+                join e in _context.Entidades on c.Id_Entidad equals e.Id_Entidad
+                join ci in _context.Ciudades on e.Id_Ciudad equals ci.Id_Ciudad into ciudades
+                from ci in ciudades.DefaultIfEmpty()
+                where idsCuota.Contains(c.Id_Deuda)
+                select new CuotaComprobanteDto
+                {
+                    IdCuota = c.Id_Deuda,
+                    IdSocio = s.Id_Socio,
+                    Apellido = e.Apellido,
+                    Nombre = e.Nombre,
+                    Calle = e.Calle,
+                    Altura = e.Altura,
+                    Ciudad = ci != null ? ci.Nombre : null,
+                    Plan = s.Plan,
+                    Concepto = tc.Concepto,
+                    Mes = c.Mes_Periodo,
+                    Anio = c.Anio_Periodo,
+                    Monto = c.Monto,
+                    FechaVencimiento = c.FechaVencimiento,
+                    Estado = c.Estado,
+                    Nicho = _context.Nichos
+                        .Where(n => n.Id_Entidad == c.Id_Entidad)
+                        .Select(n => n.Sector + "-" + n.NroNicho)
+                        .FirstOrDefault()
+                }
+            ).AsNoTracking().ToListAsync();
+        }
+
         public async Task<List<Cuota>> ObtenerLoteNichoAsync(int idEntidad, DateTime fechaHoraGeneracion)
         {
             // Trackeado: el caso de uso pasa todas estas cuotas a ANULADA en una transacción.

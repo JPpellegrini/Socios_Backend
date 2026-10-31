@@ -85,5 +85,23 @@ namespace Socios.Api.Controllers
 
             return Ok(resultado);
         }
+
+        /// <summary>
+        /// Genera el PDF de comprobantes de deuda de las cuotas indicadas (uno por cuota, 6 por
+        /// hoja A4 con líneas de corte). Se devuelve para mostrar en el navegador ("inline"),
+        /// desde donde se puede imprimir o descargar.
+        ///   - Validaciones de formato (lista vacía)       → 400 (via [ApiController]).
+        ///   - Alguna cuota inexistente                    → 404 (RecursoNoEncontradoException).
+        ///   - Alguna cuota paga o anulada                 → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("comprobantes")]
+        public async Task<IActionResult> GenerarComprobantesAsync([FromBody] CuotaComprobanteSolicitudDto dto)
+        {
+            var pdf = await _cuotaUseCase.GenerarComprobantesAsync(dto);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            Response.Headers.ContentDisposition = "inline; filename=\"comprobantes-cuotas.pdf\"";
+            return File(pdf, "application/pdf");
+        }
     }
 }

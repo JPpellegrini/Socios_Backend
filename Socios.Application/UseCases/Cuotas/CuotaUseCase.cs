@@ -17,6 +17,7 @@ namespace Socios.Application.UseCases.Cuotas
         private readonly ITipoPlanRepository _tiposPlan;
         private readonly ICuotaRepository _cuotas;
         private readonly INichoRepository _nichos;
+        private readonly IComprobanteCuotaPdf _comprobantePdf;
         private readonly IUnitOfWork _unitOfWork;
 
         private const string ConceptoSocio = "SOCIO";
@@ -26,6 +27,7 @@ namespace Socios.Application.UseCases.Cuotas
         private const string EstadoPendiente = "PENDIENTE";
         private const string EstadoPagado = "PAGADO";
         private const string EstadoAnulada = "ANULADA";
+        private const string EstadoVencida = "VENCIDA";
 
         // Ventana para poder anular una cuota desde que se generó.
         private static readonly TimeSpan VentanaAnulacion = TimeSpan.FromHours(1);
@@ -41,6 +43,7 @@ namespace Socios.Application.UseCases.Cuotas
             ITipoPlanRepository tiposPlan,
             ICuotaRepository cuotas,
             INichoRepository nichos,
+            IComprobanteCuotaPdf comprobantePdf,
             IUnitOfWork unitOfWork)
         {
             _socios = socios;
@@ -49,6 +52,7 @@ namespace Socios.Application.UseCases.Cuotas
             _tiposPlan = tiposPlan;
             _cuotas = cuotas;
             _nichos = nichos;
+            _comprobantePdf = comprobantePdf;
             _unitOfWork = unitOfWork;
         }
 
@@ -251,6 +255,54 @@ namespace Socios.Application.UseCases.Cuotas
 
             return resultado;
         }
+
+        /// <summary>
+        /// Genera el PDF de comprobantes de deuda de las cuotas indicadas, uno por cuota.
+        /// Reglas:
+        ///   - Todas las cuotas tienen que existir (si falta alguna, se informa cuáles).
+        ///   - Solo se emiten para cuotas adeudadas: PENDIENTE o VENCIDA. Una cuota paga o
+        ///     anulada no es una deuda; si viene alguna, se informa cuáles y no se genera nada.
+        /// Los comprobantes se ordenan por socio (apellido, nombre) y, dentro de cada socio,
+        /// por período y concepto, para que salgan agrupados al imprimir y repartir.
+        /// </summary>
+        public async Task<byte[]> GenerarComprobantesAsync(CuotaComprobanteSolicitudDto dto)
+        {
+            var ids = dto.IdsCuota!.Distinct().ToList();
+            var comprobantes = await _cuotas.ObtenerParaComprobanteAsync(ids);
+
+            var faltantes = ids.Except(comprobantes.Select(c => c.IdCuota)).ToList();
+            if (faltantes.Count > 0)
+                throw new RecursoNoEncontradoException($"No se encontraron las cuotas: {string.Join(", ", faltantes)}.");
+
+            var noAdeudadas = comprobantes
+                .Where(c => c.Estado != EstadoPendiente && c.Estado != EstadoVencida)
+                .ToList();
+            if (noAdeudadas.Count > 0)
+            {
+                var detalle = string.Join(", ", noAdeudadas.Select(c => $"{c.IdCuota} ({c.Estado})"));
+                throw new ReglaNegocioException($"Solo se emiten comprobantes de cuotas adeudadas (pendientes o vencidas). No corresponde para: {detalle}.");
+            }
+
+            var ordenados = comprobantes
+                .OrderBy(c => c.Apellido)
+                .ThenBy(c => c.Nombre)
+                .ThenBy(c => c.IdSocio)
+                .ThenBy(c => c.Anio)
+                .ThenBy(c => c.Mes)
+                .ThenBy(c => OrdenConcepto(c.Concepto))
+                .ToList();
+
+            return _comprobantePdf.Generar(ordenados);
+        }
+
+        /// <summary>Orden de impresión de los conceptos de un mismo período.</summary>
+        private static int OrdenConcepto(string concepto) => concepto switch
+        {
+            ConceptoSocio => 0,
+            ConceptoSepelio => 1,
+            ConceptoNicho => 2,
+            _ => 3
+        };
 
         /// <summary>
         /// Anula (lógicamente) una cuota. Reglas:
