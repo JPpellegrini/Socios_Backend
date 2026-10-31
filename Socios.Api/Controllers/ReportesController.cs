@@ -20,6 +20,15 @@ namespace Socios.Api.Controllers
         [HttpGet("socios")]
         public async Task<IActionResult> InformeSociosAsync([FromQuery] SocioInformeFiltroDto filtro)
         {
+            var estado = filtro.Estado?.Trim().ToUpperInvariant();
+            if (estado is not ("ACTIVO" or "INACTIVO" or "TODOS"))
+                return BadRequest("El estado debe ser ACTIVO, INACTIVO o TODOS.");
+
+            if (!filtro.IncluirAdherentes && !filtro.IncluirSepelio && !filtro.IncluirNicho)
+                return BadRequest("Debe seleccionar al menos una categoría: adherente, sepelio o nicho.");
+
+            filtro.Estado = estado;
+
             var reporte = await _socioRepository.GenerarInformeAsync(filtro);
 
             if (!reporte.Any())

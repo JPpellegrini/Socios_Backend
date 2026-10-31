@@ -197,6 +197,8 @@ namespace Socios.Infrastructure.Repositories
 
         public async Task<IEnumerable<SocioInformeDto>> GenerarInformeAsync(SocioInformeFiltroDto filtro)
         {
+            // No se une con EntidadBajas: el informe no muestra la fecha de baja y un socio
+            // dado de baja más de una vez (con reactivación en el medio) aparecería duplicado.
             var query =
                 from s in _context.Socios
                 join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
@@ -204,51 +206,66 @@ namespace Socios.Infrastructure.Repositories
                 join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
                 join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras
                 from os in obras.DefaultIfEmpty()
-                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas
-                from eb in bajas.DefaultIfEmpty()
                 where et.Id_Tipo == 1 // Tipo = Socio
-                select new { s, e, c, et, os, eb };
+                select new
+                {
+                    s, e, c, et, os,
+                    // Adherente = todo socio sin sepelio (incluye Sepelio nulo, no solo "NO").
+                    TieneSepelio = s.Sepelio != null && s.Sepelio.ToUpper() == "SI",
+                    TieneNicho = _context.Nichos.Any(n => n.Id_Entidad == e.Id_Entidad)
+                };
 
-            // Filtro por estado
+            // Filtro por estado (el controlador ya validó y normalizó el valor).
             if (filtro.Estado != "TODOS")
                 query = query.Where(x => x.et.Estado == filtro.Estado);
 
-            // Filtro por adherentes (Sepelio = "NO")
-            if (!filtro.IncluirAdherentes)
-                query = query.Where(x => x.s.Sepelio == "SI");
-
-            // Filtro por sepelio (Sepelio = "SI")
-            if (!filtro.IncluirSepelio)
-                query = query.Where(x => x.s.Sepelio == "NO");
-
-            // Filtro por nicho
-            if (!filtro.IncluirNicho)
-                query = query.Where(x => !_context.Nichos.Any(n => n.Id_Entidad == x.e.Id_Entidad));
-
-            return await query.Select(x => new SocioInformeDto
+            // Filtro por categoría: se combinan con OR (se listan los socios que cumplan
+            // alguna de las marcadas). "Sepelio" excluye a quienes tienen nicho, para que
+            // "solo sepelio" y "solo nicho" no se superpongan.
+            var adherentes = filtro.IncluirAdherentes;
+            var sepelio = filtro.IncluirSepelio;
+            var nicho = filtro.IncluirNicho;
+            if (!(adherentes && sepelio && nicho))
             {
-                Nombre = x.e.Nombre,
-                Apellido = x.e.Apellido,
-                Calle = x.e.Calle,
-                Altura = x.e.Altura.ToString(),
-                Ciudad = x.c.Nombre,
-                Telefono = _context.Contactos
-                                .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "TELEFONO")
-                                .Select(con => con.ContactoEntidad)
-                                .FirstOrDefault(),
-                Mail = _context.Contactos
-                                .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "MAIL")
-                                .Select(con => con.ContactoEntidad)
-                                .FirstOrDefault(),
-                ObraSocial = x.os != null ? x.os.NombreObraSocial : null,
-                Edad = x.e.Nacimiento.HasValue
-                                ? DateTime.Now.Year - x.e.Nacimiento.Value.Year
-                                : 0,
-                Sepelio = x.s.Sepelio == "SI",
-                Nicho = _context.Nichos.Any(n => n.Id_Entidad == x.e.Id_Entidad),
-                Estado = x.et.Estado,
-                TipoSocio = x.s.Sepelio == "SI" ? "Sepelio" : "Adherente"
-            }).ToListAsync();
+                query = query.Where(x =>
+                    (adherentes && !x.TieneSepelio) ||
+                    (sepelio && x.TieneSepelio && !x.TieneNicho) ||
+                    (nicho && x.TieneNicho));
+            }
+
+            var hoy = DateTime.Today;
+
+            return await query
+                .OrderBy(x => x.e.Apellido)
+                .ThenBy(x => x.e.Nombre)
+                .Select(x => new SocioInformeDto
+                {
+                    Nombre = x.e.Nombre,
+                    Apellido = x.e.Apellido,
+                    Calle = x.e.Calle,
+                    Altura = x.e.Altura.ToString(),
+                    Ciudad = x.c.Nombre,
+                    Telefono = _context.Contactos
+                                    .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "TELEFONO")
+                                    .Select(con => con.ContactoEntidad)
+                                    .FirstOrDefault(),
+                    Mail = _context.Contactos
+                                    .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "MAIL")
+                                    .Select(con => con.ContactoEntidad)
+                                    .FirstOrDefault(),
+                    ObraSocial = x.os != null ? x.os.NombreObraSocial : null,
+                    // Edad exacta: se resta un año si todavía no cumplió en el año actual.
+                    Edad = x.e.Nacimiento.HasValue
+                                    ? hoy.Year - x.e.Nacimiento.Value.Year
+                                        - (x.e.Nacimiento.Value.Month > hoy.Month
+                                            || (x.e.Nacimiento.Value.Month == hoy.Month && x.e.Nacimiento.Value.Day > hoy.Day)
+                                            ? 1 : 0)
+                                    : null,
+                    Sepelio = x.TieneSepelio,
+                    Nicho = x.TieneNicho,
+                    Estado = x.et.Estado,
+                    TipoSocio = x.TieneSepelio ? "Sepelio" : "Adherente"
+                }).AsNoTracking().ToListAsync();
         }
 
     }

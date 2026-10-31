@@ -10,18 +10,21 @@ namespace Socios.Application.DTOs
         /// </summary>
         public string Estado { get; set; } = "TODOS";
 
+        // Las tres categorías se combinan con OR: se listan los socios que cumplan
+        // alguna de las marcadas. Al menos una debe estar marcada.
+
         /// <summary>
-        /// Indica si se incluyen socios adherentes.
+        /// Incluye socios adherentes (sin sepelio).
         /// </summary>
         public bool IncluirAdherentes { get; set; } = true;
 
         /// <summary>
-        /// Indica si se incluyen socios con sepelio.
+        /// Incluye socios con sepelio que no tienen nicho asignado.
         /// </summary>
         public bool IncluirSepelio { get; set; } = true;
 
         /// <summary>
-        /// Indica si se incluyen socios con nicho.
+        /// Incluye socios que tienen un nicho asignado.
         /// </summary>
         public bool IncluirNicho { get; set; } = true;
     }

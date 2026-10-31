@@ -14,7 +14,7 @@ namespace Socios.Application.DTOs
         public string? Telefono { get; set; }
         public string? Mail { get; set; }
         public string? ObraSocial { get; set; }
-        public int Edad { get; set; }
+        public int? Edad { get; set; } // null si no hay fecha de nacimiento cargada
         public bool Sepelio { get; set; }
         public bool Nicho { get; set; }
         public string Estado { get; set; } = null!;
