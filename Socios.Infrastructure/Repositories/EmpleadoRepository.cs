@@ -39,6 +39,14 @@ namespace Socios.Infrastructure.Repositories
                 .FirstOrDefaultAsync(et => et.Id_EntidadTipo == idEntidadTipo && et.Id_Tipo == 4);
         }
 
+        public async Task<EntidadTipo?> ObtenerUltimoEntidadTipoAsync(int idEntidad)
+        {
+            return await _context.EntidadTipos
+                .Where(et => et.Id_Entidad == idEntidad && et.Id_Tipo == 4)
+                .OrderByDescending(et => et.Id_EntidadTipo)
+                .FirstOrDefaultAsync();
+        }
+
         public void AgregarEntidad(Entidad entidad) => _context.Entidades.Add(entidad);
         public void AgregarEntidadTipo(EntidadTipo entidadTipo) => _context.EntidadTipos.Add(entidadTipo);
         public void ActualizarEntidad(Entidad entidad) => _context.Entidades.Update(entidad);

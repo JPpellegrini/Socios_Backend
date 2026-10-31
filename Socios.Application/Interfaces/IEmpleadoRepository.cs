@@ -8,6 +8,7 @@ namespace Socios.Application.Interfaces
         Task<bool> EsEmpleadoAsync(int idEntidad);
         Task<Entidad?> ObtenerPorIdAsync(int idEntidad);
         Task<EntidadTipo?> ObtenerEntidadTipoAsync(int idEntidadTipo);
+        Task<EntidadTipo?> ObtenerUltimoEntidadTipoAsync(int idEntidad);
 
         void AgregarEntidad(Entidad entidad);
         void AgregarEntidadTipo(EntidadTipo entidadTipo);

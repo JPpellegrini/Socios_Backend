@@ -249,13 +249,15 @@ namespace Socios.Application.UseCases.Empleados
         /// </summary>
         public async Task ReactivarAsync(EmpleadoReactivarDto dto)
         {
-            // Ubicar la fila de tipo "Empleado" de esa entidad (viene trackeada).
-            var entidadTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(dto.IdEntidad, IdTipoProveedor)
-                ?? throw new RecursoNoEncontradoException("No se encontró un empleado para la entidad indicada.");
-
             // Regla de negocio: no se puede reactivar algo que ya está activo.
-            if (entidadTipo.Estado == "ACTIVO")
+            // Se valida antes de buscar la fila porque una entidad puede tener más de un registro
+            // de tipo "Empleado" (el alta crea uno nuevo si el anterior quedó INACTIVO).
+            if (await _empleados.EsEmpleadoAsync(dto.IdEntidad))
                 throw new ReglaNegocioException("El empleado ya está activo.");
+
+            // Ubicar el último registro de tipo "Empleado" de esa entidad (viene trackeado).
+            var entidadTipo = await _empleados.ObtenerUltimoEntidadTipoAsync(dto.IdEntidad)
+                ?? throw new RecursoNoEncontradoException("No se encontró un empleado para la entidad indicada.");
 
             entidadTipo.Estado = "ACTIVO";
 

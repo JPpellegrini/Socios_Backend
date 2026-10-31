@@ -9,7 +9,6 @@ namespace Socios.API.Controllers
     public class EmpleadosController : ControllerBase
     {
         private readonly IEmpleadoUseCase _empleados;
-        private object _empleadoUseCase;
 
         public EmpleadosController(IEmpleadoUseCase empleados)
         {
@@ -77,10 +76,15 @@ namespace Socios.API.Controllers
             return Ok(empleados);
         }
 
+        /// <summary>
+        /// Reactiva un empleado dado de baja: recibe el Id de la entidad y pasa su estado a ACTIVO.
+        ///   - Entidad sin empleado → 404 (RecursoNoEncontradoException).
+        ///   - Empleado ya activo   → 409 (ReglaNegocioException).
+        /// </summary>
         [HttpPost("reactivar")]
         public async Task<IActionResult> ReactivarEmpleadoAsync([FromBody] EmpleadoReactivarDto dto)
         {
-            await _empleadoUseCase.ReactivarAsync(dto);
+            await _empleados.ReactivarAsync(dto);
 
             return Ok(new { mensaje = "El empleado fue reactivado correctamente." });
         }
