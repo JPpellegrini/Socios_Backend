@@ -28,6 +28,9 @@ namespace Socios.Application.Interfaces
         /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>
         Task<bool> EsSocioAsync(int idEntidad);
 
+        /// <summary>Indica si el socio de la entidad indicada tiene sepelio ("SI").</summary>
+        Task<bool> TieneSepelioAsync(int idEntidad);
+
         /// <summary>
         /// Trae todos los socios ACTIVOS con los datos necesarios para generarles cuotas
         /// (entidad, sepelio, plan, nacimiento). Solo lectura.

@@ -92,7 +92,7 @@ namespace Socios.Application.UseCases.Nichos
         /// Asigna un nicho libre a un socio. Reglas:
         ///   - El nicho tiene que existir.
         ///   - El nicho no puede estar ya ocupado.
-        ///   - La entidad indicada tiene que ser un socio.
+        ///   - La entidad indicada tiene que ser un socio activo y con sepelio.
         ///   - Si lleva lápida, el valor de la lápida es obligatorio.
         /// Carga valor, cuotas, interés y lápida, y marca el nicho como ocupado.
         /// </summary>
@@ -113,6 +113,10 @@ namespace Socios.Application.UseCases.Nichos
             var socioTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(dto.IdEntidad.Value, IdTipoSocio);
             if (socioTipo is null || socioTipo.Estado != "ACTIVO")
                 throw new ReglaNegocioException("El socio no está activo: no se le puede asignar un nicho.");
+
+            // Regla de negocio: solo un socio con sepelio puede tener un nicho.
+            if (!await _socios.TieneSepelioAsync(dto.IdEntidad.Value))
+                throw new ReglaNegocioException("El socio no tiene sepelio: no se le puede asignar un nicho.");
 
             // Regla de negocio: un socio puede tener un solo nicho asignado.
             if (await _nichos.TieneNichoAsignadoAsync(dto.IdEntidad.Value))

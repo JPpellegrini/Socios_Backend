@@ -101,6 +101,11 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Socios.AnyAsync(s => s.Id_Entidad == idEntidad);
         }
 
+        public async Task<bool> TieneSepelioAsync(int idEntidad)
+        {
+            return await _context.Socios.AnyAsync(s => s.Id_Entidad == idEntidad && s.Sepelio == "SI");
+        }
+
         public async Task<List<SocioCuotaDto>> ObtenerActivosParaCuotasAsync()
         {
             // El estado ACTIVO vive en EntidadTipo (fila tipo Socio, Id_Tipo = 1).
