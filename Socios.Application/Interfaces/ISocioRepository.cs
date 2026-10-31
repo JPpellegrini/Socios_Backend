@@ -28,6 +28,12 @@ namespace Socios.Application.Interfaces
         /// <summary>Indica si la entidad indicada ya está registrada como socio.</summary>
         Task<bool> EsSocioAsync(int idEntidad);
 
+        /// <summary>
+        /// Trae todos los socios ACTIVOS con los datos necesarios para generarles cuotas
+        /// (entidad, sepelio, plan, nacimiento). Solo lectura.
+        /// </summary>
+        Task<List<SocioCuotaDto>> ObtenerActivosParaCuotasAsync();
+
         /// <summary>Marca el socio para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Socio socio);
 

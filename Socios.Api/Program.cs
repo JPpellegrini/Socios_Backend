@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Socios.Application.Interfaces;
+using Socios.Infrastructure.Context;
+using Socios.Infrastructure.Repositories;
+using Socios.Infrastructure.Pdf;
+using Microsoft.AspNetCore.Authentication;
 using Nichos.Infrastructure.Repositories;
 using Socios.Api.Authentication;
 using Socios.Api.Middleware;
-using Socios.Application.Interfaces;
 using Socios.Application.UseCases.Codeudores;
 using Socios.Application.UseCases.Empleados;
 using Socios.Application.UseCases.Entidades;
@@ -12,9 +15,8 @@ using Socios.Application.UseCases.Proveedores;
 using Socios.Application.UseCases.Colaboradores;
 using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.ConfiguracionCuotas;
+using Socios.Application.UseCases.Cuotas;
 using Socios.Infrastructure;
-using Socios.Infrastructure.Context;
-using Socios.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +80,12 @@ builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
 builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<ITipoCuotaRepository, TipoCuotaRepository>();
 builder.Services.AddScoped<ITipoPlanRepository, TipoPlanRepository>();
+builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
+
+// Comprobantes de cuotas en PDF (QuestPDF). Encabezado/leyenda opcionales en la sección
+// "Comprobante" del appsettings; si no están, se usan los datos del Centro.
+builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection("Comprobante"));
+builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -88,6 +96,7 @@ builder.Services.AddScoped<INichoUseCase, NichoUseCase>();
 builder.Services.AddScoped<IColaboradorUseCase, ColaboradorUseCase>();
 builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
 builder.Services.AddScoped<IConfiguracionCuotaUseCase, ConfiguracionCuotaUseCase>();
+builder.Services.AddScoped<ICuotaUseCase, CuotaUseCase>();
 
 #endregion
 

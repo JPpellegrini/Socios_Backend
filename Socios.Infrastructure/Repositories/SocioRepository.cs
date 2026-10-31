@@ -101,6 +101,25 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Socios.AnyAsync(s => s.Id_Entidad == idEntidad);
         }
 
+        public async Task<List<SocioCuotaDto>> ObtenerActivosParaCuotasAsync()
+        {
+            // El estado ACTIVO vive en EntidadTipo (fila tipo Socio, Id_Tipo = 1).
+            return await (
+                from s in _context.Socios
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                where et.Id_Tipo == 1 && et.Estado == "ACTIVO"
+                select new SocioCuotaDto
+                {
+                    IdSocio = s.Id_Socio,
+                    IdEntidad = e.Id_Entidad,
+                    Plan = s.Plan,
+                    Sepelio = s.Sepelio,
+                    Nacimiento = e.Nacimiento
+                }
+            ).AsNoTracking().ToListAsync();
+        }
+
         public void Agregar(Socio socio)
         {
             // Solo marca el socio para insertar. El guardado real lo dispara la unidad de trabajo.
