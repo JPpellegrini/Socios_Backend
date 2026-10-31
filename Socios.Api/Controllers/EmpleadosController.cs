@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
-using Socios.Application.UseCases.Empleados;
 
 namespace Socios.API.Controllers
 {
@@ -10,6 +9,7 @@ namespace Socios.API.Controllers
     public class EmpleadosController : ControllerBase
     {
         private readonly IEmpleadoUseCase _empleados;
+        private object _empleadoUseCase;
 
         public EmpleadosController(IEmpleadoUseCase empleados)
         {
@@ -76,5 +76,14 @@ namespace Socios.API.Controllers
 
             return Ok(empleados);
         }
+
+        [HttpPost("reactivar")]
+        public async Task<IActionResult> ReactivarEmpleadoAsync([FromBody] EmpleadoReactivarDto dto)
+        {
+            await _empleadoUseCase.ReactivarAsync(dto);
+
+            return Ok(new { mensaje = "El empleado fue reactivado correctamente." });
+        }
+
     }
 }

@@ -24,5 +24,6 @@ namespace Socios.Application.Interfaces
         /// </summary>
         Task ModificarAsync(EmpleadoModificarDto dto);
         Task<List<EmpleadoDto>> BuscarAsync(string? busqueda);
+        Task ReactivarAsync(EmpleadoReactivarDto dto);
     }
 }

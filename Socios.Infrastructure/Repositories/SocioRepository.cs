@@ -30,13 +30,13 @@ namespace Socios.Infrastructure.Repositories
                 join t in _context.TiposEntidad on et.Id_Tipo equals t.Id_Tipo
                 where t.NombreTipoEntidad == "Socio"
                 select new { s, e, et };
-            
+
             var busqueda = filtro.Busqueda?.Trim();
             if (!string.IsNullOrEmpty(busqueda))
             {
                 var patron = $"%{busqueda}%";
                 query = query.Where(x =>
-                    (x.e.Nombre != null && EF.Functions.ILike(x.e.Nombre, patron)) || 
+                    (x.e.Nombre != null && EF.Functions.ILike(x.e.Nombre, patron)) ||
                     (x.e.Apellido != null && EF.Functions.ILike(x.e.Apellido, patron)));
             }
 
@@ -53,13 +53,13 @@ namespace Socios.Infrastructure.Repositories
             }
 
             return await query.Select(x => new SocioListadoDto
-                {
-                    IdSocio = x.s.Id_Socio,
-                    Nombre = x.e.Nombre,
-                    Apellido = x.e.Apellido,
-                    Dni = x.e.Dni,
-                    Estado = x.et.Estado
-                }).ToListAsync();
+            {
+                IdSocio = x.s.Id_Socio,
+                Nombre = x.e.Nombre,
+                Apellido = x.e.Apellido,
+                Dni = x.e.Dni,
+                Estado = x.et.Estado
+            }).ToListAsync();
         }
 
         public async Task<List<SocioAsignableNichoDto>> BuscarAsignablesNichoAsync(string? busqueda)
@@ -131,9 +131,9 @@ namespace Socios.Infrastructure.Repositories
                 join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
                 join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
                 join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
-                join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras 
+                join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras
                 from os in obras.DefaultIfEmpty()
-                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas 
+                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas
                 from eb in bajas.DefaultIfEmpty()
                 where s.Id_Socio == idSocio && et.Id_Tipo == 1
                 select new SocioDetalleDto
@@ -169,6 +169,62 @@ namespace Socios.Infrastructure.Repositories
                         .ToList()
                 }
             ).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<SocioInformeDto>> GenerarInformeAsync(SocioInformeFiltroDto filtro)
+        {
+            var query =
+                from s in _context.Socios
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras
+                from os in obras.DefaultIfEmpty()
+                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas
+                from eb in bajas.DefaultIfEmpty()
+                where et.Id_Tipo == 1 // Tipo = Socio
+                select new { s, e, c, et, os, eb };
+
+            // Filtro por estado
+            if (filtro.Estado != "TODOS")
+                query = query.Where(x => x.et.Estado == filtro.Estado);
+
+            // Filtro por adherentes (Sepelio = "NO")
+            if (!filtro.IncluirAdherentes)
+                query = query.Where(x => x.s.Sepelio == "SI");
+
+            // Filtro por sepelio (Sepelio = "SI")
+            if (!filtro.IncluirSepelio)
+                query = query.Where(x => x.s.Sepelio == "NO");
+
+            // Filtro por nicho
+            if (!filtro.IncluirNicho)
+                query = query.Where(x => !_context.Nichos.Any(n => n.Id_Entidad == x.e.Id_Entidad));
+
+            return await query.Select(x => new SocioInformeDto
+            {
+                Nombre = x.e.Nombre,
+                Apellido = x.e.Apellido,
+                Calle = x.e.Calle,
+                Altura = x.e.Altura.ToString(),
+                Ciudad = x.c.Nombre,
+                Telefono = _context.Contactos
+                                .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "TELEFONO")
+                                .Select(con => con.ContactoEntidad)
+                                .FirstOrDefault(),
+                Mail = _context.Contactos
+                                .Where(con => con.Id_Entidad == x.e.Id_Entidad && con.Tipo == "MAIL")
+                                .Select(con => con.ContactoEntidad)
+                                .FirstOrDefault(),
+                ObraSocial = x.os != null ? x.os.NombreObraSocial : null,
+                Edad = x.e.Nacimiento.HasValue
+                                ? DateTime.Now.Year - x.e.Nacimiento.Value.Year
+                                : 0,
+                Sepelio = x.s.Sepelio == "SI",
+                Nicho = _context.Nichos.Any(n => n.Id_Entidad == x.e.Id_Entidad),
+                Estado = x.et.Estado,
+                TipoSocio = x.s.Sepelio == "SI" ? "Sepelio" : "Adherente"
+            }).ToListAsync();
         }
 
     }

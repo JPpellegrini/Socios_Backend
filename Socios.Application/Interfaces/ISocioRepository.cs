@@ -30,5 +30,8 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Marca el socio para ser insertado. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Socio socio);
+
+        // Nuevo método para informes
+        Task<IEnumerable<SocioInformeDto>> GenerarInformeAsync(SocioInformeFiltroDto filtro);
     }
 }

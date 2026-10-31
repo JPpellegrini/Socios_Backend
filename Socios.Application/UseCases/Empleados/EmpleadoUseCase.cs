@@ -243,5 +243,24 @@ namespace Socios.Application.UseCases.Empleados
                     .ToList()
             }).ToList();
         }
+        /// <summary>
+        /// Reactivación de empleado. Recibe el Id de la entidad, que debe existir y estar
+        /// INACTIVA como empleado. Solo cambia el estado a ACTIVO.
+        /// </summary>
+        public async Task ReactivarAsync(EmpleadoReactivarDto dto)
+        {
+            // Ubicar la fila de tipo "Empleado" de esa entidad (viene trackeada).
+            var entidadTipo = await _entidadesTipo.ObtenerPorEntidadYTipoAsync(dto.IdEntidad, IdTipoProveedor)
+                ?? throw new RecursoNoEncontradoException("No se encontró un empleado para la entidad indicada.");
+
+            // Regla de negocio: no se puede reactivar algo que ya está activo.
+            if (entidadTipo.Estado == "ACTIVO")
+                throw new ReglaNegocioException("El empleado ya está activo.");
+
+            entidadTipo.Estado = "ACTIVO";
+
+            await _unitOfWork.GuardarCambiosAsync();
+        }
+
     }
 }
