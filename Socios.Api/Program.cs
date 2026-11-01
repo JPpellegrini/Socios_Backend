@@ -86,6 +86,7 @@ builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 // "Comprobante" del appsettings; si no están, se usan los datos del Centro.
 builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection("Comprobante"));
 builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
+builder.Services.AddSingleton<IInformeSociosPdf, InformeSociosPdf>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
