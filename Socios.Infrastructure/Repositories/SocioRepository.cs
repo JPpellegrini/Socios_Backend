@@ -268,5 +268,94 @@ namespace Socios.Infrastructure.Repositories
                 }).AsNoTracking().ToListAsync();
         }
 
+        public async Task<List<SocioMovimientoDto>> ObtenerMovimientosAsync(DateTime desde, DateTime hasta, bool incluirAltas, bool incluirBajas)
+        {
+            var hoy = DateTime.Today;
+            desde = desde.Date;
+            hasta = hasta.Date;
+
+            // Una sola consulta: cada socio con su baja (si tiene). Trae a los que se dieron de
+            // alta en el período y/o a los que se dieron de baja en el período; después, en
+            // memoria, cada fila se abre en uno o dos movimientos (alta y/o baja).
+            var socios = await (
+                from s in _context.Socios
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                join c in _context.Ciudades on e.Id_Ciudad equals c.Id_Ciudad
+                join et in _context.EntidadTipos on e.Id_Entidad equals et.Id_Entidad
+                join os in _context.ObraSocial on s.Id_OS equals os.Id_ObraSocial into obras
+                from os in obras.DefaultIfEmpty()
+                join eb in _context.EntidadBajas on et.Id_EntidadTipo equals eb.Id_EntidadTipo into bajas
+                from eb in bajas.DefaultIfEmpty()
+                where et.Id_Tipo == 1 // Tipo = Socio
+                    && ((incluirAltas && et.Fecha_Alta >= desde && et.Fecha_Alta <= hasta)
+                        || (incluirBajas && eb != null && eb.Fecha_Baja >= desde && eb.Fecha_Baja <= hasta))
+                select new SocioMovimientoDto
+                {
+                    IdSocio = s.Id_Socio,
+                    Nombre = e.Nombre,
+                    Apellido = e.Apellido,
+                    Calle = e.Calle,
+                    Altura = e.Altura.ToString(),
+                    Ciudad = c.Nombre,
+                    Telefono = _context.Contactos
+                                    .Where(con => con.Id_Entidad == e.Id_Entidad && con.Tipo == "TELEFONO")
+                                    .Select(con => con.ContactoEntidad)
+                                    .FirstOrDefault(),
+                    ObraSocial = os != null ? os.NombreObraSocial : null,
+                    // Edad exacta (a hoy), igual que en el informe de socios.
+                    Edad = e.Nacimiento.HasValue
+                                    ? hoy.Year - e.Nacimiento.Value.Year
+                                        - (e.Nacimiento.Value.Month > hoy.Month
+                                            || (e.Nacimiento.Value.Month == hoy.Month && e.Nacimiento.Value.Day > hoy.Day)
+                                            ? 1 : 0)
+                                    : null,
+                    Sepelio = s.Sepelio != null && s.Sepelio.ToUpper() == "SI",
+                    Nicho = _context.Nichos.Any(n => n.Id_Entidad == e.Id_Entidad),
+                    FechaAlta = et.Fecha_Alta,
+                    FechaBaja = eb != null ? eb.Fecha_Baja : null,
+                    MotivoBaja = eb != null ? eb.Motivo : null
+                }).AsNoTracking().ToListAsync();
+
+            var movimientos = new List<SocioMovimientoDto>();
+            // Por si un socio tuviera más de una baja: su alta se informa una sola vez.
+            var altasInformadas = new HashSet<int>();
+
+            foreach (var socio in socios)
+            {
+                if (incluirAltas && socio.FechaAlta >= desde && socio.FechaAlta <= hasta
+                    && altasInformadas.Add(socio.IdSocio))
+                    movimientos.Add(ComoMovimiento(socio, "ALTA", socio.FechaAlta));
+
+                if (incluirBajas && socio.FechaBaja is DateTime fechaBaja && fechaBaja >= desde && fechaBaja <= hasta)
+                    movimientos.Add(ComoMovimiento(socio, "BAJA", fechaBaja));
+            }
+
+            return movimientos
+                .OrderBy(m => m.Fecha)
+                .ThenBy(m => m.Apellido)
+                .ThenBy(m => m.Nombre)
+                .ToList();
+        }
+
+        /// <summary>Copia de la fila del socio marcada como un movimiento puntual (alta o baja).</summary>
+        private static SocioMovimientoDto ComoMovimiento(SocioMovimientoDto socio, string movimiento, DateTime fecha) => new()
+        {
+            IdSocio = socio.IdSocio,
+            Nombre = socio.Nombre,
+            Apellido = socio.Apellido,
+            Calle = socio.Calle,
+            Altura = socio.Altura,
+            Ciudad = socio.Ciudad,
+            Telefono = socio.Telefono,
+            ObraSocial = socio.ObraSocial,
+            Edad = socio.Edad,
+            Sepelio = socio.Sepelio,
+            Nicho = socio.Nicho,
+            FechaAlta = socio.FechaAlta,
+            FechaBaja = socio.FechaBaja,
+            MotivoBaja = socio.MotivoBaja,
+            Movimiento = movimiento,
+            Fecha = fecha
+        };
     }
 }

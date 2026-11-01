@@ -12,11 +12,16 @@ namespace Socios.Api.Controllers
     {
         private readonly ISocioRepository _socioRepository;
         private readonly IInformeSociosPdf _informeSociosPdf;
+        private readonly IInformeMovimientosSociosPdf _informeMovimientosPdf;
 
-        public ReportesController(ISocioRepository socioRepository, IInformeSociosPdf informeSociosPdf)
+        public ReportesController(
+            ISocioRepository socioRepository,
+            IInformeSociosPdf informeSociosPdf,
+            IInformeMovimientosSociosPdf informeMovimientosPdf)
         {
             _socioRepository = socioRepository;
             _informeSociosPdf = informeSociosPdf;
+            _informeMovimientosPdf = informeMovimientosPdf;
         }
 
         [HttpGet("socios")]
@@ -57,6 +62,79 @@ namespace Socios.Api.Controllers
             // "inline": el navegador lo muestra en vez de forzar la descarga.
             Response.Headers.ContentDisposition = "inline; filename=\"informe-socios.pdf\"";
             return File(pdf, "application/pdf");
+        }
+
+        /// <summary>
+        /// Altas y bajas de socios en un período: detalle (una fila por movimiento) y resumen
+        /// (totales y bajas por motivo) para armar el gráfico.
+        ///   - Falta alguna fecha, desde > hasta o tipo inválido → 400.
+        ///   - Ningún movimiento en el período                  → 404.
+        /// </summary>
+        [HttpGet("socios/movimientos")]
+        public async Task<IActionResult> InformeMovimientosAsync([FromQuery] SocioMovimientoFiltroDto filtro)
+        {
+            var error = ValidarFiltro(filtro);
+            if (error is not null)
+                return BadRequest(error);
+
+            var informe = await ArmarInformeMovimientosAsync(filtro);
+
+            if (informe.Movimientos.Count == 0)
+                return NotFound("No se encontraron altas ni bajas con los criterios seleccionados.");
+
+            return Ok(informe);
+        }
+
+        /// <summary>
+        /// Mismo informe que GET socios/movimientos, en PDF (A4 apaisada): resumen con gráfico
+        /// de barras y detalle de movimientos. Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("socios/movimientos/pdf")]
+        public async Task<IActionResult> InformeMovimientosPdfAsync([FromQuery] SocioMovimientoFiltroDto filtro)
+        {
+            var error = ValidarFiltro(filtro);
+            if (error is not null)
+                return BadRequest(error);
+
+            var informe = await ArmarInformeMovimientosAsync(filtro);
+
+            if (informe.Movimientos.Count == 0)
+                return NotFound("No se encontraron altas ni bajas con los criterios seleccionados.");
+
+            var pdf = _informeMovimientosPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            Response.Headers.ContentDisposition = "inline; filename=\"altas-bajas-socios.pdf\"";
+            return File(pdf, "application/pdf");
+        }
+
+        private async Task<SocioMovimientosInformeDto> ArmarInformeMovimientosAsync(SocioMovimientoFiltroDto filtro)
+        {
+            var movimientos = await _socioRepository.ObtenerMovimientosAsync(
+                filtro.FechaDesde!.Value,
+                filtro.FechaHasta!.Value,
+                incluirAltas: filtro.Tipo != "BAJAS",
+                incluirBajas: filtro.Tipo != "ALTAS");
+
+            return SocioMovimientosInformeDto.Armar(filtro, movimientos);
+        }
+
+        /// <summary>
+        /// Valida el filtro de altas/bajas y normaliza el tipo (mayúsculas, sin espacios).
+        /// Las fechas obligatorias ya las valida [ApiController] (400 automático).
+        /// Devuelve el mensaje de error, o null si el filtro es válido.
+        /// </summary>
+        private static string? ValidarFiltro(SocioMovimientoFiltroDto filtro)
+        {
+            if (filtro.FechaDesde!.Value.Date > filtro.FechaHasta!.Value.Date)
+                return "La fecha desde no puede ser posterior a la fecha hasta.";
+
+            var tipo = filtro.Tipo?.Trim().ToUpperInvariant();
+            if (tipo is not ("TODOS" or "ALTAS" or "BAJAS"))
+                return "El tipo debe ser TODOS, ALTAS o BAJAS.";
+
+            filtro.Tipo = tipo;
+            return null;
         }
 
         /// <summary>

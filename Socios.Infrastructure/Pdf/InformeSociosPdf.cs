@@ -1,10 +1,10 @@
-using System.Globalization;
 using Microsoft.Extensions.Options;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
+using static Socios.Infrastructure.Pdf.PdfInformeComun;
 
 namespace Socios.Infrastructure.Pdf
 {
@@ -16,20 +16,9 @@ namespace Socios.Infrastructure.Pdf
     /// </summary>
     public class InformeSociosPdf : IInformeSociosPdf
     {
-        // Misma fuente que los comprobantes: viene incluida en QuestPDF (ver ComprobanteCuotaPdf).
-        private const string Fuente = "Lato";
-        private const string SinDato = "-";
-
-        private static readonly CultureInfo CulturaAr = new("es-AR");
-
         private readonly ComprobanteOpciones _opciones;
 
-        static InformeSociosPdf()
-        {
-            // Misma declaración de licencia que en ComprobanteCuotaPdf: se repite acá porque el
-            // informe puede ser el primer documento que se genere desde que arrancó la API.
-            QuestPDF.Settings.License = LicenseType.Community;
-        }
+        static InformeSociosPdf() => DeclararLicencia();
 
         public InformeSociosPdf(IOptions<ComprobanteOpciones> opciones)
         {
@@ -45,13 +34,9 @@ namespace Socios.Infrastructure.Pdf
                 {
                     documento.Page(pagina =>
                     {
-                        pagina.Size(PageSizes.A4.Landscape());
-                        pagina.Margin(10, Unit.Millimetre);
-                        pagina.DefaultTextStyle(estilo => estilo.FontFamily(Fuente).FontSize(8.5f));
-
+                        ConfigurarHoja(pagina, emision);
                         pagina.Header().Element(x => Encabezado(x, filtro, socios.Count));
                         pagina.Content().PaddingTop(4, Unit.Millimetre).Element(x => Tabla(x, socios));
-                        pagina.Footer().Element(x => Pie(x, emision));
                     });
                 })
                 .WithMetadata(new DocumentMetadata { Title = "Informe de socios" })
@@ -62,9 +47,7 @@ namespace Socios.Infrastructure.Pdf
         {
             contenedor.Column(col =>
             {
-                col.Item().Text(_opciones.Institucion).Bold().FontSize(12);
-                col.Item().Text($"{_opciones.Domicilio}    Pers. Jurídica {_opciones.PersoneriaJuridica}    Tel.: {_opciones.Telefono}")
-                    .FontSize(8).FontColor(Colors.Grey.Darken2);
+                Institucion(col, _opciones);
 
                 col.Item().PaddingTop(3, Unit.Millimetre).Row(fila =>
                 {
@@ -116,50 +99,20 @@ namespace Socios.Infrastructure.Pdf
                 for (var i = 0; i < socios.Count; i++)
                 {
                     var s = socios[i];
-                    // Filas alternadas en gris claro para seguir la línea con la vista.
-                    var fondo = i % 2 == 0 ? Colors.White : Colors.Grey.Lighten4;
 
-                    Celda(tabla.Cell(), fondo).Text(NombreCompleto(s)).Bold();
-                    Celda(tabla.Cell(), fondo).Text(Domicilio(s));
-                    Celda(tabla.Cell(), fondo).Text(Valor(s.Ciudad));
-                    Celda(tabla.Cell(), fondo).Text(Valor(s.Telefono));
-                    Celda(tabla.Cell(), fondo).Text(Valor(s.Mail));
-                    Celda(tabla.Cell(), fondo).Text(Valor(s.ObraSocial));
-                    Celda(tabla.Cell(), fondo).AlignCenter().Text(s.Edad?.ToString() ?? SinDato);
-                    Celda(tabla.Cell(), fondo).AlignCenter().Text(s.Sepelio ? "SI" : "NO");
-                    Celda(tabla.Cell(), fondo).AlignCenter().Text(s.Nicho ? "SI" : "NO");
-                    Celda(tabla.Cell(), fondo).AlignCenter().Text(Valor(s.Estado));
+                    Celda(tabla.Cell(), i).Text(NombreCompleto(s.Apellido, s.Nombre)).Bold();
+                    Celda(tabla.Cell(), i).Text(Domicilio(s.Calle, s.Altura));
+                    Celda(tabla.Cell(), i).Text(Valor(s.Ciudad));
+                    Celda(tabla.Cell(), i).Text(Valor(s.Telefono));
+                    Celda(tabla.Cell(), i).Text(Valor(s.Mail));
+                    Celda(tabla.Cell(), i).Text(Valor(s.ObraSocial));
+                    Celda(tabla.Cell(), i).AlignCenter().Text(s.Edad?.ToString() ?? SinDato);
+                    Celda(tabla.Cell(), i).AlignCenter().Text(s.Sepelio ? "SI" : "NO");
+                    Celda(tabla.Cell(), i).AlignCenter().Text(s.Nicho ? "SI" : "NO");
+                    Celda(tabla.Cell(), i).AlignCenter().Text(Valor(s.Estado));
                 }
             });
         }
-
-        private static void Pie(IContainer contenedor, DateTime emision)
-        {
-            contenedor.PaddingTop(2, Unit.Millimetre).Row(fila =>
-            {
-                fila.RelativeItem().Text($"Emitido el {emision.ToString("dd/MM/yyyy HH:mm", CulturaAr)}")
-                    .FontSize(7.5f).FontColor(Colors.Grey.Darken1);
-                fila.RelativeItem().AlignRight().Text(texto =>
-                {
-                    texto.DefaultTextStyle(estilo => estilo.FontSize(7.5f).FontColor(Colors.Grey.Darken1));
-                    texto.Span("Página ");
-                    texto.CurrentPageNumber();
-                    texto.Span(" de ");
-                    texto.TotalPages();
-                });
-            });
-        }
-
-        private static IContainer CeldaTitulo(IContainer celda) =>
-            celda.Background(Colors.Grey.Lighten2)
-                .BorderBottom(0.8f).BorderColor(Colors.Black)
-                .PaddingVertical(1.5f, Unit.Millimetre).PaddingHorizontal(1.2f, Unit.Millimetre)
-                .DefaultTextStyle(estilo => estilo.Bold().FontSize(8));
-
-        private static IContainer Celda(IContainer celda, string fondo) =>
-            celda.Background(fondo)
-                .BorderBottom(0.3f).BorderColor(Colors.Grey.Lighten1)
-                .PaddingVertical(1.2f, Unit.Millimetre).PaddingHorizontal(1.2f, Unit.Millimetre);
 
         private static string DescripcionEstado(string estado) => estado switch
         {
@@ -176,17 +129,5 @@ namespace Socios.Infrastructure.Pdf
             if (filtro.IncluirNicho) categorias.Add("Nicho");
             return categorias.Count == 3 ? "Todas" : string.Join(", ", categorias);
         }
-
-        private static string NombreCompleto(SocioInformeDto s)
-        {
-            var apellido = (s.Apellido ?? string.Empty).ToUpper(CulturaAr).Trim();
-            var nombre = (s.Nombre ?? string.Empty).Trim();
-            return apellido.Length > 0 && nombre.Length > 0 ? $"{apellido}, {nombre}" : Valor(apellido + nombre);
-        }
-
-        private static string Domicilio(SocioInformeDto s) => Valor($"{s.Calle} {s.Altura}".Trim());
-
-        private static string Valor(string? texto) =>
-            string.IsNullOrWhiteSpace(texto) ? SinDato : texto.Trim();
     }
 }

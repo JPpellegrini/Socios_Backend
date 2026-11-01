@@ -87,6 +87,7 @@ builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection("Comprobante"));
 builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
 builder.Services.AddSingleton<IInformeSociosPdf, InformeSociosPdf>();
+builder.Services.AddSingleton<IInformeMovimientosSociosPdf, InformeMovimientosSociosPdf>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
