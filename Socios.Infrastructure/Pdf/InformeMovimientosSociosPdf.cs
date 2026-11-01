@@ -11,7 +11,8 @@ namespace Socios.Infrastructure.Pdf
     /// <summary>
     /// Genera el PDF del informe de altas y bajas de socios con QuestPDF.
     /// Diseño: A4 apaisada. Arriba, el resumen del período (totales y un gráfico de barras
-    /// horizontales con las altas y las bajas por motivo); debajo, el detalle de movimientos.
+    /// horizontales con las altas y las bajas por motivo); debajo, el detalle con una fila por
+    /// socio (si se dio de baja en el período, la fila muestra la baja con su motivo).
     ///
     /// Se usan barras y no una torta: las altas y las bajas no son partes de un mismo total,
     /// y las barras permiten comparar cantidades a simple vista (cada una lleva su número).
@@ -47,8 +48,8 @@ namespace Socios.Infrastructure.Pdf
                         {
                             col.Item().Element(x => Resumen(x, informe));
                             col.Item().PaddingTop(6, Unit.Millimetre)
-                                .Text($"Detalle de movimientos ({informe.Movimientos.Count})").Bold().FontSize(11);
-                            col.Item().PaddingTop(2, Unit.Millimetre).Element(x => Tabla(x, informe.Movimientos));
+                                .Text($"Detalle de socios ({informe.Socios.Count})").Bold().FontSize(11);
+                            col.Item().PaddingTop(2, Unit.Millimetre).Element(x => Tabla(x, informe.Socios));
                         });
                     });
                 })
@@ -89,8 +90,11 @@ namespace Socios.Infrastructure.Pdf
                 fila.ConstantItem(62, Unit.Millimetre).Column(totales =>
                 {
                     totales.Spacing(2, Unit.Millimetre);
+                    // Con solo altas no se cuentan los socios que ya se dieron de baja: se aclara.
                     if (conAltas)
-                        totales.Item().Element(x => Indicador(x, "Altas", informe.Altas.ToString(), ColorAltas, null));
+                        totales.Item().Element(x => Indicador(x,
+                            conBajas ? "Altas" : "Altas vigentes", informe.Altas.ToString(), ColorAltas,
+                            conBajas ? null : "socios que siguen activos"));
                     if (conBajas)
                         totales.Item().Element(x => Indicador(x, "Bajas", informe.Bajas.ToString(), ColorBajas, null));
                     if (conAltas && conBajas)
@@ -185,7 +189,7 @@ namespace Socios.Infrastructure.Pdf
 
         // ---------------------------------------------------------------- Detalle
 
-        private static void Tabla(IContainer contenedor, IReadOnlyList<SocioMovimientoDto> movimientos)
+        private static void Tabla(IContainer contenedor, IReadOnlyList<SocioMovimientoDto> socios)
         {
             contenedor.Table(tabla =>
             {
@@ -217,9 +221,9 @@ namespace Socios.Infrastructure.Pdf
                     CeldaTitulo(encabezado.Cell()).Text("Movimiento");
                 });
 
-                for (var i = 0; i < movimientos.Count; i++)
+                for (var i = 0; i < socios.Count; i++)
                 {
-                    var m = movimientos[i];
+                    var m = socios[i];
                     var esAlta = m.Movimiento == "ALTA";
 
                     Celda(tabla.Cell(), i).Text(NombreCompleto(m.Apellido, m.Nombre)).Bold();
@@ -247,7 +251,7 @@ namespace Socios.Infrastructure.Pdf
 
         private static string DescripcionTipo(string tipo) => tipo switch
         {
-            "ALTAS" => "Solo altas",
+            "ALTAS" => "Solo altas vigentes (sin socios dados de baja)",
             "BAJAS" => "Solo bajas",
             _ => "Altas y bajas"
         };

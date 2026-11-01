@@ -1,8 +1,10 @@
 namespace Socios.Application.DTOs
 {
     /// <summary>
-    /// DTO de salida del informe de altas y bajas: el detalle de movimientos y el resumen
+    /// DTO de salida del informe de altas y bajas: el detalle (una fila por socio) y el resumen
     /// (totales y bajas por motivo) con el que el frontend o el PDF arman el gráfico.
+    /// Un socio que se dio de alta y de baja en el período es una sola fila, pero suma en
+    /// ambos totales.
     /// </summary>
     public class SocioMovimientosInformeDto
     {
@@ -21,15 +23,15 @@ namespace Socios.Application.DTOs
         public int VariacionNeta => Altas - Bajas;
         public List<BajaPorMotivoDto> BajasPorMotivo { get; set; } = new();
 
-        public List<SocioMovimientoDto> Movimientos { get; set; } = new();
+        public List<SocioMovimientoDto> Socios { get; set; } = new();
 
         /// <summary>
-        /// Arma el informe a partir de los movimientos ya filtrados: calcula los totales y
-        /// agrupa las bajas por motivo (de mayor a menor cantidad).
+        /// Arma el informe a partir de los socios ya filtrados: calcula los totales y agrupa
+        /// las bajas por motivo (de mayor a menor cantidad).
         /// </summary>
-        public static SocioMovimientosInformeDto Armar(SocioMovimientoFiltroDto filtro, List<SocioMovimientoDto> movimientos)
+        public static SocioMovimientosInformeDto Armar(SocioMovimientoFiltroDto filtro, List<SocioMovimientoDto> socios)
         {
-            var bajas = movimientos.Where(m => m.Movimiento == "BAJA").ToList();
+            var bajas = socios.Where(s => s.BajaEnPeriodo).ToList();
 
             // Motivos conocidos (aunque tengan 0) más cualquier otro que venga en los datos.
             var motivos = MotivosBaja
@@ -47,10 +49,10 @@ namespace Socios.Application.DTOs
                 FechaDesde = filtro.FechaDesde!.Value.Date,
                 FechaHasta = filtro.FechaHasta!.Value.Date,
                 Tipo = filtro.Tipo,
-                Altas = movimientos.Count(m => m.Movimiento == "ALTA"),
+                Altas = socios.Count(s => s.AltaEnPeriodo),
                 Bajas = bajas.Count,
                 BajasPorMotivo = motivos,
-                Movimientos = movimientos
+                Socios = socios
             };
         }
     }

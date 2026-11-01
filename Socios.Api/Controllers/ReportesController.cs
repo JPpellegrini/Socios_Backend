@@ -65,8 +65,9 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
-        /// Altas y bajas de socios en un período: detalle (una fila por movimiento) y resumen
-        /// (totales y bajas por motivo) para armar el gráfico.
+        /// Altas y bajas de socios en un período: detalle (una fila por socio; si se dio de baja
+        /// en el período, muestra la baja con su motivo) y resumen (totales y bajas por motivo)
+        /// para armar el gráfico.
         ///   - Falta alguna fecha, desde > hasta o tipo inválido → 400.
         ///   - Ningún movimiento en el período                  → 404.
         /// </summary>
@@ -79,7 +80,7 @@ namespace Socios.Api.Controllers
 
             var informe = await ArmarInformeMovimientosAsync(filtro);
 
-            if (informe.Movimientos.Count == 0)
+            if (informe.Socios.Count == 0)
                 return NotFound("No se encontraron altas ni bajas con los criterios seleccionados.");
 
             return Ok(informe);
@@ -87,7 +88,7 @@ namespace Socios.Api.Controllers
 
         /// <summary>
         /// Mismo informe que GET socios/movimientos, en PDF (A4 apaisada): resumen con gráfico
-        /// de barras y detalle de movimientos. Se devuelve "inline" para verlo en el navegador.
+        /// de barras y detalle de socios. Se devuelve "inline" para verlo en el navegador.
         /// </summary>
         [HttpGet("socios/movimientos/pdf")]
         public async Task<IActionResult> InformeMovimientosPdfAsync([FromQuery] SocioMovimientoFiltroDto filtro)
@@ -98,7 +99,7 @@ namespace Socios.Api.Controllers
 
             var informe = await ArmarInformeMovimientosAsync(filtro);
 
-            if (informe.Movimientos.Count == 0)
+            if (informe.Socios.Count == 0)
                 return NotFound("No se encontraron altas ni bajas con los criterios seleccionados.");
 
             var pdf = _informeMovimientosPdf.Generar(informe);
@@ -110,13 +111,13 @@ namespace Socios.Api.Controllers
 
         private async Task<SocioMovimientosInformeDto> ArmarInformeMovimientosAsync(SocioMovimientoFiltroDto filtro)
         {
-            var movimientos = await _socioRepository.ObtenerMovimientosAsync(
+            var socios = await _socioRepository.ObtenerMovimientosAsync(
                 filtro.FechaDesde!.Value,
                 filtro.FechaHasta!.Value,
                 incluirAltas: filtro.Tipo != "BAJAS",
                 incluirBajas: filtro.Tipo != "ALTAS");
 
-            return SocioMovimientosInformeDto.Armar(filtro, movimientos);
+            return SocioMovimientosInformeDto.Armar(filtro, socios);
         }
 
         /// <summary>

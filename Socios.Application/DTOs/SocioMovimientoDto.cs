@@ -1,9 +1,9 @@
 namespace Socios.Application.DTOs
 {
     /// <summary>
-    /// Una fila del informe de altas y bajas: un movimiento (alta o baja) de un socio.
-    /// Un socio que se dio de alta y de baja dentro del mismo período aparece dos veces,
-    /// una por cada movimiento.
+    /// Una fila del informe de altas y bajas: un socio que se dio de alta y/o de baja en el
+    /// período. Hay una sola fila por socio: si se dio de baja en el período, la fila muestra
+    /// la baja (con su motivo); si no, el alta.
     /// </summary>
     public class SocioMovimientoDto
     {
@@ -22,7 +22,13 @@ namespace Socios.Application.DTOs
         public DateTime? FechaBaja { get; set; }
         public string? MotivoBaja { get; set; } // MORA, FALLECIMIENTO o RENUNCIA (null si no tiene baja)
 
-        public string Movimiento { get; set; } = null!; // "ALTA" o "BAJA"
-        public DateTime Fecha { get; set; }             // Fecha del movimiento (alta o baja)
+        /// <summary>Se dio de alta dentro del período (y se pidieron altas). Cuenta en el total de altas.</summary>
+        public bool AltaEnPeriodo { get; set; }
+
+        /// <summary>Se dio de baja dentro del período (y se pidieron bajas). Cuenta en el total de bajas.</summary>
+        public bool BajaEnPeriodo { get; set; }
+
+        public string Movimiento { get; set; } = null!; // "BAJA" si se dio de baja en el período; si no, "ALTA"
+        public DateTime Fecha { get; set; }             // Fecha del movimiento que muestra la fila
     }
 }

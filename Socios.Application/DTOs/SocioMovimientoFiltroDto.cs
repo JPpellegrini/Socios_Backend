@@ -21,6 +21,7 @@ namespace Socios.Application.DTOs
 
         /// <summary>
         /// Movimientos a incluir: "TODOS", "ALTAS" o "BAJAS".
+        /// "ALTAS" trae solo altas vigentes: excluye a los socios que ya fueron dados de baja.
         /// </summary>
         public string Tipo { get; set; } = "TODOS";
     }

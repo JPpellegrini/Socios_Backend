@@ -44,8 +44,8 @@ namespace Socios.Application.Interfaces
         Task<IEnumerable<SocioInformeDto>> GenerarInformeAsync(SocioInformeFiltroDto filtro);
 
         /// <summary>
-        /// Altas y/o bajas de socios entre dos fechas (ambas inclusive), una fila por movimiento,
-        /// ordenadas por fecha del movimiento.
+        /// Socios que se dieron de alta y/o de baja entre dos fechas (ambas inclusive), una fila
+        /// por socio, ordenadas por fecha del movimiento que muestra cada fila.
         /// </summary>
         Task<List<SocioMovimientoDto>> ObtenerMovimientosAsync(DateTime desde, DateTime hasta, bool incluirAltas, bool incluirBajas);
     }
