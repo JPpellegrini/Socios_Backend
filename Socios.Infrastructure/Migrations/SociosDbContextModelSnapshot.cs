@@ -17,7 +17,7 @@ namespace Socios.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -527,6 +527,11 @@ namespace Socios.Infrastructure.Migrations
                         {
                             Id_Detmov = 6,
                             NombreDetalleMovimiento = "TRANSFERENCIA"
+                        },
+                        new
+                        {
+                            Id_Detmov = 7,
+                            NombreDetalleMovimiento = "CUOTA NICHO"
                         });
                 });
 
@@ -1871,7 +1876,7 @@ namespace Socios.Infrastructure.Migrations
             modelBuilder.Entity("Socios.Domain.Entities.Contacto", b =>
                 {
                     b.HasOne("Socios.Domain.Entities.Entidad", "Entidad")
-                        .WithMany()
+                        .WithMany("Contactos")
                         .HasForeignKey("Id_Entidad")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2043,6 +2048,11 @@ namespace Socios.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("Socios.Domain.Entities.Entidad", b =>
+                {
+                    b.Navigation("Contactos");
                 });
 #pragma warning restore 612, 618
         }

@@ -47,5 +47,13 @@ namespace Socios.Application.Interfaces
         /// Las cuotas inexistentes simplemente no vienen en el resultado.
         /// </summary>
         Task<List<CuotaComprobanteDto>> ObtenerParaComprobanteAsync(IReadOnlyCollection<int> idsCuota);
+
+        /// <summary>
+        /// Trae la cuota a cobrar BLOQUEANDO su fila (SELECT ... FOR UPDATE) hasta que termine
+        /// la transacción, trackeada para modificarla. Así dos cobros simultáneos de la misma
+        /// cuota no pasan los dos: el segundo espera y ve la cuota ya pagada. Debe llamarse
+        /// dentro de una transacción (IUnitOfWork.EjecutarEnTransaccionAsync). Null si no existe.
+        /// </summary>
+        Task<Cuota?> ObtenerParaPagoAsync(int idDeuda);
     }
 }

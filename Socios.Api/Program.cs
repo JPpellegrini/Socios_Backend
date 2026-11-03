@@ -16,6 +16,7 @@ using Socios.Application.UseCases.Colaboradores;
 using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.ConfiguracionCuotas;
 using Socios.Application.UseCases.Cuotas;
+using Socios.Application.UseCases.Pagos;
 using Socios.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +87,14 @@ builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 // "Comprobante" del appsettings; si no están, se usan los datos del Centro.
 builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection("Comprobante"));
 builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
+builder.Services.AddSingleton<IComprobantePagoPdf, ComprobantePagoPdf>();
+
+// Caja: movimientos, caja diaria, métodos de pago, cuentas y detalles de movimiento.
+builder.Services.AddScoped<ICajaRepository, CajaRepository>();
+builder.Services.AddScoped<IEstadoCajaDiariaRepository, EstadoCajaDiariaRepository>();
+builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
+builder.Services.AddScoped<ICuentaRepository, CuentaRepository>();
+builder.Services.AddScoped<IDetalleMovimientoRepository, DetalleMovimientoRepository>();
 
 // Unidad de trabajo (dueña de la transacción) y casos de uso (orquestan la lógica)
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -97,6 +106,7 @@ builder.Services.AddScoped<IColaboradorUseCase, ColaboradorUseCase>();
 builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
 builder.Services.AddScoped<IConfiguracionCuotaUseCase, ConfiguracionCuotaUseCase>();
 builder.Services.AddScoped<ICuotaUseCase, CuotaUseCase>();
+builder.Services.AddScoped<IPagoCuotaUseCase, PagoCuotaUseCase>();
 
 #endregion
 
