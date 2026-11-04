@@ -48,11 +48,25 @@ namespace Socios.Infrastructure.Repositories
             }
 
             // Filtro por estado. El DTO valida los valores permitidos ([AllowedValues]);
-            // acá "TODAS" o vacío no filtra. El resto matchea directo contra el literal
-            // guardado en la columna Estado (PAGADO/PENDIENTE/VENCIDA/ANULADA).
+            // acá "TODAS" o vacío no filtra.
+            // El estado VENCIDA no lo asigna ningún proceso: una cuota está vencida si sigue
+            // PENDIENTE y su fecha de vencimiento ya pasó (la que vence hoy todavía no). Por eso
+            // PENDIENTE y VENCIDA se separan por fecha y cada cuota cae en un solo filtro.
+            // Misma regla que PagoCuotaUseCase.EstaVencida: si cambia, cambiar las dos.
             var estado = filtro.Estado?.Trim();
-            if (!string.IsNullOrWhiteSpace(estado) && estado != "TODAS")
+            var hoy = DateTime.Today;
+            if (estado == "VENCIDA")
             {
+                query = query.Where(x => x.c.Estado == "VENCIDA"
+                    || (x.c.Estado == "PENDIENTE" && x.c.FechaVencimiento < hoy));
+            }
+            else if (estado == "PENDIENTE")
+            {
+                query = query.Where(x => x.c.Estado == "PENDIENTE" && x.c.FechaVencimiento >= hoy);
+            }
+            else if (!string.IsNullOrWhiteSpace(estado) && estado != "TODAS")
+            {
+                // PAGADO / ANULADA: directo contra el literal guardado.
                 query = query.Where(x => x.c.Estado == estado);
             }
 
@@ -73,7 +87,9 @@ namespace Socios.Infrastructure.Repositories
                     Anio = x.c.Anio_Periodo,
                     Monto = x.c.Monto,
                     FechaVencimiento = x.c.FechaVencimiento,
-                    Estado = x.c.Estado
+                    // Una pendiente con la fecha de vencimiento pasada se muestra como VENCIDA
+                    // (en la base sigue PENDIENTE), coherente con el filtro de arriba.
+                    Estado = x.c.Estado == "PENDIENTE" && x.c.FechaVencimiento < hoy ? "VENCIDA" : x.c.Estado
                 })
                 .ToListAsync();
         }

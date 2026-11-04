@@ -25,8 +25,9 @@ namespace Socios.Application.DTOs
         public string? TipoCuota { get; set; }
 
         /// <summary>
-        /// Estado a filtrar. Valores válidos: los que guarda la columna Estado
-        /// (PAGADO, PENDIENTE, VENCIDA, ANULADA). "TODAS" (o no enviar el parámetro) no filtra.
+        /// Estado a filtrar: PAGADO, PENDIENTE, VENCIDA o ANULADA. "TODAS" (o no enviar el
+        /// parámetro) no filtra. PENDIENTE = sin pagar y todavía no vencida; VENCIDA = sin pagar
+        /// con la fecha de vencimiento pasada (se calcula por fecha: en la base sigue PENDIENTE).
         /// El null en la lista es obligatorio: [AllowedValues] rechaza null si no está.
         /// </summary>
         [AllowedValues(null, "TODAS", "PAGADO", "PENDIENTE", "VENCIDA", "ANULADA",

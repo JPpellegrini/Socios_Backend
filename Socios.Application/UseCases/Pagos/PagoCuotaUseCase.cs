@@ -191,7 +191,8 @@ namespace Socios.Application.UseCases.Pagos
         /// Una cuota está vencida si sigue PENDIENTE y su fecha de vencimiento ya pasó (la que vence
         /// hoy todavía no está vencida). El estado VENCIDA no se usa por ahora (decisión del
         /// usuario): el vencimiento sale de la fecha. Si alguna cuota tuviera el estado VENCIDA
-        /// guardado, también se considera vencida.
+        /// guardado, también se considera vencida. Misma regla que el filtro de estado de
+        /// CuotaRepository.BuscarAsync: si cambia, cambiar las dos.
         /// </summary>
         private static bool EstaVencida(Cuota cuota) =>
             cuota.Estado == EstadoVencida
