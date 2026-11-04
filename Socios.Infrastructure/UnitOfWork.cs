@@ -23,5 +23,17 @@ namespace Socios.Infrastructure
         {
             return await _context.SaveChangesAsync();
         }
+
+        public async Task<T> EjecutarEnTransaccionAsync<T>(Func<Task<T>> operacion)
+        {
+            // Los SaveChanges de la operación se suman a esta transacción. Si la operación lanza
+            // una excepción, al salir del using la transacción se descarta (rollback) sin confirmar.
+            await using var transaccion = await _context.Database.BeginTransactionAsync();
+
+            var resultado = await operacion();
+
+            await transaccion.CommitAsync();
+            return resultado;
+        }
     }
 }

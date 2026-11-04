@@ -17,5 +17,13 @@ namespace Socios.Application.Interfaces
         /// Devuelve la cantidad de filas afectadas.
         /// </summary>
         Task<int> GuardarCambiosAsync();
+
+        /// <summary>
+        /// Ejecuta la operación dentro de una transacción explícita: si termina bien se
+        /// confirma; si lanza una excepción, se deshace todo. Hace falta cuando la operación
+        /// necesita bloquear filas mientras decide (ej. cobrar una cuota sin cobrarla dos
+        /// veces). Dentro de la operación se sigue llamando a <see cref="GuardarCambiosAsync"/>.
+        /// </summary>
+        Task<T> EjecutarEnTransaccionAsync<T>(Func<Task<T>> operacion);
     }
 }

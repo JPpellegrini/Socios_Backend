@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
 using Socios.Application.Interfaces;
 using Socios.Application.UseCases.Cuotas;
+using Socios.Application.UseCases.Pagos;
 
 namespace Socios.Api.Controllers
 {
@@ -13,11 +15,13 @@ namespace Socios.Api.Controllers
     {
         private readonly ICuotaRepository _cuotaRepository;
         private readonly ICuotaUseCase _cuotaUseCase;
+        private readonly IPagoCuotaUseCase _pagoCuotaUseCase;
 
-        public CuotasController(ICuotaRepository cuotaRepository, ICuotaUseCase cuotaUseCase)
+        public CuotasController(ICuotaRepository cuotaRepository, ICuotaUseCase cuotaUseCase, IPagoCuotaUseCase pagoCuotaUseCase)
         {
             _cuotaRepository = cuotaRepository;
             _cuotaUseCase = cuotaUseCase;
+            _pagoCuotaUseCase = pagoCuotaUseCase;
         }
 
         /// <summary>
@@ -101,6 +105,56 @@ namespace Socios.Api.Controllers
 
             // "inline": el navegador lo muestra en vez de forzar la descarga.
             Response.Headers.ContentDisposition = "inline; filename=\"comprobantes-cuotas.pdf\"";
+            return File(pdf, "application/pdf");
+        }
+
+        /// <summary>
+        /// Devuelve cuánto se cobraría la cuota si se paga ahora, para mostrarlo en la pantalla
+        /// de pago antes de confirmar (pendiente: su monto; vencida: el valor actual de
+        /// configuración, salvo nicho). Usa el mismo cálculo que el cobro. No modifica nada.
+        ///   - Cuota inexistente      → 404 (RecursoNoEncontradoException).
+        ///   - Cuota paga o anulada   → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpGet("{idCuota:int}/importe-a-cobrar")]
+        public async Task<IActionResult> ObtenerImporteACobrarAsync(int idCuota)
+        {
+            var importe = await _pagoCuotaUseCase.ObtenerImporteACobrarAsync(idCuota);
+
+            return Ok(importe);
+        }
+
+        /// <summary>
+        /// Cobra una cuota en la caja abierta del usuario logueado: registra el ingreso en caja
+        /// y deja la cuota PAGADA. El monto lo calcula el backend. Devuelve el IdMovimiento,
+        /// con el que se pide el comprobante de pago.
+        ///   - Validaciones de formato                          → 400 (via [ApiController]).
+        ///   - Cuota, método de pago o cuenta inexistentes      → 404 (RecursoNoEncontradoException).
+        ///   - Sin caja abierta / cuota paga o anulada /
+        ///     cuenta inválida para el método de pago           → 409 (ReglaNegocioException).
+        /// </summary>
+        [HttpPost("pagar")]
+        public async Task<IActionResult> PagarAsync([FromBody] CuotaPagarDto dto)
+        {
+            // El usuario sale de la autenticación: el cobro se registra en SU caja abierta.
+            var idUsuario = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var resultado = await _pagoCuotaUseCase.PagarAsync(dto, idUsuario);
+
+            return Ok(resultado);
+        }
+
+        /// <summary>
+        /// Genera (o reimprime) el PDF del comprobante de pago de una cuota, NO válido como
+        /// factura, a partir del IdMovimiento devuelto al cobrar. Se devuelve para mostrar en
+        /// el navegador ("inline"), desde donde se puede imprimir o descargar.
+        ///   - Movimiento inexistente o que no es un pago de cuota → 404.
+        /// </summary>
+        [HttpGet("pagos/{idMovimiento:int}/comprobante")]
+        public async Task<IActionResult> GenerarComprobantePagoAsync(int idMovimiento)
+        {
+            var pdf = await _pagoCuotaUseCase.GenerarComprobanteAsync(idMovimiento);
+
+            Response.Headers.ContentDisposition = $"inline; filename=\"comprobante-pago-{idMovimiento}.pdf\"";
             return File(pdf, "application/pdf");
         }
     }

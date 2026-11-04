@@ -390,7 +390,8 @@ namespace Socios.Infrastructure.Context
                 new DetalleMovimiento { Id_Detmov = 3, NombreDetalleMovimiento = "AJUSTE DIFERENCIA CAJA" },
                 new DetalleMovimiento { Id_Detmov = 4, NombreDetalleMovimiento = "COLABORACIÓN" },
                 new DetalleMovimiento { Id_Detmov = 5, NombreDetalleMovimiento = "PAGO A PROVEEDOR" },
-                new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "TRANSFERENCIA" }
+                new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "TRANSFERENCIA" },
+                new DetalleMovimiento { Id_Detmov = 7, NombreDetalleMovimiento = "CUOTA NICHO" }
             );
 
             // Seed de Metodos de Pago de prueba

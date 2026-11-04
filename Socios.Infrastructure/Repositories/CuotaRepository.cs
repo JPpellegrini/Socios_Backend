@@ -173,6 +173,18 @@ namespace Socios.Infrastructure.Repositories
             ).AsNoTracking().ToListAsync();
         }
 
+        public async Task<Cuota?> ObtenerParaPagoAsync(int idDeuda)
+        {
+            // FOR UPDATE bloquea la fila hasta que termine la transacción en curso: un segundo
+            // cobro de la misma cuota queda esperando y, al seguir, ya la ve PAGADA.
+            // Se materializa sin componer la consulta para que EF envíe el SQL tal cual.
+            var cuotas = await _context.Cuotas
+                .FromSqlInterpolated($"SELECT * FROM cuotas WHERE \"Id_Deuda\" = {idDeuda} FOR UPDATE")
+                .ToListAsync();
+
+            return cuotas.FirstOrDefault();
+        }
+
         public async Task<List<Cuota>> ObtenerLoteNichoAsync(int idEntidad, DateTime fechaHoraGeneracion)
         {
             // Trackeado: el caso de uso pasa todas estas cuotas a ANULADA en una transacción.
