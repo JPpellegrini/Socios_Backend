@@ -11,6 +11,10 @@ namespace Socios.Application.DTOs
         public string Concepto { get; set; } = null!;
         public int Mes { get; set; }
         public int Anio { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+
+        /// <summary>True si la cuota sigue pendiente y su fecha de vencimiento ya pasó.</summary>
+        public bool Vencida { get; set; }
 
         /// <summary>Monto guardado en la cuota.</summary>
         public decimal MontoOriginal { get; set; }

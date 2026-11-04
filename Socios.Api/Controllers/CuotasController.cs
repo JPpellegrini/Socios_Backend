@@ -110,8 +110,9 @@ namespace Socios.Api.Controllers
 
         /// <summary>
         /// Devuelve cuánto se cobraría la cuota si se paga ahora, para mostrarlo en la pantalla
-        /// de pago antes de confirmar (pendiente: su monto; vencida: el valor actual de
-        /// configuración, salvo nicho). Usa el mismo cálculo que el cobro. No modifica nada.
+        /// de pago antes de confirmar (al día: su monto; vencida, es decir pendiente con la fecha
+        /// de vencimiento ya pasada: el valor actual de configuración, salvo nicho). Usa el mismo
+        /// cálculo que el cobro. No modifica nada.
         ///   - Cuota inexistente      → 404 (RecursoNoEncontradoException).
         ///   - Cuota paga o anulada   → 409 (ReglaNegocioException).
         /// </summary>

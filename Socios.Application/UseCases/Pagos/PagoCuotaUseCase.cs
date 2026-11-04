@@ -72,6 +72,8 @@ namespace Socios.Application.UseCases.Pagos
                 Concepto = tipoCuota.Concepto,
                 Mes = cuota.Mes_Periodo,
                 Anio = cuota.Anio_Periodo,
+                FechaVencimiento = cuota.FechaVencimiento,
+                Vencida = EstaVencida(cuota),
                 MontoOriginal = cuota.Monto,
                 MontoACobrar = montoACobrar,
                 ActualizadaAValorVigente = montoACobrar != cuota.Monto
@@ -85,10 +87,11 @@ namespace Socios.Application.UseCases.Pagos
         ///   - Método de pago EFECTIVO: la cuenta es siempre EFECTIVO. Otro método (ej.
         ///     transferencia): la cuenta es obligatoria, tiene que estar ACTIVA y no puede ser
         ///     la de EFECTIVO.
-        ///   - Solo se cobran cuotas PENDIENTES o VENCIDAS (no PAGADAS ni ANULADAS).
-        ///   - Monto: pendiente → su monto; vencida → el valor actual de configuración (salvo
-        ///     nicho, que se cobra por su monto financiado). El monto de la cuota se actualiza
-        ///     al valor cobrado, para que la cuota y la caja digan lo mismo.
+        ///   - Solo se cobran cuotas PENDIENTES (no PAGADAS ni ANULADAS).
+        ///   - Monto: al día → su monto; vencida (pendiente con la fecha de vencimiento ya pasada)
+        ///     → el valor actual de configuración (salvo nicho, que se cobra por su monto
+        ///     financiado). El monto de la cuota se actualiza al valor cobrado, para que la cuota
+        ///     y la caja digan lo mismo.
         ///   - Se registra un INGRESO en caja con el detalle "CUOTA {concepto}" y la cuota pasa a
         ///     PAGADO vinculada a ese movimiento.
         /// Todo en una sola transacción, con la fila de la cuota bloqueada: si dos personas
@@ -173,15 +176,26 @@ namespace Socios.Application.UseCases.Pagos
         /// <summary>
         /// Monto a cobrar. Es el ÚNICO lugar donde vive la regla (la usan el cobro y la consulta
         /// previa del importe):
-        ///   - PENDIENTE: el monto guardado en la cuota.
-        ///   - VENCIDA: el importe vigente de su tipo de cuota en la configuración; excepto
-        ///     NICHO, cuyo monto sale de la financiación del nicho y no de la configuración.
+        ///   - Al día (no vencida): el monto guardado en la cuota.
+        ///   - Vencida (ver <see cref="EstaVencida"/>): el importe vigente de su tipo de cuota en la
+        ///     configuración; excepto NICHO, cuyo monto sale de la financiación del nicho y no de la
+        ///     configuración.
         /// </summary>
         private static decimal CalcularMontoACobrar(Cuota cuota, TipoCuota tipoCuota)
         {
-            var actualizaAValorVigente = cuota.Estado == EstadoVencida && tipoCuota.Concepto != ConceptoNicho;
+            var actualizaAValorVigente = EstaVencida(cuota) && tipoCuota.Concepto != ConceptoNicho;
             return actualizaAValorVigente ? tipoCuota.Importe : cuota.Monto;
         }
+
+        /// <summary>
+        /// Una cuota está vencida si sigue PENDIENTE y su fecha de vencimiento ya pasó (la que vence
+        /// hoy todavía no está vencida). El estado VENCIDA no se usa por ahora (decisión del
+        /// usuario): el vencimiento sale de la fecha. Si alguna cuota tuviera el estado VENCIDA
+        /// guardado, también se considera vencida.
+        /// </summary>
+        private static bool EstaVencida(Cuota cuota) =>
+            cuota.Estado == EstadoVencida
+            || (cuota.Estado == EstadoPendiente && cuota.FechaVencimiento.Date < DateTime.Today);
 
         /// <summary>
         /// Cuenta donde ingresa el dinero. Con EFECTIVO es siempre la cuenta EFECTIVO; con otro
