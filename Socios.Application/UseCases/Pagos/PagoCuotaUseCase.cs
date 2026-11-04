@@ -68,7 +68,9 @@ namespace Socios.Application.UseCases.Pagos
             return new CuotaImporteACobrarDto
             {
                 IdCuota = cuota.Id_Deuda,
-                Estado = cuota.Estado,
+                // Igual que la grilla: una pendiente con la fecha de vencimiento pasada se muestra
+                // como VENCIDA (en la base sigue PENDIENTE).
+                Estado = EstaVencida(cuota) ? EstadoVencida : cuota.Estado,
                 Concepto = tipoCuota.Concepto,
                 Mes = cuota.Mes_Periodo,
                 Anio = cuota.Anio_Periodo,
