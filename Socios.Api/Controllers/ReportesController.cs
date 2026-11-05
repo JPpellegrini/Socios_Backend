@@ -13,15 +13,107 @@ namespace Socios.Api.Controllers
         private readonly ISocioRepository _socioRepository;
         private readonly IInformeSociosPdf _informeSociosPdf;
         private readonly IInformeMovimientosSociosPdf _informeMovimientosPdf;
+        private readonly IMovimientosEntidadRepository _movimientosEntidadRepository;
+        private readonly IInformeMovimientosEntidadPdf _informeMovimientosEntidadPdf;
 
         public ReportesController(
             ISocioRepository socioRepository,
             IInformeSociosPdf informeSociosPdf,
-            IInformeMovimientosSociosPdf informeMovimientosPdf)
+            IInformeMovimientosSociosPdf informeMovimientosPdf,
+            IMovimientosEntidadRepository movimientosEntidadRepository,
+            IInformeMovimientosEntidadPdf informeMovimientosEntidadPdf)
         {
             _socioRepository = socioRepository;
             _informeSociosPdf = informeSociosPdf;
             _informeMovimientosPdf = informeMovimientosPdf;
+            _movimientosEntidadRepository = movimientosEntidadRepository;
+            _informeMovimientosEntidadPdf = informeMovimientosEntidadPdf;
+        }
+
+        /// <summary>
+        /// Listado de entidades de un tipo (PROVEEDOR o COLABORADOR), activas e inactivas, para el
+        /// selector del reporte de movimientos por entidad.
+        ///   - Tipo inválido            → 400.
+        ///   - Ninguna entidad del tipo → 404.
+        /// </summary>
+        [HttpGet("entidades")]
+        public async Task<IActionResult> ListarEntidadesAsync([FromQuery] string? tipo)
+        {
+            var configuracion = TipoEntidadMovimientos.Obtener(tipo);
+            if (configuracion is null)
+                return BadRequest(MensajeTipoInvalido);
+
+            var entidades = await _movimientosEntidadRepository.ListarEntidadesAsync(configuracion);
+
+            if (entidades.Count == 0)
+                return NotFound($"No hay entidades registradas como {configuracion.Descripcion.ToLower()}.");
+
+            return Ok(entidades);
+        }
+
+        /// <summary>
+        /// Movimientos de caja de un proveedor o colaborador en un período. La columna de importe es
+        /// "Ingreso" para colaboradores y "Egreso" para proveedores; un movimiento en sentido
+        /// contrario (ej.: devolución) va en negativo y resta del total.
+        ///   - Tipo inválido, falta una fecha o desde > hasta → 400.
+        ///   - La entidad no es del tipo indicado             → 404.
+        ///   - Sin movimientos en el período                  → 200 con la lista vacía y total 0.
+        /// </summary>
+        [HttpGet("entidades/{idEntidad:int}/movimientos")]
+        public async Task<IActionResult> MovimientosEntidadAsync(int idEntidad, [FromQuery] MovimientoEntidadFiltroDto filtro)
+        {
+            var (informe, resultadoError) = await ArmarMovimientosEntidadAsync(idEntidad, filtro);
+            if (informe is null)
+                return resultadoError!;
+
+            return Ok(informe);
+        }
+
+        /// <summary>
+        /// Mismo reporte que GET entidades/{idEntidad}/movimientos, en PDF (A4 apaisada), con el
+        /// total de la columna importe. Si el período no tiene movimientos, el PDF lo indica.
+        /// Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("entidades/{idEntidad:int}/movimientos/pdf")]
+        public async Task<IActionResult> MovimientosEntidadPdfAsync(int idEntidad, [FromQuery] MovimientoEntidadFiltroDto filtro)
+        {
+            var (informe, resultadoError) = await ArmarMovimientosEntidadAsync(idEntidad, filtro);
+            if (informe is null)
+                return resultadoError!;
+
+            var pdf = _informeMovimientosEntidadPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            var nombreArchivo = $"movimientos-{informe.Tipo.ToLower()}-{idEntidad}.pdf";
+            Response.Headers.ContentDisposition = $"inline; filename=\"{nombreArchivo}\"";
+            return File(pdf, "application/pdf");
+        }
+
+        private const string MensajeTipoInvalido = "El tipo debe ser PROVEEDOR o COLABORADOR.";
+
+        /// <summary>
+        /// Valida el filtro y arma el informe. Si algo falla, devuelve null y la respuesta de error.
+        /// Las fechas y el tipo obligatorios ya los valida [ApiController] (400 automático).
+        /// </summary>
+        private async Task<(MovimientosEntidadInformeDto? Informe, IActionResult? Error)> ArmarMovimientosEntidadAsync(
+            int idEntidad, MovimientoEntidadFiltroDto filtro)
+        {
+            var tipo = TipoEntidadMovimientos.Obtener(filtro.Tipo);
+            if (tipo is null)
+                return (null, BadRequest(MensajeTipoInvalido));
+
+            var desde = filtro.FechaDesde!.Value.Date;
+            var hasta = filtro.FechaHasta!.Value.Date;
+            if (desde > hasta)
+                return (null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
+
+            var entidad = await _movimientosEntidadRepository.ObtenerEntidadAsync(idEntidad, tipo);
+            if (entidad is null)
+                return (null, NotFound($"La entidad {idEntidad} no está registrada como {tipo.Descripcion.ToLower()}."));
+
+            var movimientos = await _movimientosEntidadRepository.ObtenerMovimientosAsync(idEntidad, tipo, desde, hasta);
+
+            return (MovimientosEntidadInformeDto.Armar(tipo, desde, hasta, entidad, movimientos), null);
         }
 
         [HttpGet("socios")]
