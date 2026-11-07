@@ -17,6 +17,7 @@ using Socios.Application.UseCases.Socios;
 using Socios.Application.UseCases.ConfiguracionCuotas;
 using Socios.Application.UseCases.Cuotas;
 using Socios.Application.UseCases.Pagos;
+using Socios.Application.UseCases.CajaDiaria;
 using Socios.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +110,7 @@ builder.Services.AddScoped<IEmpleadoUseCase, EmpleadoUseCase>();
 builder.Services.AddScoped<IConfiguracionCuotaUseCase, ConfiguracionCuotaUseCase>();
 builder.Services.AddScoped<ICuotaUseCase, CuotaUseCase>();
 builder.Services.AddScoped<IPagoCuotaUseCase, PagoCuotaUseCase>();
+builder.Services.AddScoped<ICajaDiariaUseCase, CajaDiariaUseCase>();
 
 #endregion
 
