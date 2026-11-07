@@ -15,19 +15,211 @@ namespace Socios.Api.Controllers
         private readonly IInformeMovimientosSociosPdf _informeMovimientosPdf;
         private readonly IMovimientosEntidadRepository _movimientosEntidadRepository;
         private readonly IInformeMovimientosEntidadPdf _informeMovimientosEntidadPdf;
+        private readonly ISocioEstadoCuentaRepository _socioEstadoCuentaRepository;
+        private readonly IEstadoCuentaSocioPdf _estadoCuentaSocioPdf;
+        private readonly IMovimientosCajaRepository _movimientosCajaRepository;
+        private readonly IInformeMovimientosCajaPdf _informeMovimientosCajaPdf;
+
+        /// <summary>Tipos de actividad (detalles de movimiento) para el desplegable del reporte de ingresos y egresos.</summary>
+        [HttpGet("caja/actividades")]
+        public async Task<IActionResult> ListarActividadesCajaAsync()
+        {
+            return Ok(await _movimientosCajaRepository.ListarActividadesAsync());
+        }
+
+        /// <summary>
+        /// Ingresos y egresos de la institución en un período (sirve para el reporte mensual o
+        /// anual según el rango): detalle de movimientos, totales y subtotales por actividad y por mes.
+        ///   - Falta una fecha, desde > hasta, tipo inválido o actividad inexistente → 400.
+        ///   - Sin movimientos → 200 con la lista vacía y totales en 0.
+        /// </summary>
+        [HttpGet("caja/movimientos")]
+        public async Task<IActionResult> MovimientosCajaAsync([FromQuery] MovimientosCajaFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarMovimientosCajaAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            return Ok(new
+            {
+                informe.FechaDesde,
+                informe.FechaHasta,
+                informe.TipoMovimiento,
+                informe.Actividad,
+                informe.Cantidad,
+                informe.TotalIngresos,
+                informe.TotalEgresos,
+                informe.Saldo,
+                informe.PorActividad,
+                informe.PorMes,
+                informe.Movimientos
+            });
+        }
+
+        /// <summary>
+        /// Mismo reporte que GET caja/movimientos, en PDF (A4 apaisada).
+        /// Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("caja/movimientos/pdf")]
+        public async Task<IActionResult> MovimientosCajaPdfAsync([FromQuery] MovimientosCajaFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarMovimientosCajaAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            var pdf = _informeMovimientosCajaPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            var nombre = $"ingresos-egresos-{informe.FechaDesde:yyyyMMdd}-{informe.FechaHasta:yyyyMMdd}.pdf";
+            Response.Headers.ContentDisposition = $"inline; filename=\"{nombre}\"";
+            return File(pdf, "application/pdf");
+        }
+
+        /// <summary>
+        /// Valida el filtro y arma el reporte de ingresos y egresos. Si algo falla, devuelve null y
+        /// la respuesta de error. Las fechas obligatorias ya las valida [ApiController].
+        /// </summary>
+        private async Task<(MovimientosCajaInformeDto? Informe, IActionResult? Error)> ArmarMovimientosCajaAsync(
+            MovimientosCajaFiltroDto filtro)
+        {
+            var desde = filtro.FechaDesde!.Value.Date;
+            var hasta = filtro.FechaHasta!.Value.Date;
+            if (desde > hasta)
+                return (null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
+
+            var tipo = string.IsNullOrWhiteSpace(filtro.TipoMovimiento)
+                ? MovimientosCajaFiltroDto.TodosLosTipos
+                : filtro.TipoMovimiento.Trim().ToUpperInvariant();
+
+            string? tipoMovimiento = tipo switch
+            {
+                MovimientosCajaFiltroDto.TodosLosTipos => null,
+                MovimientosCajaFiltroDto.Ingresos => MovimientosCajaInformeDto.TipoIngreso,
+                MovimientosCajaFiltroDto.Egresos => MovimientosCajaInformeDto.TipoEgreso,
+                _ => "INVALIDO"
+            };
+            if (tipoMovimiento == "INVALIDO")
+                return (null, BadRequest("El tipo de movimiento debe ser TODOS, INGRESOS o EGRESOS."));
+
+            string? actividad = null;
+            if (filtro.IdActividad.HasValue)
+            {
+                actividad = await _movimientosCajaRepository.ObtenerNombreActividadAsync(filtro.IdActividad.Value);
+                if (actividad is null)
+                    return (null, BadRequest($"No existe la actividad {filtro.IdActividad.Value}."));
+            }
+
+            var movimientos = await _movimientosCajaRepository.ObtenerMovimientosAsync(
+                desde, hasta, tipoMovimiento, filtro.IdActividad);
+
+            return (new MovimientosCajaInformeDto
+            {
+                FechaDesde = desde,
+                FechaHasta = hasta,
+                TipoMovimiento = tipo,
+                Actividad = actividad,
+                Movimientos = movimientos
+            }, null);
+        }
 
         public ReportesController(
             ISocioRepository socioRepository,
             IInformeSociosPdf informeSociosPdf,
             IInformeMovimientosSociosPdf informeMovimientosPdf,
             IMovimientosEntidadRepository movimientosEntidadRepository,
-            IInformeMovimientosEntidadPdf informeMovimientosEntidadPdf)
+            IInformeMovimientosEntidadPdf informeMovimientosEntidadPdf,
+            ISocioEstadoCuentaRepository socioEstadoCuentaRepository,
+            IEstadoCuentaSocioPdf estadoCuentaSocioPdf,
+            IMovimientosCajaRepository movimientosCajaRepository,
+            IInformeMovimientosCajaPdf informeMovimientosCajaPdf)
         {
+            _movimientosCajaRepository = movimientosCajaRepository;
+            _informeMovimientosCajaPdf = informeMovimientosCajaPdf;
             _socioRepository = socioRepository;
             _informeSociosPdf = informeSociosPdf;
             _informeMovimientosPdf = informeMovimientosPdf;
             _movimientosEntidadRepository = movimientosEntidadRepository;
             _informeMovimientosEntidadPdf = informeMovimientosEntidadPdf;
+            _socioEstadoCuentaRepository = socioEstadoCuentaRepository;
+            _estadoCuentaSocioPdf = estadoCuentaSocioPdf;
+        }
+
+        /// <summary>
+        /// Socios (activos e inactivos) para el selector del estado de cuenta.
+        /// 'busqueda' (opcional) filtra por nombre, apellido o DNI. Sin coincidencias → 200 con lista vacía.
+        /// </summary>
+        [HttpGet("socios/seleccion")]
+        public async Task<IActionResult> ListarSociosParaEstadoCuentaAsync([FromQuery] string? busqueda)
+        {
+            return Ok(await _socioEstadoCuentaRepository.ListarSociosAsync(busqueda));
+        }
+
+        /// <summary>
+        /// Estado de cuenta individual del socio: cuotas (excepto anuladas) con vencimiento en el
+        /// período, con los datos del pago si están pagas; total, pagado, adeudado y deuda total
+        /// del socio a la fecha (esta última sin importar el período).
+        ///   - Falta una fecha o desde > hasta → 400.
+        ///   - La entidad no es socio          → 404.
+        ///   - Sin cuotas en el período        → 200 con la lista vacía (la deuda total igual se informa).
+        /// </summary>
+        [HttpGet("socios/{idEntidad:int}/cuenta")]
+        public async Task<IActionResult> EstadoCuentaSocioAsync(int idEntidad, [FromQuery] SocioEstadoCuentaFiltroDto filtro)
+        {
+            var (estadoCuenta, error) = await ArmarEstadoCuentaSocioAsync(idEntidad, filtro);
+            if (estadoCuenta is null)
+                return error!;
+
+            return Ok(estadoCuenta);
+        }
+
+        /// <summary>
+        /// Mismo reporte que GET socios/{idEntidad}/cuenta, en PDF (A4 apaisada).
+        /// Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("socios/{idEntidad:int}/cuenta/pdf")]
+        public async Task<IActionResult> EstadoCuentaSocioPdfAsync(int idEntidad, [FromQuery] SocioEstadoCuentaFiltroDto filtro)
+        {
+            var (estadoCuenta, error) = await ArmarEstadoCuentaSocioAsync(idEntidad, filtro);
+            if (estadoCuenta is null)
+                return error!;
+
+            var pdf = _estadoCuentaSocioPdf.Generar(estadoCuenta);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            Response.Headers.ContentDisposition = $"inline; filename=\"estado-cuenta-socio-{estadoCuenta.Socio.IdSocio}.pdf\"";
+            return File(pdf, "application/pdf");
+        }
+
+        /// <summary>
+        /// Valida el filtro y arma el estado de cuenta. Si algo falla, devuelve null y la respuesta
+        /// de error. Las fechas obligatorias ya las valida [ApiController] (400 automático).
+        /// </summary>
+        private async Task<(SocioEstadoCuentaDto? EstadoCuenta, IActionResult? Error)> ArmarEstadoCuentaSocioAsync(
+            int idEntidad, SocioEstadoCuentaFiltroDto filtro)
+        {
+            var desde = filtro.FechaDesde!.Value.Date;
+            var hasta = filtro.FechaHasta!.Value.Date;
+            if (desde > hasta)
+                return (null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
+
+            var socio = await _socioEstadoCuentaRepository.ObtenerSocioAsync(idEntidad);
+            if (socio is null)
+                return (null, NotFound($"La entidad {idEntidad} no está registrada como socio."));
+
+            var cuotas = await _socioEstadoCuentaRepository.ObtenerCuotasAsync(idEntidad, desde, hasta);
+            var adeudadas = await _socioEstadoCuentaRepository.ObtenerCuotasAdeudadasAsync(idEntidad);
+            SocioEstadoCuentaDto.CalcularMontos(cuotas);
+            SocioEstadoCuentaDto.CalcularMontos(adeudadas);
+
+            return (new SocioEstadoCuentaDto
+            {
+                Socio = socio,
+                FechaDesde = desde,
+                FechaHasta = hasta,
+                Cuotas = cuotas,
+                DeudaTotal = adeudadas.Sum(c => c.Monto),
+                CuotasAdeudadasTotal = adeudadas.Count
+            }, null);
         }
 
         /// <summary>

@@ -24,7 +24,6 @@ namespace Socios.Application.UseCases.Pagos
         private const string EstadoPendiente = "PENDIENTE";
         private const string EstadoVencida = "VENCIDA";
         private const string EstadoPagado = "PAGADO";
-        private const string ConceptoNicho = "NICHO";
         private const string Efectivo = "EFECTIVO";
         private const string CuentaActiva = "ACTIVA";
         private const string TipoIngreso = "INGRESO";
@@ -170,18 +169,9 @@ namespace Socios.Application.UseCases.Pagos
                 throw new ReglaNegocioException($"No se puede cobrar una cuota en estado {cuota.Estado}.");
         }
 
-        /// <summary>
-        /// Monto a cobrar. Es el ÚNICO lugar donde vive la regla (la usan el cobro y la consulta
-        /// previa del importe):
-        ///   - PENDIENTE: el monto guardado en la cuota.
-        ///   - VENCIDA: el importe vigente de su tipo de cuota en la configuración; excepto
-        ///     NICHO, cuyo monto sale de la financiación del nicho y no de la configuración.
-        /// </summary>
-        private static decimal CalcularMontoACobrar(Cuota cuota, TipoCuota tipoCuota)
-        {
-            var actualizaAValorVigente = cuota.Estado == EstadoVencida && tipoCuota.Concepto != ConceptoNicho;
-            return actualizaAValorVigente ? tipoCuota.Importe : cuota.Monto;
-        }
+        /// <summary>Monto a cobrar: la regla vive en <see cref="MontoCuotaACobrar"/>.</summary>
+        private static decimal CalcularMontoACobrar(Cuota cuota, TipoCuota tipoCuota) =>
+            MontoCuotaACobrar.Calcular(cuota.Estado, tipoCuota.Concepto, cuota.Monto, tipoCuota.Importe);
 
         /// <summary>
         /// Cuenta donde ingresa el dinero. Con EFECTIVO es siempre la cuenta EFECTIVO; con otro

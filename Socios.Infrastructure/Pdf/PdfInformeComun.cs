@@ -65,9 +65,14 @@ namespace Socios.Infrastructure.Pdf
                 .PaddingVertical(1.5f, Unit.Millimetre).PaddingHorizontal(1.2f, Unit.Millimetre)
                 .DefaultTextStyle(estilo => estilo.Bold().FontSize(8));
 
-        /// <summary>Celda de datos. Las filas alternan fondo blanco y gris claro.</summary>
+        /// <summary>
+        /// Celda de datos. Las filas alternan fondo blanco y gris claro. ShowEntire evita que una
+        /// celda de dos renglones (ej. "TRANSFERENCIA BANCARIA") quede partida entre dos hojas:
+        /// si no entra completa, la fila pasa entera a la hoja siguiente.
+        /// </summary>
         public static IContainer Celda(IContainer celda, int fila) =>
-            celda.Background(fila % 2 == 0 ? Colors.White : Colors.Grey.Lighten4)
+            celda.ShowEntire()
+                .Background(fila % 2 == 0 ? Colors.White : Colors.Grey.Lighten4)
                 .BorderBottom(0.3f).BorderColor(Colors.Grey.Lighten1)
                 .PaddingVertical(1.2f, Unit.Millimetre).PaddingHorizontal(1.2f, Unit.Millimetre);
 
