@@ -8,6 +8,9 @@ namespace Socios.Infrastructure.Repositories
 {
     public class CajaRepository : ICajaRepository
     {
+        private const string TipoIngreso = "INGRESO";
+        private const string TipoEgreso = "EGRESO";
+
         private readonly SociosDbContext _context;
 
         public CajaRepository(SociosDbContext context)
@@ -19,6 +22,22 @@ namespace Socios.Infrastructure.Repositories
         {
             // Solo marca el movimiento para insertar. El guardado real lo dispara la unidad de trabajo.
             _context.Caja.Add(movimiento);
+        }
+
+        public async Task<(decimal Ingresos, decimal Egresos)> ObtenerTotalesPorCuentaAsync(int idCajaDiaria, int idCuenta)
+        {
+            var movimientos = _context.Caja
+                .AsNoTracking()
+                .Where(m => m.Id_CajaDiaria == idCajaDiaria && m.Id_Cuenta == idCuenta);
+
+            var ingresos = await movimientos
+                .Where(m => m.Tipo_Movimiento == TipoIngreso)
+                .SumAsync(m => (decimal?)m.Monto) ?? 0m;
+            var egresos = await movimientos
+                .Where(m => m.Tipo_Movimiento == TipoEgreso)
+                .SumAsync(m => (decimal?)m.Monto) ?? 0m;
+
+            return (ingresos, egresos);
         }
 
         public async Task<ComprobantePagoDto?> ObtenerComprobantePagoAsync(int idMovimiento)

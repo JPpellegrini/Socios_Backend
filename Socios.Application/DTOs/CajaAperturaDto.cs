@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Socios.Application.Validations;
 
 namespace Socios.Application.DTOs
 {
@@ -14,29 +15,7 @@ namespace Socios.Application.DTOs
         [Required(ErrorMessage = "El saldo inicial es obligatorio.")]
         public decimal? SaldoInicial { get; set; }
 
-        /// <summary>Máximo que admite la columna Saldo (numeric(18,2)).</summary>
-        private const decimal SaldoMaximo = 9_999_999_999_999_999.99m;
-
-        // Los límites se validan acá y no con [Range(typeof(decimal), ...)]: ese atributo
-        // interpreta los textos con la cultura del servidor (es-AR toma el punto como miles) y
-        // revienta con 500.
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (!SaldoInicial.HasValue)
-                yield break;
-
-            if (SaldoInicial.Value < 0)
-                yield return new ValidationResult(
-                    "El saldo inicial no puede ser negativo.", new[] { nameof(SaldoInicial) });
-            else if (SaldoInicial.Value > SaldoMaximo)
-                yield return new ValidationResult(
-                    "El saldo inicial excede el máximo permitido.", new[] { nameof(SaldoInicial) });
-
-            // La columna guarda 2 decimales: no se redondea en silencio lo que declaró el usuario.
-            if (decimal.Round(SaldoInicial.Value, 2) != SaldoInicial.Value)
-                yield return new ValidationResult(
-                    "El saldo inicial admite como máximo 2 decimales.",
-                    new[] { nameof(SaldoInicial) });
-        }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
+            ValidacionSaldoEfectivo.Validar(SaldoInicial, nameof(SaldoInicial), "saldo inicial");
     }
 }

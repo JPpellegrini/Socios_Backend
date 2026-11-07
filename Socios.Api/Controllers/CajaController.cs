@@ -19,6 +19,19 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
+        /// Caja abierta del usuario autenticado: número, fecha/hora de apertura y saldo inicial
+        /// (para las pantallas de caja). No incluye el efectivo esperado.
+        ///   - El usuario no tiene caja abierta → 404.
+        /// </summary>
+        [HttpGet("abierta")]
+        public async Task<IActionResult> ObtenerCajaAbiertaAsync()
+        {
+            var caja = await _cajaDiariaUseCase.ObtenerCajaAbiertaAsync(ObtenerIdUsuario());
+
+            return Ok(caja);
+        }
+
+        /// <summary>
         /// Abre la caja diaria del usuario autenticado con el efectivo que declara. Body:
         /// { saldoInicial }. El usuario sale del login y la fecha/hora es la del servidor
         /// (se devuelve en FechaHoraApertura). El número de caja lo asigna el sistema
@@ -30,12 +43,28 @@ namespace Socios.Api.Controllers
         [HttpPost("apertura")]
         public async Task<IActionResult> AbrirAsync([FromBody] CajaAperturaDto dto)
         {
-            // La caja se abre a nombre del usuario autenticado.
-            var idUsuario = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            var resultado = await _cajaDiariaUseCase.AbrirAsync(dto, idUsuario);
+            var resultado = await _cajaDiariaUseCase.AbrirAsync(dto, ObtenerIdUsuario());
 
             return Ok(resultado);
         }
+
+        /// <summary>
+        /// Cierra la caja abierta del usuario autenticado. Body: { saldoFinal } (efectivo
+        /// contado). Solo cierra si coincide exacto con el efectivo que calcula el sistema
+        /// (saldo inicial + ingresos − egresos en la cuenta EFECTIVO de esa caja).
+        ///   - Saldo final ausente, negativo o con más de 2 decimales           → 400.
+        ///   - Sin caja abierta / el efectivo no coincide (informa la diferencia) → 409.
+        /// </summary>
+        [HttpPost("cierre")]
+        public async Task<IActionResult> CerrarAsync([FromBody] CajaCierreDto dto)
+        {
+            var resultado = await _cajaDiariaUseCase.CerrarAsync(dto, ObtenerIdUsuario());
+
+            return Ok(resultado);
+        }
+
+        /// <summary>La caja es siempre la del usuario autenticado.</summary>
+        private int ObtenerIdUsuario() =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     }
 }

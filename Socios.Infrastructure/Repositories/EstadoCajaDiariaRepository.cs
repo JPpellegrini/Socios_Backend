@@ -11,11 +11,10 @@ namespace Socios.Infrastructure.Repositories
         private const string TipoCierre = "CIERRE";
 
         /// <summary>
-        /// Clave del bloqueo consultivo (pg_advisory_xact_lock) que serializa la numeración de
-        /// cajas. Es un número arbitrario: solo tiene que ser el mismo en todos los lugares que
-        /// numeren o abran/cierren cajas.
+        /// Clave del bloqueo consultivo de PostgreSQL (pg_advisory_xact_lock) sobre las cajas.
+        /// Es un número arbitrario: solo tiene que ser el mismo en todos los lugares que lo usen.
         /// </summary>
-        private const long ClaveBloqueoNumeracion = 7_301_001;
+        private const long ClaveBloqueoCajas = 7_301_001;
 
         private readonly SociosDbContext _context;
 
@@ -48,12 +47,20 @@ namespace Socios.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task BloquearNumeracionAsync()
+        public async Task BloquearCajasAsync()
         {
             // Bloqueo a nivel de transacción: se libera solo al confirmar o deshacer. No toca
-            // filas ni tablas, así que los cobros (que leen la caja abierta) no se frenan.
+            // filas ni tablas; solo coordina a quienes pidan el mismo bloqueo.
             await _context.Database.ExecuteSqlRawAsync(
-                "SELECT pg_advisory_xact_lock({0})", ClaveBloqueoNumeracion);
+                "SELECT pg_advisory_xact_lock({0})", ClaveBloqueoCajas);
+        }
+
+        public async Task BloquearCajasCompartidoAsync()
+        {
+            // Versión compartida: varios cobros a la vez no se bloquean entre sí, pero no
+            // conviven con una apertura/cierre (que toma el exclusivo).
+            await _context.Database.ExecuteSqlRawAsync(
+                "SELECT pg_advisory_xact_lock_shared({0})", ClaveBloqueoCajas);
         }
 
         public async Task<int> ObtenerSiguienteNroCajaAsync()

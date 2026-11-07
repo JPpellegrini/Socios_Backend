@@ -101,16 +101,22 @@ namespace Socios.Application.UseCases.Pagos
         /// </summary>
         public async Task<CuotaPagoResultadoDto> PagarAsync(CuotaPagarDto dto, int idUsuario)
         {
-            // Regla de negocio: solo se cobra con la caja abierta.
-            var cajaAbierta = await _cajasDiarias.ObtenerCajaAbiertaAsync(idUsuario)
-                ?? throw new ReglaNegocioException("No tiene una caja abierta: debe abrir la caja antes de cobrar.");
-
             var metodoPago = await _metodosPago.ObtenerPorIdAsync(dto.IdMetodoPago!.Value)
                 ?? throw new RecursoNoEncontradoException("No se encontró el método de pago indicado.");
             var cuenta = await ResolverCuentaAsync(metodoPago, dto.IdCuenta);
 
             return await _unitOfWork.EjecutarEnTransaccionAsync(async () =>
             {
+                // Bloqueo compartido de las cajas: los cobros no se frenan entre sí, pero no
+                // conviven con un cierre en curso. La caja abierta se busca DESPUÉS del bloqueo,
+                // así el cobro nunca cae en una caja que se acaba de cerrar (y el cierre no
+                // cuadra contra un efectivo que cambió por debajo).
+                await _cajasDiarias.BloquearCajasCompartidoAsync();
+
+                // Regla de negocio: solo se cobra con la caja abierta.
+                var cajaAbierta = await _cajasDiarias.ObtenerCajaAbiertaAsync(idUsuario)
+                    ?? throw new ReglaNegocioException("No tiene una caja abierta: debe abrir la caja antes de cobrar.");
+
                 // Bloquea la fila de la cuota hasta el final de la transacción.
                 var cuota = await _cuotas.ObtenerParaPagoAsync(dto.IdCuota!.Value)
                     ?? throw new RecursoNoEncontradoException("No se encontró la cuota solicitada.");
