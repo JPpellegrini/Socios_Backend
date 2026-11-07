@@ -17,5 +17,11 @@ namespace Socios.Application.Interfaces
         /// </summary>
         Task<List<MovimientoCajaDto>> ObtenerMovimientosAsync(
             DateTime fechaDesde, DateTime fechaHasta, string? tipoMovimiento, int? idActividad);
+
+        /// <summary>
+        /// Totales de caja entre las dos fechas (ambas inclusive) agrupados por actividad y tipo de
+        /// movimiento (normalizado a mayúsculas). La suma se hace en la base: no trae los movimientos.
+        /// </summary>
+        Task<List<TotalCajaAgrupadoDto>> ObtenerTotalesPorActividadAsync(DateTime fechaDesde, DateTime fechaHasta);
     }
 }

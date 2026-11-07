@@ -25,10 +25,13 @@ namespace Socios.Infrastructure.Pdf
         /// </summary>
         public static void DeclararLicencia() => QuestPDF.Settings.License = LicenseType.Community;
 
-        /// <summary>Hoja A4 apaisada con márgenes, fuente y pie estándar de los informes.</summary>
-        public static void ConfigurarHoja(PageDescriptor pagina, DateTime emision)
+        /// <summary>
+        /// Hoja A4 (apaisada por defecto) con márgenes, fuente y pie estándar de los informes.
+        /// Los informes angostos (por ejemplo, un resumen de totales) pueden usar la hoja vertical.
+        /// </summary>
+        public static void ConfigurarHoja(PageDescriptor pagina, DateTime emision, bool apaisada = true)
         {
-            pagina.Size(PageSizes.A4.Landscape());
+            pagina.Size(apaisada ? PageSizes.A4.Landscape() : PageSizes.A4);
             pagina.Margin(10, Unit.Millimetre);
             pagina.DefaultTextStyle(estilo => estilo.FontFamily(Fuente).FontSize(8.5f));
             pagina.Footer().Element(x => Pie(x, emision));

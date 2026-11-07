@@ -95,6 +95,7 @@ builder.Services.AddSingleton<IInformeMovimientosSociosPdf, InformeMovimientosSo
 builder.Services.AddSingleton<IInformeMovimientosEntidadPdf, InformeMovimientosEntidadPdf>();
 builder.Services.AddSingleton<IEstadoCuentaSocioPdf, EstadoCuentaSocioPdf>();
 builder.Services.AddSingleton<IInformeMovimientosCajaPdf, InformeMovimientosCajaPdf>();
+builder.Services.AddSingleton<IInformeTotalesCajaPdf, InformeTotalesCajaPdf>();
 builder.Services.AddSingleton<IComprobantePagoPdf, ComprobantePagoPdf>();
 
 // Caja: movimientos, caja diaria, métodos de pago, cuentas y detalles de movimiento.

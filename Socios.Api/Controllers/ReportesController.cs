@@ -19,6 +19,7 @@ namespace Socios.Api.Controllers
         private readonly IEstadoCuentaSocioPdf _estadoCuentaSocioPdf;
         private readonly IMovimientosCajaRepository _movimientosCajaRepository;
         private readonly IInformeMovimientosCajaPdf _informeMovimientosCajaPdf;
+        private readonly IInformeTotalesCajaPdf _informeTotalesCajaPdf;
 
         /// <summary>Tipos de actividad (detalles de movimiento) para el desplegable del reporte de ingresos y egresos.</summary>
         [HttpGet("caja/actividades")]
@@ -82,24 +83,10 @@ namespace Socios.Api.Controllers
         private async Task<(MovimientosCajaInformeDto? Informe, IActionResult? Error)> ArmarMovimientosCajaAsync(
             MovimientosCajaFiltroDto filtro)
         {
-            var desde = filtro.FechaDesde!.Value.Date;
-            var hasta = filtro.FechaHasta!.Value.Date;
-            if (desde > hasta)
-                return (null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
-
-            var tipo = string.IsNullOrWhiteSpace(filtro.TipoMovimiento)
-                ? MovimientosCajaFiltroDto.TodosLosTipos
-                : filtro.TipoMovimiento.Trim().ToUpperInvariant();
-
-            string? tipoMovimiento = tipo switch
-            {
-                MovimientosCajaFiltroDto.TodosLosTipos => null,
-                MovimientosCajaFiltroDto.Ingresos => MovimientosCajaInformeDto.TipoIngreso,
-                MovimientosCajaFiltroDto.Egresos => MovimientosCajaInformeDto.TipoEgreso,
-                _ => "INVALIDO"
-            };
-            if (tipoMovimiento == "INVALIDO")
-                return (null, BadRequest("El tipo de movimiento debe ser TODOS, INGRESOS o EGRESOS."));
+            var (desde, hasta, tipo, tipoMovimiento, errorFiltro) =
+                ValidarFiltroCaja(filtro.FechaDesde!.Value, filtro.FechaHasta!.Value, filtro.TipoMovimiento);
+            if (errorFiltro is not null)
+                return (null, errorFiltro);
 
             string? actividad = null;
             if (filtro.IdActividad.HasValue)
@@ -122,6 +109,79 @@ namespace Socios.Api.Controllers
             }, null);
         }
 
+        /// <summary>
+        /// Informe totalizado de ingresos y egresos: total por actividad en una sección de ingresos
+        /// y otra de egresos, total de cada sección y resultado del período (con el filtro TODOS).
+        ///   - Falta una fecha, desde > hasta o tipo inválido → 400.
+        ///   - Sin movimientos → 200 con las secciones vacías y totales en 0.
+        /// </summary>
+        [HttpGet("caja/totales")]
+        public async Task<IActionResult> TotalesCajaAsync([FromQuery] TotalesCajaFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarTotalesCajaAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            return Ok(informe);
+        }
+
+        /// <summary>
+        /// Mismo informe que GET caja/totales, en PDF (A4 vertical).
+        /// Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("caja/totales/pdf")]
+        public async Task<IActionResult> TotalesCajaPdfAsync([FromQuery] TotalesCajaFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarTotalesCajaAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            var pdf = _informeTotalesCajaPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            var nombre = $"ingresos-egresos-totalizado-{informe.FechaDesde:yyyyMMdd}-{informe.FechaHasta:yyyyMMdd}.pdf";
+            Response.Headers.ContentDisposition = $"inline; filename=\"{nombre}\"";
+            return File(pdf, "application/pdf");
+        }
+
+        private async Task<(TotalesCajaInformeDto? Informe, IActionResult? Error)> ArmarTotalesCajaAsync(
+            TotalesCajaFiltroDto filtro)
+        {
+            var (desde, hasta, tipo, _, errorFiltro) =
+                ValidarFiltroCaja(filtro.FechaDesde!.Value, filtro.FechaHasta!.Value, filtro.TipoMovimiento);
+            if (errorFiltro is not null)
+                return (null, errorFiltro);
+
+            var agrupados = await _movimientosCajaRepository.ObtenerTotalesPorActividadAsync(desde, hasta);
+            return (TotalesCajaInformeDto.Armar(desde, hasta, tipo, agrupados), null);
+        }
+
+        /// <summary>
+        /// Validación común de los informes de caja: desde ≤ hasta y tipo TODOS / INGRESOS / EGRESOS.
+        /// Devuelve las fechas, el código del tipo normalizado, el tipo de movimiento a filtrar
+        /// ("INGRESO", "EGRESO" o null = todos) y la respuesta de error si no es válido.
+        /// </summary>
+        private (DateTime Desde, DateTime Hasta, string Tipo, string? TipoMovimiento, IActionResult? Error) ValidarFiltroCaja(
+            DateTime fechaDesde, DateTime fechaHasta, string? tipoMovimientoFiltro)
+        {
+            var desde = fechaDesde.Date;
+            var hasta = fechaHasta.Date;
+            if (desde > hasta)
+                return (desde, hasta, "", null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
+
+            var tipo = string.IsNullOrWhiteSpace(tipoMovimientoFiltro)
+                ? MovimientosCajaFiltroDto.TodosLosTipos
+                : tipoMovimientoFiltro.Trim().ToUpperInvariant();
+
+            return tipo switch
+            {
+                MovimientosCajaFiltroDto.TodosLosTipos => (desde, hasta, tipo, null, null),
+                MovimientosCajaFiltroDto.Ingresos => (desde, hasta, tipo, MovimientosCajaInformeDto.TipoIngreso, null),
+                MovimientosCajaFiltroDto.Egresos => (desde, hasta, tipo, MovimientosCajaInformeDto.TipoEgreso, null),
+                _ => (desde, hasta, tipo, null, BadRequest("El tipo de movimiento debe ser TODOS, INGRESOS o EGRESOS."))
+            };
+        }
+
         public ReportesController(
             ISocioRepository socioRepository,
             IInformeSociosPdf informeSociosPdf,
@@ -131,8 +191,10 @@ namespace Socios.Api.Controllers
             ISocioEstadoCuentaRepository socioEstadoCuentaRepository,
             IEstadoCuentaSocioPdf estadoCuentaSocioPdf,
             IMovimientosCajaRepository movimientosCajaRepository,
-            IInformeMovimientosCajaPdf informeMovimientosCajaPdf)
+            IInformeMovimientosCajaPdf informeMovimientosCajaPdf,
+            IInformeTotalesCajaPdf informeTotalesCajaPdf)
         {
+            _informeTotalesCajaPdf = informeTotalesCajaPdf;
             _movimientosCajaRepository = movimientosCajaRepository;
             _informeMovimientosCajaPdf = informeMovimientosCajaPdf;
             _socioRepository = socioRepository;

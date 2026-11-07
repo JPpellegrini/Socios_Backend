@@ -532,6 +532,11 @@ namespace Socios.Infrastructure.Migrations
                         {
                             Id_Detmov = 7,
                             NombreDetalleMovimiento = "CUOTA NICHO"
+                        },
+                        new
+                        {
+                            Id_Detmov = 8,
+                            NombreDetalleMovimiento = "PAGO A EMPLEADOS"
                         });
                 });
 
