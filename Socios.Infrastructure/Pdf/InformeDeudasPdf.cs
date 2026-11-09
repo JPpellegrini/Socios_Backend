@@ -69,12 +69,9 @@ namespace Socios.Infrastructure.Pdf
 
                             col.Item().PaddingTop(2, Unit.Millimetre).Column(notas =>
                             {
-                                // Aclara las cuotas que ya vencieron pero siguen marcadas PENDIENTE (solo si las hay).
-                                var pendientesConAtraso = informe.Cuotas.Count(c => c.Estado == "PENDIENTE" && c.DiasAtraso > 0);
-                                notas.Item().Text($"Atraso: días desde el vencimiento al {Fecha(informe.FechaCorte)}." +
-                                                  (pendientesConAtraso > 0
-                                                      ? $" {pendientesConAtraso} cuota{(pendientesConAtraso == 1 ? "" : "s")} ya vencida{(pendientesConAtraso == 1 ? "" : "s")} todavía figura{(pendientesConAtraso == 1 ? "" : "n")} como PENDIENTE."
-                                                      : ""))
+                                notas.Item().Text($"Atraso: días desde el vencimiento al {Fecha(informe.FechaCorte)}. " +
+                                                  "Una cuota pendiente cuyo vencimiento ya pasó se informa VENCIDA " +
+                                                  "(misma regla que el cobro).")
                                     .FontSize(7.5f).Italic().FontColor(Colors.Grey.Darken2);
                                 if (informe.TieneMontosActualizados)
                                     notas.Item().Text("* Cuota VENCIDA: se informa al importe vigente, que es el que se cobra hoy.")

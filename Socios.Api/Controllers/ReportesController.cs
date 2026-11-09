@@ -214,7 +214,8 @@ namespace Socios.Api.Controllers
         /// el monto a cobrar hoy, días de atraso y totales por tipo de cuota y por socio.
         /// Por defecto (sinFechas = true) no filtra por fecha; con sinFechas = false filtra por
         /// fecha de vencimiento entre fechaDesde y fechaHasta (ambas obligatorias).
-        /// estadoCuota: TODAS (default), VENCIDAS o PENDIENTES (por el estado guardado de la cuota).
+        /// estadoCuota: TODAS (default), VENCIDAS o PENDIENTES, con la regla de vencimiento del cobro
+        /// (una PENDIENTE cuyo vencimiento ya pasó cuenta como VENCIDA).
         /// El selector de socios es GET socios/seleccion.
         ///   - Estado inválido, falta una fecha (con sinFechas = false) o desde > hasta → 400.
         ///   - La entidad indicada no es socio                       → 404.
@@ -250,8 +251,7 @@ namespace Socios.Api.Controllers
 
         private async Task<(DeudasInformeDto? Informe, IActionResult? Error)> ArmarDeudasAsync(DeudasFiltroDto filtro)
         {
-            var estados = filtro.EstadosAFiltrar();
-            if (estados is null)
+            if (!filtro.NormalizarEstadoCuota())
                 return (null, BadRequest("El estado de cuota debe ser TODAS, VENCIDAS o PENDIENTES."));
 
             DateTime? desde = null, hasta = null;
@@ -274,8 +274,10 @@ namespace Socios.Api.Controllers
                     return (null, NotFound($"La entidad {filtro.IdEntidad.Value} no está registrada como socio."));
             }
 
-            var cuotas = await _socioEstadoCuentaRepository.ObtenerDeudasAsync(filtro.IdEntidad, desde, hasta, estados);
-            return (DeudasInformeDto.Armar(filtro, socio, cuotas, DateTime.Today), null);
+            // Una sola fecha de corte para el filtro, el estado, el monto y los días de atraso.
+            var hoy = DateTime.Today;
+            var cuotas = await _socioEstadoCuentaRepository.ObtenerDeudasAsync(filtro.IdEntidad, desde, hasta, filtro.EstadoCuota!, hoy);
+            return (DeudasInformeDto.Armar(filtro, socio, cuotas, hoy), null);
         }
 
         /// <summary>
@@ -342,8 +344,8 @@ namespace Socios.Api.Controllers
 
             var cuotas = await _socioEstadoCuentaRepository.ObtenerCuotasAsync(idEntidad, desde, hasta);
             var adeudadas = await _socioEstadoCuentaRepository.ObtenerCuotasAdeudadasAsync(idEntidad);
-            SocioEstadoCuentaDto.CalcularMontos(cuotas);
-            SocioEstadoCuentaDto.CalcularMontos(adeudadas);
+            SocioEstadoCuentaDto.CalcularMontos(cuotas, DateTime.Today);
+            SocioEstadoCuentaDto.CalcularMontos(adeudadas, DateTime.Today);
 
             return (new SocioEstadoCuentaDto
             {

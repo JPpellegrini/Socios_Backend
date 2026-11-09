@@ -24,7 +24,6 @@ namespace Socios.Application.UseCases.Pagos
         private const string EstadoPendiente = "PENDIENTE";
         private const string EstadoVencida = "VENCIDA";
         private const string EstadoPagado = "PAGADO";
-        private const string ConceptoNicho = "NICHO";
         private const string Efectivo = "EFECTIVO";
         private const string CuentaActiva = "ACTIVA";
         private const string TipoIngreso = "INGRESO";
@@ -182,29 +181,19 @@ namespace Socios.Application.UseCases.Pagos
         }
 
         /// <summary>
-        /// Monto a cobrar. Es el ÚNICO lugar donde vive la regla (la usan el cobro y la consulta
-        /// previa del importe):
-        ///   - Al día (no vencida): el monto guardado en la cuota.
-        ///   - Vencida (ver <see cref="EstaVencida"/>): el importe vigente de su tipo de cuota en la
-        ///     configuración; excepto NICHO, cuyo monto sale de la financiación del nicho y no de la
-        ///     configuración.
+        /// Monto a cobrar (al día: su monto; vencida: el importe vigente, salvo NICHO). La regla vive
+        /// en <see cref="MontoCuotaACobrar"/>, compartida con el estado de cuenta y el reporte de deudas.
         /// </summary>
-        private static decimal CalcularMontoACobrar(Cuota cuota, TipoCuota tipoCuota)
-        {
-            var actualizaAValorVigente = EstaVencida(cuota) && tipoCuota.Concepto != ConceptoNicho;
-            return actualizaAValorVigente ? tipoCuota.Importe : cuota.Monto;
-        }
+        private static decimal CalcularMontoACobrar(Cuota cuota, TipoCuota tipoCuota) =>
+            MontoCuotaACobrar.Calcular(cuota.Estado, tipoCuota.Concepto, cuota.FechaVencimiento,
+                cuota.Monto, tipoCuota.Importe, DateTime.Today);
 
         /// <summary>
-        /// Una cuota está vencida si sigue PENDIENTE y su fecha de vencimiento ya pasó (la que vence
-        /// hoy todavía no está vencida). El estado VENCIDA no se usa por ahora (decisión del
-        /// usuario): el vencimiento sale de la fecha. Si alguna cuota tuviera el estado VENCIDA
-        /// guardado, también se considera vencida. Misma regla que el filtro de estado de
-        /// CuotaRepository.BuscarAsync: si cambia, cambiar las dos.
+        /// Vencida: sigue PENDIENTE y su fecha de vencimiento ya pasó (o tiene el estado VENCIDA
+        /// guardado). La regla vive en <see cref="MontoCuotaACobrar.EstaVencida"/>.
         /// </summary>
         private static bool EstaVencida(Cuota cuota) =>
-            cuota.Estado == EstadoVencida
-            || (cuota.Estado == EstadoPendiente && cuota.FechaVencimiento.Date < DateTime.Today);
+            MontoCuotaACobrar.EstaVencida(cuota.Estado, cuota.FechaVencimiento, DateTime.Today);
 
         /// <summary>
         /// Cuenta donde ingresa el dinero. Con EFECTIVO es siempre la cuenta EFECTIVO; con otro

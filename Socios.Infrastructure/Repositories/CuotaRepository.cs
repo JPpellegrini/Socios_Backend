@@ -52,7 +52,8 @@ namespace Socios.Infrastructure.Repositories
             // El estado VENCIDA no lo asigna ningún proceso: una cuota está vencida si sigue
             // PENDIENTE y su fecha de vencimiento ya pasó (la que vence hoy todavía no). Por eso
             // PENDIENTE y VENCIDA se separan por fecha y cada cuota cae en un solo filtro.
-            // Misma regla que PagoCuotaUseCase.EstaVencida: si cambia, cambiar las dos.
+            // Misma regla que MontoCuotaACobrar.EstaVencida (la que usan el cobro, el estado de
+            // cuenta y el reporte de deudas): si cambia, cambiar las dos.
             var estado = filtro.Estado?.Trim();
             var hoy = DateTime.Today;
             if (estado == "VENCIDA")

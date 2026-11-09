@@ -34,7 +34,15 @@ namespace Socios.Application.DTOs
         public int Anio { get; set; }
         public string TipoCuota { get; set; } = null!;
         public DateTime FechaVencimiento { get; set; }
+
+        /// <summary>
+        /// Estado a mostrar: el guardado, salvo una PENDIENTE cuyo vencimiento ya pasó, que se
+        /// informa VENCIDA (misma regla que el cobro; ver MontoCuotaACobrar). Lo calcula CalcularMontos.
+        /// </summary>
         public string Estado { get; set; } = null!;
+
+        /// <summary>Estado tal como está guardado en la base.</summary>
+        public string EstadoGuardado { get; set; } = null!;
 
         /// <summary>Monto guardado en la cuota (en las pagas, lo efectivamente cobrado).</summary>
         public decimal MontoCuota { get; set; }
@@ -96,11 +104,18 @@ namespace Socios.Application.DTOs
 
         public bool TieneMontosActualizados => Cuotas.Any(c => c.MontoActualizado);
 
-        /// <summary>Calcula el monto a informar de cada cuota con la regla de cobro.</summary>
-        public static void CalcularMontos(IEnumerable<SocioCuotaCuentaDto> cuotas)
+        /// <summary>
+        /// Calcula, con las reglas del cobro (MontoCuotaACobrar) a la fecha 'hoy', el estado a
+        /// mostrar y el monto a informar de cada cuota. Se puede llamar una sola vez por cuota:
+        /// toma como estado guardado el que trae la consulta.
+        /// </summary>
+        public static void CalcularMontos(IEnumerable<SocioCuotaCuentaDto> cuotas, DateTime hoy)
         {
             foreach (var c in cuotas)
             {
+                c.EstadoGuardado = c.Estado;
+                c.Estado = MontoCuotaACobrar.EstadoEfectivo(c.EstadoGuardado, c.FechaVencimiento, hoy);
+
                 if (c.EstaPaga)
                 {
                     c.Monto = c.MontoCuota;
@@ -108,7 +123,8 @@ namespace Socios.Application.DTOs
                     continue;
                 }
 
-                c.Monto = MontoCuotaACobrar.Calcular(c.Estado, c.TipoCuota, c.MontoCuota, c.ImporteVigente);
+                c.Monto = MontoCuotaACobrar.Calcular(c.EstadoGuardado, c.TipoCuota, c.FechaVencimiento,
+                    c.MontoCuota, c.ImporteVigente, hoy);
                 c.MontoActualizado = c.Monto != c.MontoCuota;
             }
         }

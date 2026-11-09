@@ -61,18 +61,25 @@ namespace Socios.Infrastructure.Repositories
         }
 
         public async Task<List<DeudaCuotaDto>> ObtenerDeudasAsync(int? idEntidad, DateTime? fechaDesde, DateTime? fechaHasta,
-            IReadOnlyCollection<string> estados)
+            string estadoCuota, DateTime hoy)
         {
-            // Solo estados adeudados: aunque el llamador pida otra cosa, nunca se listan PAGADO ni ANULADA.
-            var estadosFiltro = estados.Where(e => EstadosAdeudados.Contains(e)).ToArray();
-
             var query =
                 from c in _context.Cuotas.AsNoTracking()
                 join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
                 join s in _context.Socios on c.Id_Entidad equals s.Id_Entidad
                 join e in _context.Entidades on c.Id_Entidad equals e.Id_Entidad
-                where estadosFiltro.Contains(c.Estado)
+                where EstadosAdeudados.Contains(c.Estado)
                 select new { c, tc, s, e };
+
+            // Estado con la regla de vencimiento del cobro (MontoCuotaACobrar.EstaVencida), igual que
+            // el filtro de CuotaRepository: vencida = VENCIDA guardada, o PENDIENTE con el vencimiento
+            // anterior a hoy (la que vence hoy todavía no). Si cambia la regla, cambiar los tres lugares.
+            var hoyFecha = hoy.Date;
+            if (estadoCuota == DeudasFiltroDto.Vencidas)
+                query = query.Where(x => x.c.Estado == "VENCIDA"
+                    || (x.c.Estado == "PENDIENTE" && x.c.FechaVencimiento < hoyFecha));
+            else if (estadoCuota == DeudasFiltroDto.Pendientes)
+                query = query.Where(x => x.c.Estado == "PENDIENTE" && x.c.FechaVencimiento >= hoyFecha);
 
             if (idEntidad.HasValue)
                 query = query.Where(x => x.c.Id_Entidad == idEntidad.Value);

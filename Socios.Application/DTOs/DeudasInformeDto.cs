@@ -18,9 +18,9 @@ namespace Socios.Application.DTOs
         public DateTime? FechaHasta { get; set; }
 
         /// <summary>
-        /// Estado guardado de la cuota: "TODAS" (default), "VENCIDAS" (estado VENCIDA) o
-        /// "PENDIENTES" (estado PENDIENTE, incluidas las que ya pasaron su vencimiento sin que
-        /// nadie las marcara como VENCIDA).
+        /// Estado de la cuota, con la misma regla de vencimiento que el cobro y el listado de cuotas
+        /// (MontoCuotaACobrar.EstaVencida): "TODAS" (default); "VENCIDAS" (estado VENCIDA, o
+        /// PENDIENTE con el vencimiento ya pasado); "PENDIENTES" (PENDIENTE que todavía no venció).
         /// </summary>
         public string? EstadoCuota { get; set; } = Todas;
 
@@ -29,19 +29,12 @@ namespace Socios.Application.DTOs
         public const string Pendientes = "PENDIENTES";
 
         /// <summary>
-        /// Estados guardados que corresponden al filtro, o null si el valor no es válido.
-        /// Normaliza EstadoCuota (mayúsculas, sin espacios; vacío = TODAS).
+        /// Normaliza EstadoCuota (mayúsculas, sin espacios; vacío = TODAS) e indica si es válido.
         /// </summary>
-        public string[]? EstadosAFiltrar()
+        public bool NormalizarEstadoCuota()
         {
             EstadoCuota = string.IsNullOrWhiteSpace(EstadoCuota) ? Todas : EstadoCuota.Trim().ToUpperInvariant();
-            return EstadoCuota switch
-            {
-                Todas => new[] { "PENDIENTE", "VENCIDA" },
-                Vencidas => new[] { "VENCIDA" },
-                Pendientes => new[] { "PENDIENTE" },
-                _ => null
-            };
+            return EstadoCuota is Todas or Vencidas or Pendientes;
         }
     }
 
@@ -108,7 +101,7 @@ namespace Socios.Application.DTOs
         public static DeudasInformeDto Armar(DeudasFiltroDto filtro, SocioSeleccionDto? socio,
             List<DeudaCuotaDto> cuotas, DateTime fechaCorte)
         {
-            SocioEstadoCuentaDto.CalcularMontos(cuotas);
+            SocioEstadoCuentaDto.CalcularMontos(cuotas, fechaCorte);
             foreach (var c in cuotas)
                 c.DiasAtraso = Math.Max(0, (fechaCorte.Date - c.FechaVencimiento.Date).Days);
 
