@@ -60,6 +60,60 @@ namespace Socios.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<DeudaCuotaDto>> ObtenerDeudasAsync(int? idEntidad, DateTime? fechaDesde, DateTime? fechaHasta,
+            IReadOnlyCollection<string> estados)
+        {
+            // Solo estados adeudados: aunque el llamador pida otra cosa, nunca se listan PAGADO ni ANULADA.
+            var estadosFiltro = estados.Where(e => EstadosAdeudados.Contains(e)).ToArray();
+
+            var query =
+                from c in _context.Cuotas.AsNoTracking()
+                join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                join s in _context.Socios on c.Id_Entidad equals s.Id_Entidad
+                join e in _context.Entidades on c.Id_Entidad equals e.Id_Entidad
+                where estadosFiltro.Contains(c.Estado)
+                select new { c, tc, s, e };
+
+            if (idEntidad.HasValue)
+                query = query.Where(x => x.c.Id_Entidad == idEntidad.Value);
+
+            // Filtro por fecha de vencimiento (ambas inclusive; "hasta" toma el día completo).
+            if (fechaDesde.HasValue)
+            {
+                var desde = fechaDesde.Value.Date;
+                query = query.Where(x => x.c.FechaVencimiento >= desde);
+            }
+            if (fechaHasta.HasValue)
+            {
+                var hastaExclusivo = fechaHasta.Value.Date.AddDays(1);
+                query = query.Where(x => x.c.FechaVencimiento < hastaExclusivo);
+            }
+
+            return await query
+                .OrderBy(x => x.e.Apellido)
+                .ThenBy(x => x.e.Nombre)
+                .ThenBy(x => x.e.Id_Entidad)
+                .ThenBy(x => x.c.FechaVencimiento)
+                .ThenBy(x => x.tc.Concepto)
+                .Select(x => new DeudaCuotaDto
+                {
+                    IdEntidad = x.e.Id_Entidad,
+                    IdSocio = x.s.Id_Socio,
+                    Apellido = x.e.Apellido,
+                    Nombre = x.e.Nombre,
+                    Dni = x.e.Dni,
+                    IdCuota = x.c.Id_Deuda,
+                    Mes = x.c.Mes_Periodo,
+                    Anio = x.c.Anio_Periodo,
+                    TipoCuota = x.tc.Concepto,
+                    FechaVencimiento = x.c.FechaVencimiento,
+                    Estado = x.c.Estado,
+                    MontoCuota = x.c.Monto,
+                    ImporteVigente = x.tc.Importe
+                })
+                .ToListAsync();
+        }
+
         /// <summary>
         /// Una fila por socio con el estado de su fila más reciente de tipo socio en
         /// entidad_tipos (puede tener varias si fue dado de baja y reactivado).

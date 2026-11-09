@@ -20,6 +20,7 @@ namespace Socios.Api.Controllers
         private readonly IMovimientosCajaRepository _movimientosCajaRepository;
         private readonly IInformeMovimientosCajaPdf _informeMovimientosCajaPdf;
         private readonly IInformeTotalesCajaPdf _informeTotalesCajaPdf;
+        private readonly IInformeDeudasPdf _informeDeudasPdf;
 
         /// <summary>Tipos de actividad (detalles de movimiento) para el desplegable del reporte de ingresos y egresos.</summary>
         [HttpGet("caja/actividades")]
@@ -192,8 +193,10 @@ namespace Socios.Api.Controllers
             IEstadoCuentaSocioPdf estadoCuentaSocioPdf,
             IMovimientosCajaRepository movimientosCajaRepository,
             IInformeMovimientosCajaPdf informeMovimientosCajaPdf,
-            IInformeTotalesCajaPdf informeTotalesCajaPdf)
+            IInformeTotalesCajaPdf informeTotalesCajaPdf,
+            IInformeDeudasPdf informeDeudasPdf)
         {
+            _informeDeudasPdf = informeDeudasPdf;
             _informeTotalesCajaPdf = informeTotalesCajaPdf;
             _movimientosCajaRepository = movimientosCajaRepository;
             _informeMovimientosCajaPdf = informeMovimientosCajaPdf;
@@ -204,6 +207,75 @@ namespace Socios.Api.Controllers
             _informeMovimientosEntidadPdf = informeMovimientosEntidadPdf;
             _socioEstadoCuentaRepository = socioEstadoCuentaRepository;
             _estadoCuentaSocioPdf = estadoCuentaSocioPdf;
+        }
+
+        /// <summary>
+        /// Informe de deudas: cuotas adeudadas (PENDIENTE o VENCIDA) de un socio o de todos, con
+        /// el monto a cobrar hoy, días de atraso y totales por tipo de cuota y por socio.
+        /// Por defecto (sinFechas = true) no filtra por fecha; con sinFechas = false filtra por
+        /// fecha de vencimiento entre fechaDesde y fechaHasta (ambas obligatorias).
+        /// estadoCuota: TODAS (default), VENCIDAS o PENDIENTES (por el estado guardado de la cuota).
+        /// El selector de socios es GET socios/seleccion.
+        ///   - Estado inválido, falta una fecha (con sinFechas = false) o desde > hasta → 400.
+        ///   - La entidad indicada no es socio                       → 404.
+        ///   - Sin deudas → 200 con la lista vacía y total 0.
+        /// </summary>
+        [HttpGet("deudas")]
+        public async Task<IActionResult> DeudasAsync([FromQuery] DeudasFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarDeudasAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            return Ok(informe);
+        }
+
+        /// <summary>
+        /// Mismo informe que GET deudas, en PDF (A4 apaisada). Se devuelve "inline" para verlo en el navegador.
+        /// </summary>
+        [HttpGet("deudas/pdf")]
+        public async Task<IActionResult> DeudasPdfAsync([FromQuery] DeudasFiltroDto filtro)
+        {
+            var (informe, error) = await ArmarDeudasAsync(filtro);
+            if (informe is null)
+                return error!;
+
+            var pdf = _informeDeudasPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            var nombre = informe.Socio is null ? "deudas-socios.pdf" : $"deudas-socio-{informe.Socio.IdSocio}.pdf";
+            Response.Headers.ContentDisposition = $"inline; filename=\"{nombre}\"";
+            return File(pdf, "application/pdf");
+        }
+
+        private async Task<(DeudasInformeDto? Informe, IActionResult? Error)> ArmarDeudasAsync(DeudasFiltroDto filtro)
+        {
+            var estados = filtro.EstadosAFiltrar();
+            if (estados is null)
+                return (null, BadRequest("El estado de cuota debe ser TODAS, VENCIDAS o PENDIENTES."));
+
+            DateTime? desde = null, hasta = null;
+            if (!filtro.SinFechas)
+            {
+                if (filtro.FechaDesde is null || filtro.FechaHasta is null)
+                    return (null, BadRequest("Para filtrar por fechas debe indicar la fecha desde y la fecha hasta (o marcar sin fechas)."));
+
+                desde = filtro.FechaDesde.Value.Date;
+                hasta = filtro.FechaHasta.Value.Date;
+                if (desde > hasta)
+                    return (null, BadRequest("La fecha desde no puede ser posterior a la fecha hasta."));
+            }
+
+            SocioSeleccionDto? socio = null;
+            if (filtro.IdEntidad.HasValue)
+            {
+                socio = await _socioEstadoCuentaRepository.ObtenerSocioAsync(filtro.IdEntidad.Value);
+                if (socio is null)
+                    return (null, NotFound($"La entidad {filtro.IdEntidad.Value} no está registrada como socio."));
+            }
+
+            var cuotas = await _socioEstadoCuentaRepository.ObtenerDeudasAsync(filtro.IdEntidad, desde, hasta, estados);
+            return (DeudasInformeDto.Armar(filtro, socio, cuotas, DateTime.Today), null);
         }
 
         /// <summary>

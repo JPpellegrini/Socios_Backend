@@ -22,5 +22,14 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Cuotas adeudadas (pendientes y vencidas) de la entidad, sin filtro de fechas.</summary>
         Task<List<SocioCuotaCuentaDto>> ObtenerCuotasAdeudadasAsync(int idEntidad);
+
+        /// <summary>
+        /// Cuotas adeudadas de un socio, o de todos si 'idEntidad' es null, con los estados
+        /// indicados (PENDIENTE y/o VENCIDA), opcionalmente filtradas por fecha de vencimiento
+        /// (ambas inclusive; null = sin límite). Ordenadas por socio y vencimiento.
+        /// 'Monto' todavía no está calculado.
+        /// </summary>
+        Task<List<DeudaCuotaDto>> ObtenerDeudasAsync(int? idEntidad, DateTime? fechaDesde, DateTime? fechaHasta,
+            IReadOnlyCollection<string> estados);
     }
 }
