@@ -391,7 +391,8 @@ namespace Socios.Infrastructure.Context
                 new DetalleMovimiento { Id_Detmov = 4, NombreDetalleMovimiento = "COLABORACIÓN" },
                 new DetalleMovimiento { Id_Detmov = 5, NombreDetalleMovimiento = "PAGO A PROVEEDOR" },
                 new DetalleMovimiento { Id_Detmov = 6, NombreDetalleMovimiento = "TRANSFERENCIA" },
-                new DetalleMovimiento { Id_Detmov = 7, NombreDetalleMovimiento = "CUOTA NICHO" }
+                new DetalleMovimiento { Id_Detmov = 7, NombreDetalleMovimiento = "CUOTA NICHO" },
+                new DetalleMovimiento { Id_Detmov = 8, NombreDetalleMovimiento = "PAGO A EMPLEADOS" }
             );
 
             // Seed de Metodos de Pago de prueba
@@ -671,7 +672,7 @@ namespace Socios.Infrastructure.Context
                 new Contacto
                 {
                     Id_Contacto = 1,
-                    Tipo = "TELÉFONO",
+                    Tipo = "TELEFONO",
                     ContactoEntidad = "3413458966",
                     Id_Entidad = 1
                 },
@@ -685,14 +686,14 @@ namespace Socios.Infrastructure.Context
                 new Contacto
                 {
                     Id_Contacto = 3,
-                    Tipo = "TELÉFONO",
+                    Tipo = "TELEFONO",
                     ContactoEntidad = "3413485977",
                     Id_Entidad = 4
                 },
                 new Contacto
                 {
                     Id_Contacto = 4,
-                    Tipo = "TELÉFONO",
+                    Tipo = "TELEFONO",
                     ContactoEntidad = "08007775427",
                     Id_Entidad = 3
                 }

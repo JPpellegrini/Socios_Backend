@@ -297,7 +297,7 @@ namespace Socios.Infrastructure.Migrations
                             Id_Contacto = 1,
                             ContactoEntidad = "3413458966",
                             Id_Entidad = 1,
-                            Tipo = "TELÉFONO"
+                            Tipo = "TELEFONO"
                         },
                         new
                         {
@@ -311,14 +311,14 @@ namespace Socios.Infrastructure.Migrations
                             Id_Contacto = 3,
                             ContactoEntidad = "3413485977",
                             Id_Entidad = 4,
-                            Tipo = "TELÉFONO"
+                            Tipo = "TELEFONO"
                         },
                         new
                         {
                             Id_Contacto = 4,
                             ContactoEntidad = "08007775427",
                             Id_Entidad = 3,
-                            Tipo = "TELÉFONO"
+                            Tipo = "TELEFONO"
                         },
                         new
                         {
@@ -532,6 +532,11 @@ namespace Socios.Infrastructure.Migrations
                         {
                             Id_Detmov = 7,
                             NombreDetalleMovimiento = "CUOTA NICHO"
+                        },
+                        new
+                        {
+                            Id_Detmov = 8,
+                            NombreDetalleMovimiento = "PAGO A EMPLEADOS"
                         });
                 });
 

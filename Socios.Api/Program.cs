@@ -83,6 +83,9 @@ builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<ITipoCuotaRepository, TipoCuotaRepository>();
 builder.Services.AddScoped<ITipoPlanRepository, TipoPlanRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
+builder.Services.AddScoped<IMovimientosEntidadRepository, MovimientosEntidadRepository>();
+builder.Services.AddScoped<ISocioEstadoCuentaRepository, SocioEstadoCuentaRepository>();
+builder.Services.AddScoped<IMovimientosCajaRepository, MovimientosCajaRepository>();
 
 // Comprobantes de cuotas en PDF (QuestPDF). Encabezado/leyenda opcionales en la sección
 // "Comprobante" del appsettings; si no están, se usan los datos del Centro.
@@ -90,6 +93,11 @@ builder.Services.Configure<ComprobanteOpciones>(builder.Configuration.GetSection
 builder.Services.AddSingleton<IComprobanteCuotaPdf, ComprobanteCuotaPdf>();
 builder.Services.AddSingleton<IInformeSociosPdf, InformeSociosPdf>();
 builder.Services.AddSingleton<IInformeMovimientosSociosPdf, InformeMovimientosSociosPdf>();
+builder.Services.AddSingleton<IInformeMovimientosEntidadPdf, InformeMovimientosEntidadPdf>();
+builder.Services.AddSingleton<IEstadoCuentaSocioPdf, EstadoCuentaSocioPdf>();
+builder.Services.AddSingleton<IInformeMovimientosCajaPdf, InformeMovimientosCajaPdf>();
+builder.Services.AddSingleton<IInformeTotalesCajaPdf, InformeTotalesCajaPdf>();
+builder.Services.AddSingleton<IInformeDeudasPdf, InformeDeudasPdf>();
 builder.Services.AddSingleton<IComprobantePagoPdf, ComprobantePagoPdf>();
 
 // Caja: movimientos, caja diaria, métodos de pago, cuentas y detalles de movimiento.
