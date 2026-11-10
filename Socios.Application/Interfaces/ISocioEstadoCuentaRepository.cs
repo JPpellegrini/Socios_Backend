@@ -31,5 +31,12 @@ namespace Socios.Application.Interfaces
         /// </summary>
         Task<List<DeudaCuotaDto>> ObtenerDeudasAsync(int? idEntidad, DateTime? fechaDesde, DateTime? fechaHasta,
             string estadoCuota, DateTime hoy);
+
+        /// <summary>
+        /// Socios ACTIVOS con sepelio y/o nicho que, a la fecha 'hoy', adeudan como máximo
+        /// 'maximoMeses' meses (meses con al menos una cuota vencida e impaga, de cualquier tipo,
+        /// con la regla de vencimiento del cobro). Ordenados por apellido y nombre. 'Edad' sin calcular.
+        /// </summary>
+        Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses);
     }
 }

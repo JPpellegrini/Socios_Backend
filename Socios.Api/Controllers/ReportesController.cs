@@ -21,6 +21,7 @@ namespace Socios.Api.Controllers
         private readonly IInformeMovimientosCajaPdf _informeMovimientosCajaPdf;
         private readonly IInformeTotalesCajaPdf _informeTotalesCajaPdf;
         private readonly IInformeDeudasPdf _informeDeudasPdf;
+        private readonly IInformeCasaVelatoriaPdf _informeCasaVelatoriaPdf;
 
         /// <summary>Tipos de actividad (detalles de movimiento) para el desplegable del reporte de ingresos y egresos.</summary>
         [HttpGet("caja/actividades")]
@@ -194,8 +195,10 @@ namespace Socios.Api.Controllers
             IMovimientosCajaRepository movimientosCajaRepository,
             IInformeMovimientosCajaPdf informeMovimientosCajaPdf,
             IInformeTotalesCajaPdf informeTotalesCajaPdf,
-            IInformeDeudasPdf informeDeudasPdf)
+            IInformeDeudasPdf informeDeudasPdf,
+            IInformeCasaVelatoriaPdf informeCasaVelatoriaPdf)
         {
+            _informeCasaVelatoriaPdf = informeCasaVelatoriaPdf;
             _informeDeudasPdf = informeDeudasPdf;
             _informeTotalesCajaPdf = informeTotalesCajaPdf;
             _movimientosCajaRepository = movimientosCajaRepository;
@@ -247,6 +250,36 @@ namespace Socios.Api.Controllers
             var nombre = informe.Socio is null ? "deudas-socios.pdf" : $"deudas-socio-{informe.Socio.IdSocio}.pdf";
             Response.Headers.ContentDisposition = $"inline; filename=\"{nombre}\"";
             return File(pdf, "application/pdf");
+        }
+
+        /// <summary>
+        /// Listado para la casa velatoria: socios ACTIVOS con sepelio y/o nicho que, a la fecha de
+        /// emisión (hoy), no adeudan más de 3 meses de cuotas vencidas (regla de vencimiento del
+        /// cobro). Sin filtros: las condiciones son fijas. Sin socios → 200 con la lista vacía.
+        /// </summary>
+        [HttpGet("casa-velatoria")]
+        public async Task<IActionResult> CasaVelatoriaAsync()
+        {
+            return Ok(await ArmarCasaVelatoriaAsync());
+        }
+
+        /// <summary>Mismo listado que GET casa-velatoria, en PDF (A4 vertical), con la fecha de emisión.</summary>
+        [HttpGet("casa-velatoria/pdf")]
+        public async Task<IActionResult> CasaVelatoriaPdfAsync()
+        {
+            var informe = await ArmarCasaVelatoriaAsync();
+            var pdf = _informeCasaVelatoriaPdf.Generar(informe);
+
+            // "inline": el navegador lo muestra en vez de forzar la descarga.
+            Response.Headers.ContentDisposition = $"inline; filename=\"socios-habilitados-sepelio-{informe.FechaEmision:yyyyMMdd}.pdf\"";
+            return File(pdf, "application/pdf");
+        }
+
+        private async Task<CasaVelatoriaInformeDto> ArmarCasaVelatoriaAsync()
+        {
+            var hoy = DateTime.Today;
+            var socios = await _socioEstadoCuentaRepository.ObtenerHabilitadosSepelioAsync(hoy, CasaVelatoriaInformeDto.MaximoMesesAdeudados);
+            return CasaVelatoriaInformeDto.Armar(socios, hoy);
         }
 
         private async Task<(DeudasInformeDto? Informe, IActionResult? Error)> ArmarDeudasAsync(DeudasFiltroDto filtro)

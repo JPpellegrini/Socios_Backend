@@ -121,6 +121,49 @@ namespace Socios.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses)
+        {
+            var hoyFecha = hoy.Date;
+
+            var socios =
+                from s in _context.Socios.AsNoTracking()
+                join e in _context.Entidades on s.Id_Entidad equals e.Id_Entidad
+                // Estado del socio: el de su fila más reciente de tipo socio en entidad_tipos.
+                let estado = _context.EntidadTipos
+                    .Where(et => et.Id_Entidad == e.Id_Entidad && et.Id_Tipo == IdTipoSocio)
+                    .OrderByDescending(et => et.Id_EntidadTipo)
+                    .Select(et => et.Estado)
+                    .FirstOrDefault()
+                let tieneSepelio = s.Sepelio != null && s.Sepelio.ToUpper() == "SI"
+                let tieneNicho = _context.Nichos.Any(n => n.Id_Entidad == e.Id_Entidad)
+                // Meses adeudados: períodos distintos con alguna cuota vencida e impaga. Regla de
+                // vencimiento del cobro (MontoCuotaACobrar.EstaVencida): VENCIDA guardada, o
+                // PENDIENTE con el vencimiento anterior a hoy. Si cambia la regla, cambiarla acá también.
+                let mesesAdeudados = _context.Cuotas
+                    .Where(c => c.Id_Entidad == e.Id_Entidad
+                        && (c.Estado == "VENCIDA" || (c.Estado == "PENDIENTE" && c.FechaVencimiento < hoyFecha)))
+                    .Select(c => c.Anio_Periodo * 100 + c.Mes_Periodo)
+                    .Distinct()
+                    .Count()
+                where estado == "ACTIVO" && (tieneSepelio || tieneNicho) && mesesAdeudados <= maximoMeses
+                orderby e.Apellido, e.Nombre
+                select new SocioHabilitadoSepelioDto
+                {
+                    IdSocio = s.Id_Socio,
+                    IdEntidad = e.Id_Entidad,
+                    Apellido = e.Apellido,
+                    Nombre = e.Nombre,
+                    Dni = e.Dni,
+                    Nacimiento = e.Nacimiento,
+                    Plan = s.Plan,
+                    Sepelio = tieneSepelio,
+                    Nicho = tieneNicho,
+                    MesesAdeudados = mesesAdeudados
+                };
+
+            return await socios.ToListAsync();
+        }
+
         /// <summary>
         /// Una fila por socio con el estado de su fila más reciente de tipo socio en
         /// entidad_tipos (puede tener varias si fue dado de baja y reactivado).
