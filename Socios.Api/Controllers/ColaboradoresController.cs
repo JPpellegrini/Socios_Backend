@@ -8,6 +8,7 @@ namespace Socios.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/colaboradores")]
+    [Authorize]
     public class ColaboradoresController : ControllerBase
     {
         private readonly IColaboradorUseCase _colaboradores;
