@@ -16,10 +16,13 @@ namespace Socios.Application.DTOs
         public bool Nicho { get; set; }
         /// <summary>Meses con al menos una cuota vencida e impaga a la fecha de emisión.</summary>
         public int MesesAdeudados { get; set; }
+        /// <summary>Cuotas de SEPELIO pagadas hasta la fecha de emisión.</summary>
+        public int CuotasSepelioPagadas { get; set; }
     }
 
     /// <summary>
-    /// Listado para la casa velatoria: socios ACTIVOS con sepelio y/o nicho que, a la fecha de
+    /// Listado para la casa velatoria: socios ACTIVOS con sepelio (el nicho solo no alcanza), con al
+    /// menos <see cref="MinimoCuotasSepelioPagadas"/> cuotas de sepelio pagadas y que, a la fecha de
     /// emisión, no adeudan más de <see cref="MaximoMesesAdeudados"/> meses. Es una foto de ese día:
     /// después de la emisión la situación de un socio puede cambiar.
     /// </summary>
@@ -28,8 +31,12 @@ namespace Socios.Application.DTOs
         /// <summary>Condición de la casa velatoria: con más meses adeudados no accede al servicio.</summary>
         public const int MaximoMesesAdeudados = 3;
 
+        /// <summary>Condición de la casa velatoria: cuotas de sepelio pagadas necesarias para acceder al servicio.</summary>
+        public const int MinimoCuotasSepelioPagadas = 6;
+
         public DateTime FechaEmision { get; set; }
         public int MaximoMeses => MaximoMesesAdeudados;
+        public int MinimoCuotasSepelio => MinimoCuotasSepelioPagadas;
         public List<SocioHabilitadoSepelioDto> Socios { get; set; } = new();
         public int Cantidad => Socios.Count;
 

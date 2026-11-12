@@ -253,9 +253,10 @@ namespace Socios.Api.Controllers
         }
 
         /// <summary>
-        /// Listado para la casa velatoria: socios ACTIVOS con sepelio y/o nicho que, a la fecha de
-        /// emisión (hoy), no adeudan más de 3 meses de cuotas vencidas (regla de vencimiento del
-        /// cobro). Sin filtros: las condiciones son fijas. Sin socios → 200 con la lista vacía.
+        /// Listado para la casa velatoria: socios ACTIVOS con sepelio (el nicho solo no alcanza), con
+        /// al menos 6 cuotas de sepelio pagadas y que, a la fecha de emisión (hoy), no adeudan más de
+        /// 3 meses de cuotas vencidas (regla de vencimiento del cobro). Sin filtros: las condiciones
+        /// son fijas. Sin socios → 200 con la lista vacía.
         /// </summary>
         [HttpGet("casa-velatoria")]
         public async Task<IActionResult> CasaVelatoriaAsync()
@@ -278,7 +279,8 @@ namespace Socios.Api.Controllers
         private async Task<CasaVelatoriaInformeDto> ArmarCasaVelatoriaAsync()
         {
             var hoy = DateTime.Today;
-            var socios = await _socioEstadoCuentaRepository.ObtenerHabilitadosSepelioAsync(hoy, CasaVelatoriaInformeDto.MaximoMesesAdeudados);
+            var socios = await _socioEstadoCuentaRepository.ObtenerHabilitadosSepelioAsync(hoy,
+                CasaVelatoriaInformeDto.MaximoMesesAdeudados, CasaVelatoriaInformeDto.MinimoCuotasSepelioPagadas);
             return CasaVelatoriaInformeDto.Armar(socios, hoy);
         }
 

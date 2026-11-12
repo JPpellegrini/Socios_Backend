@@ -121,7 +121,8 @@ namespace Socios.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses)
+        public async Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses,
+            int minimoCuotasSepelioPagadas)
         {
             var hoyFecha = hoy.Date;
 
@@ -145,7 +146,19 @@ namespace Socios.Infrastructure.Repositories
                     .Select(c => c.Anio_Periodo * 100 + c.Mes_Periodo)
                     .Distinct()
                     .Count()
-                where estado == "ACTIVO" && (tieneSepelio || tieneNicho) && mesesAdeudados <= maximoMeses
+                // Cuotas de SEPELIO pagadas (cualquier tipo de cuota cuyo concepto sea SEPELIO).
+                let cuotasSepelioPagadas = (
+                    from c in _context.Cuotas
+                    join tc in _context.TiposCuotas on c.Id_TipoCuota equals tc.Id_TipoCuota
+                    where c.Id_Entidad == e.Id_Entidad && c.Estado == "PAGADO" && tc.Concepto == "SEPELIO"
+                    select c.Id_Deuda).Count()
+                // Condiciones de la casa velatoria: socio activo, con sepelio (el nicho solo da acceso
+                // si además tiene sepelio), con el mínimo de cuotas de sepelio pagadas y sin superar
+                // el máximo de meses adeudados.
+                where estado == "ACTIVO"
+                      && tieneSepelio
+                      && cuotasSepelioPagadas >= minimoCuotasSepelioPagadas
+                      && mesesAdeudados <= maximoMeses
                 orderby e.Apellido, e.Nombre
                 select new SocioHabilitadoSepelioDto
                 {
@@ -158,7 +171,8 @@ namespace Socios.Infrastructure.Repositories
                     Plan = s.Plan,
                     Sepelio = tieneSepelio,
                     Nicho = tieneNicho,
-                    MesesAdeudados = mesesAdeudados
+                    MesesAdeudados = mesesAdeudados,
+                    CuotasSepelioPagadas = cuotasSepelioPagadas
                 };
 
             return await socios.ToListAsync();

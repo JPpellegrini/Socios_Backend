@@ -33,10 +33,13 @@ namespace Socios.Application.Interfaces
             string estadoCuota, DateTime hoy);
 
         /// <summary>
-        /// Socios ACTIVOS con sepelio y/o nicho que, a la fecha 'hoy', adeudan como máximo
-        /// 'maximoMeses' meses (meses con al menos una cuota vencida e impaga, de cualquier tipo,
-        /// con la regla de vencimiento del cobro). Ordenados por apellido y nombre. 'Edad' sin calcular.
+        /// Socios habilitados para el servicio de sepelio a la fecha 'hoy': ACTIVOS, con sepelio
+        /// (el nicho solo no alcanza), con al menos 'minimoCuotasSepelioPagadas' cuotas de SEPELIO
+        /// pagadas y que adeudan como máximo 'maximoMeses' meses (meses con al menos una cuota
+        /// vencida e impaga, de cualquier tipo, con la regla de vencimiento del cobro).
+        /// Ordenados por apellido y nombre. 'Edad' sin calcular.
         /// </summary>
-        Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses);
+        Task<List<SocioHabilitadoSepelioDto>> ObtenerHabilitadosSepelioAsync(DateTime hoy, int maximoMeses,
+            int minimoCuotasSepelioPagadas);
     }
 }

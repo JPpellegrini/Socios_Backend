@@ -86,8 +86,9 @@ namespace Socios.Infrastructure.Pdf
                     });
 
                 col.Item().PaddingTop(2, Unit.Millimetre).Text(
-                        $"Socios activos con sepelio y/o nicho que, a la fecha de emisión, no adeudan más de " +
-                        $"{informe.MaximoMeses} meses de cuotas vencidas.")
+                        $"Socios activos con sepelio (el nicho solo no da acceso al servicio), con al menos " +
+                        $"{informe.MinimoCuotasSepelio} cuotas de sepelio pagadas y que, a la fecha de emisión, no " +
+                        $"adeudan más de {informe.MaximoMeses} meses de cuotas vencidas.")
                     .FontSize(8.5f).FontColor(Colors.Grey.Darken2);
 
                 col.Item().PaddingTop(2, Unit.Millimetre).LineHorizontal(0.8f).LineColor(Colors.Black);
@@ -102,13 +103,13 @@ namespace Socios.Infrastructure.Pdf
             {
                 tabla.ColumnsDefinition(c =>
                 {
-                    c.RelativeColumn(30); // Apellido y nombre
-                    c.RelativeColumn(12); // DNI
-                    c.RelativeColumn(7);  // Edad
+                    c.RelativeColumn(28); // Apellido y nombre
+                    c.RelativeColumn(11); // DNI
+                    c.RelativeColumn(6);  // Edad
+                    c.RelativeColumn(11); // Cuotas sepelio pagadas
                     c.RelativeColumn(11); // Meses adeudados
-                    c.RelativeColumn(7);  // Plan
-                    c.RelativeColumn(9);  // Sepelio
-                    c.RelativeColumn(8);  // Nicho
+                    c.RelativeColumn(6);  // Plan
+                    c.RelativeColumn(7);  // Nicho
                 });
 
                 // El encabezado de la tabla se repite automáticamente en cada hoja.
@@ -117,9 +118,9 @@ namespace Socios.Infrastructure.Pdf
                     CeldaTitulo(h.Cell()).Text("Apellido y nombre");
                     CeldaTitulo(h.Cell()).Text("DNI");
                     CeldaTitulo(h.Cell()).AlignCenter().Text("Edad");
+                    CeldaTitulo(h.Cell()).AlignCenter().Text("Cuotas sepelio pagadas");
                     CeldaTitulo(h.Cell()).AlignCenter().Text("Meses adeudados");
                     CeldaTitulo(h.Cell()).AlignCenter().Text("Plan");
-                    CeldaTitulo(h.Cell()).AlignCenter().Text("Sepelio");
                     CeldaTitulo(h.Cell()).AlignCenter().Text("Nicho");
                 });
 
@@ -129,9 +130,9 @@ namespace Socios.Infrastructure.Pdf
                     Celda(tabla.Cell(), i).Text(NombreCompleto(s.Apellido, s.Nombre)).Bold();
                     Celda(tabla.Cell(), i).Text(Valor(s.Dni));
                     Celda(tabla.Cell(), i).AlignCenter().Text(s.Edad?.ToString() ?? SinDato);
+                    Celda(tabla.Cell(), i).AlignCenter().Text(s.CuotasSepelioPagadas.ToString());
                     Celda(tabla.Cell(), i).AlignCenter().Text(s.MesesAdeudados.ToString());
                     Celda(tabla.Cell(), i).AlignCenter().Text(Valor(s.Plan));
-                    Celda(tabla.Cell(), i).AlignCenter().Text(s.Sepelio ? "SI" : "NO");
                     Celda(tabla.Cell(), i).AlignCenter().Text(s.Nicho ? "SI" : "NO");
                 }
             });
