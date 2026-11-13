@@ -42,6 +42,7 @@ namespace Socios.Application.UseCases.CajaDiaria
         private readonly IEntidadRepository _entidades;
         private readonly IMetodoPagoRepository _metodosPago;
         private readonly IDetalleMovimientoRepository _detallesMovimiento;
+        private readonly IComprobanteTransferenciaPdf _comprobanteTransferenciaPdf;
         private readonly IUnitOfWork _unitOfWork;
 
         public CajaDiariaUseCase(
@@ -51,8 +52,10 @@ namespace Socios.Application.UseCases.CajaDiaria
             IEntidadRepository entidades,
             IMetodoPagoRepository metodosPago,
             IDetalleMovimientoRepository detallesMovimiento,
+            IComprobanteTransferenciaPdf comprobanteTransferenciaPdf,
             IUnitOfWork unitOfWork)
         {
+            _comprobanteTransferenciaPdf = comprobanteTransferenciaPdf;
             _cajasDiarias = cajasDiarias;
             _caja = caja;
             _cuentas = cuentas;
@@ -316,6 +319,18 @@ namespace Socios.Application.UseCases.CajaDiaria
                 Id_Detmov = detalle.Id_Detmov,
                 Observacion = observacion
             };
+        }
+
+        /// <summary>
+        /// Genera (o reimprime) el PDF del comprobante de una transferencia. Acepta el Id de
+        /// cualquiera de sus dos movimientos: siempre devuelve el mismo comprobante.
+        /// </summary>
+        public async Task<byte[]> GenerarComprobanteTransferenciaAsync(int idMovimiento)
+        {
+            var comprobante = await _caja.ObtenerComprobanteTransferenciaAsync(idMovimiento)
+                ?? throw new RecursoNoEncontradoException("No se encontró la transferencia indicada.");
+
+            return _comprobanteTransferenciaPdf.Generar(comprobante);
         }
 
         /// <summary>

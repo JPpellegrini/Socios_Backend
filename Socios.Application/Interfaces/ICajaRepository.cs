@@ -16,6 +16,13 @@ namespace Socios.Application.Interfaces
         Task<(decimal Ingresos, decimal Egresos)> ObtenerTotalesPorCuentaAsync(int idCajaDiaria, int idCuenta);
 
         /// <summary>
+        /// Trae los datos para imprimir el comprobante de una transferencia entre cuentas. Acepta
+        /// el Id de cualquiera de sus dos movimientos (egreso o ingreso) y devuelve siempre el
+        /// mismo comprobante. Null si el movimiento no existe o no es una transferencia. Solo lectura.
+        /// </summary>
+        Task<ComprobanteTransferenciaDto?> ObtenerComprobanteTransferenciaAsync(int idMovimiento);
+
+        /// <summary>
         /// Trae los datos para imprimir el comprobante de pago de un movimiento de caja que
         /// corresponde al cobro de una cuota. Null si el movimiento no existe o no es el pago
         /// de una cuota. Solo lectura.

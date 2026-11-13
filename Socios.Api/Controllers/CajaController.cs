@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Socios.Application.DTOs;
+using Socios.Application.Interfaces;
 using Socios.Application.UseCases.CajaDiaria;
 
 namespace Socios.Api.Controllers
@@ -12,10 +13,25 @@ namespace Socios.Api.Controllers
     public class CajaController : ControllerBase
     {
         private readonly ICajaDiariaUseCase _cajaDiariaUseCase;
+        private readonly ICuentaRepository _cuentaRepository;
 
-        public CajaController(ICajaDiariaUseCase cajaDiariaUseCase)
+        public CajaController(ICajaDiariaUseCase cajaDiariaUseCase, ICuentaRepository cuentaRepository)
         {
             _cajaDiariaUseCase = cajaDiariaUseCase;
+            _cuentaRepository = cuentaRepository;
+        }
+
+        /// <summary>
+        /// Cuánto dinero hay en cada cuenta (activas e inactivas) según el sistema:
+        /// saldo inicial + ingresos − egresos de los movimientos desde la fecha del saldo inicial.
+        /// Solo lectura: va directo al repositorio (sin caso de uso), como las demás búsquedas.
+        /// </summary>
+        [HttpGet("saldos")]
+        public async Task<IActionResult> ObtenerSaldosAsync()
+        {
+            var saldos = await _cuentaRepository.ObtenerSaldosAsync();
+
+            return Ok(saldos);
         }
 
         /// <summary>
@@ -91,6 +107,21 @@ namespace Socios.Api.Controllers
             var resultado = await _cajaDiariaUseCase.TransferirAsync(dto, ObtenerIdUsuario());
 
             return Ok(resultado);
+        }
+
+        /// <summary>
+        /// Genera (o reimprime) el PDF del comprobante de una transferencia. Acepta el Id de
+        /// cualquiera de sus dos movimientos (IdMovimientoEgreso o IdMovimientoIngreso): una
+        /// transferencia tiene un solo comprobante, numerado con el egreso. Se devuelve "inline".
+        ///   - Movimiento inexistente o que no es una transferencia → 404.
+        /// </summary>
+        [HttpGet("transferencias/{idMovimiento:int}/comprobante")]
+        public async Task<IActionResult> GenerarComprobanteTransferenciaAsync(int idMovimiento)
+        {
+            var pdf = await _cajaDiariaUseCase.GenerarComprobanteTransferenciaAsync(idMovimiento);
+
+            Response.Headers.ContentDisposition = $"inline; filename=\"comprobante-transferencia-{idMovimiento}.pdf\"";
+            return File(pdf, "application/pdf");
         }
 
         /// <summary>La caja es siempre la del usuario autenticado.</summary>

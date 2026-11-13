@@ -10,6 +10,10 @@ namespace Socios.Infrastructure.Repositories
     {
         private const string TipoIngreso = "INGRESO";
         private const string TipoEgreso = "EGRESO";
+        private const string DetalleTransferencia = "TRANSFERENCIA";
+
+        /// <summary>Marca con la que la transferencia agrega el comprobante bancario a la observación.</summary>
+        private const string MarcaComprobante = " - COMP. ";
 
         private readonly SociosDbContext _context;
 
@@ -38,6 +42,89 @@ namespace Socios.Infrastructure.Repositories
                 .SumAsync(m => (decimal?)m.Monto) ?? 0m;
 
             return (ingresos, egresos);
+        }
+
+        public async Task<ComprobanteTransferenciaDto?> ObtenerComprobanteTransferenciaAsync(int idMovimiento)
+        {
+            var movimiento = await _context.Caja
+                .AsNoTracking()
+                .Include(m => m.DetalleMovimiento)
+                .FirstOrDefaultAsync(m => m.Id_Movimiento == idMovimiento);
+
+            if (movimiento is null || movimiento.DetalleMovimiento.NombreDetalleMovimiento != DetalleTransferencia)
+                return null;
+
+            // La transferencia no guarda un vínculo explícito entre sus dos movimientos: su par es
+            // el del tipo opuesto registrado en la MISMA caja, con la misma fecha/hora, importe y
+            // observación (se graban juntos en una transacción). Si hubiera más de uno, el de Id
+            // más cercano.
+            var tipoPar = movimiento.Tipo_Movimiento == TipoIngreso ? TipoEgreso : TipoIngreso;
+            var candidatos = await _context.Caja
+                .AsNoTracking()
+                .Where(m => m.Id_Movimiento != movimiento.Id_Movimiento
+                            && m.Id_CajaDiaria == movimiento.Id_CajaDiaria
+                            && m.Id_Detmov == movimiento.Id_Detmov
+                            && m.Tipo_Movimiento == tipoPar
+                            && m.FechaHoraMov == movimiento.FechaHoraMov
+                            && m.Monto == movimiento.Monto
+                            && m.Observacion == movimiento.Observacion)
+                .Select(m => m.Id_Movimiento)
+                .ToListAsync();
+
+            if (candidatos.Count == 0)
+                return null;
+
+            var idPar = candidatos.MinBy(id => Math.Abs(id - movimiento.Id_Movimiento));
+            var idEgreso = movimiento.Tipo_Movimiento == TipoEgreso ? movimiento.Id_Movimiento : idPar;
+            var idIngreso = movimiento.Tipo_Movimiento == TipoIngreso ? movimiento.Id_Movimiento : idPar;
+
+            var comprobante = await (
+                from eg in _context.Caja
+                from ing in _context.Caja.Where(i => i.Id_Movimiento == idIngreso)
+                join co in _context.Cuenta on eg.Id_Cuenta equals co.Id_Cuenta
+                join cd in _context.Cuenta on ing.Id_Cuenta equals cd.Id_Cuenta
+                join mp in _context.MetodoPago on eg.Id_MetodoPago equals mp.Id_MetodoPago
+                join caja in _context.EstadosCajaDiaria on eg.Id_CajaDiaria equals caja.Id_CajaDiaria
+                join u in _context.Usuarios on caja.Id_Usuario equals u.Id_Usuario
+                where eg.Id_Movimiento == idEgreso
+                select new ComprobanteTransferenciaDto
+                {
+                    IdMovimientoEgreso = eg.Id_Movimiento,
+                    IdMovimientoIngreso = ing.Id_Movimiento,
+                    FechaHora = eg.FechaHoraMov,
+                    Importe = eg.Monto,
+                    MetodoPago = mp.NombreMetodoPago,
+                    CuentaOrigen = co.NombreCuenta,
+                    NroCuentaOrigen = co.NroCuenta,
+                    CuentaDestino = cd.NombreCuenta,
+                    NroCuentaDestino = cd.NroCuenta,
+                    ComprobanteBancario = eg.Observacion,
+                    Cajero = u.UsuarioNombre,
+                    NroCaja = caja.Nro_Caja
+                }
+            ).AsNoTracking().FirstOrDefaultAsync();
+
+            if (comprobante is not null)
+                comprobante.ComprobanteBancario = ExtraerComprobanteBancario(comprobante.ComprobanteBancario);
+
+            return comprobante;
+        }
+
+        /// <summary>
+        /// La transferencia guarda el comprobante bancario dentro de la observación:
+        /// "TRANSFERENCIA EFECTIVO A BANCO MACRO - COMP. 123456" → "123456". Null si no tiene.
+        /// </summary>
+        private static string? ExtraerComprobanteBancario(string? observacion)
+        {
+            if (string.IsNullOrEmpty(observacion))
+                return null;
+
+            var posicion = observacion.LastIndexOf(MarcaComprobante, StringComparison.Ordinal);
+            if (posicion < 0)
+                return null;
+
+            var numero = observacion[(posicion + MarcaComprobante.Length)..].Trim();
+            return numero.Length > 0 ? numero : null;
         }
 
         public async Task<ComprobantePagoDto?> ObtenerComprobantePagoAsync(int idMovimiento)

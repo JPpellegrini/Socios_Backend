@@ -370,6 +370,9 @@ namespace Socios.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<DateTime?>("FechaSaldoInicial")
+                        .HasColumnType("date");
+
                     b.Property<string>("NombreCuenta")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -377,6 +380,9 @@ namespace Socios.Infrastructure.Migrations
 
                     b.Property<int>("NroCuenta")
                         .HasColumnType("integer");
+
+                    b.Property<decimal>("SaldoInicial")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id_Cuenta");
 
@@ -388,21 +394,24 @@ namespace Socios.Infrastructure.Migrations
                             Id_Cuenta = 1,
                             Estado = "ACTIVA",
                             NombreCuenta = "EFECTIVO",
-                            NroCuenta = 0
+                            NroCuenta = 0,
+                            SaldoInicial = 0m
                         },
                         new
                         {
                             Id_Cuenta = 2,
                             Estado = "ACTIVA",
                             NombreCuenta = "BANCO MACRO",
-                            NroCuenta = 789012
+                            NroCuenta = 789012,
+                            SaldoInicial = 0m
                         },
                         new
                         {
                             Id_Cuenta = 3,
                             Estado = "INACTIVA",
                             NombreCuenta = "BANCO NACION",
-                            NroCuenta = 712906
+                            NroCuenta = 712906,
+                            SaldoInicial = 0m
                         });
                 });
 

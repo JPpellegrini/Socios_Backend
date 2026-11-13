@@ -30,5 +30,11 @@ namespace Socios.Application.UseCases.CajaDiaria
         /// usuario (EGRESO de origen + INGRESO en destino).
         /// </summary>
         Task<TransferenciaResultadoDto> TransferirAsync(TransferenciaCrearDto dto, int idUsuario);
+
+        /// <summary>
+        /// PDF del comprobante de una transferencia (uno por transferencia), a partir del Id de
+        /// cualquiera de sus dos movimientos.
+        /// </summary>
+        Task<byte[]> GenerarComprobanteTransferenciaAsync(int idMovimiento);
     }
 }
