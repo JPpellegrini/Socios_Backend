@@ -63,6 +63,36 @@ namespace Socios.Api.Controllers
             return Ok(resultado);
         }
 
+        /// <summary>
+        /// Cuentas activas (id, nombre, número) para los desplegables de origen y destino de la
+        /// pantalla de transferencias.
+        /// </summary>
+        [HttpGet("cuentas")]
+        public async Task<IActionResult> ListarCuentasAsync()
+        {
+            var cuentas = await _cajaDiariaUseCase.ListarCuentasActivasAsync();
+
+            return Ok(cuentas);
+        }
+
+        /// <summary>
+        /// Transfiere dinero entre dos cuentas del Centro (ej. EFECTIVO → banco, banco →
+        /// EFECTIVO, banco → banco). Body: { idCuentaOrigen, idCuentaDestino, importe,
+        /// nroComprobante? }. Se registra en la caja abierta del usuario autenticado como dos
+        /// movimientos (EGRESO de origen + INGRESO en destino) y solo afecta el cierre de esa caja.
+        ///   - Datos faltantes, misma cuenta, importe 0, negativo o con más de 2 decimales → 400.
+        ///   - Cuenta inexistente                                                           → 404.
+        ///   - Sin caja abierta / cuenta inactiva /
+        ///     sale de EFECTIVO más de lo que la caja tiene según el sistema                → 409.
+        /// </summary>
+        [HttpPost("transferencias")]
+        public async Task<IActionResult> TransferirAsync([FromBody] TransferenciaCrearDto dto)
+        {
+            var resultado = await _cajaDiariaUseCase.TransferirAsync(dto, ObtenerIdUsuario());
+
+            return Ok(resultado);
+        }
+
         /// <summary>La caja es siempre la del usuario autenticado.</summary>
         private int ObtenerIdUsuario() =>
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

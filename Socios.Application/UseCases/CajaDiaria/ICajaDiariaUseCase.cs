@@ -21,5 +21,14 @@ namespace Socios.Application.UseCases.CajaDiaria
         /// calcula el sistema; si no coincide, falla informando la diferencia.
         /// </summary>
         Task<CajaCierreResultadoDto> CerrarAsync(CajaCierreDto dto, int idUsuario);
+
+        /// <summary>Cuentas activas para los desplegables de las pantallas de caja.</summary>
+        Task<List<CuentaListadoDto>> ListarCuentasActivasAsync();
+
+        /// <summary>
+        /// Transfiere dinero entre dos cuentas del Centro, registrándolo en la caja abierta del
+        /// usuario (EGRESO de origen + INGRESO en destino).
+        /// </summary>
+        Task<TransferenciaResultadoDto> TransferirAsync(TransferenciaCrearDto dto, int idUsuario);
     }
 }

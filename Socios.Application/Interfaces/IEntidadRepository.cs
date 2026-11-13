@@ -20,6 +20,9 @@ namespace Socios.Application.Interfaces
         /// <summary>Trae la entidad que tenga exactamente ese CUIT/CUIL, o null si no existe.</summary>
         Task<Entidad?> ObtenerPorCuitCuilAsync(string cuitCuil);
 
+        /// <summary>Trae la entidad que tenga exactamente esa razón social, o null si no existe. Solo lectura.</summary>
+        Task<Entidad?> ObtenerPorRazonSocialAsync(string razonSocial);
+
         /// <summary>Indica si existe una entidad con ese Id.</summary>
         Task<bool> ExisteAsync(int id);
 

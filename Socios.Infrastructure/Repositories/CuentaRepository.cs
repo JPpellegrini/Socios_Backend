@@ -27,5 +27,14 @@ namespace Socios.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.NombreCuenta == nombreCuenta);
         }
+
+        public async Task<List<Cuenta>> ListarActivasAsync()
+        {
+            return await _context.Cuenta
+                .AsNoTracking()
+                .Where(c => c.Estado == "ACTIVA")
+                .OrderBy(c => c.NombreCuenta)
+                .ToListAsync();
+        }
     }
 }

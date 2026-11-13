@@ -20,5 +20,12 @@ namespace Socios.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id_MetodoPago == idMetodoPago);
         }
+
+        public async Task<MetodoPago?> ObtenerPorNombreAsync(string nombre)
+        {
+            return await _context.MetodoPago
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.NombreMetodoPago == nombre);
+        }
     }
 }

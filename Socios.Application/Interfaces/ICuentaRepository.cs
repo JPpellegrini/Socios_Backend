@@ -9,5 +9,8 @@ namespace Socios.Application.Interfaces
 
         /// <summary>Trae la cuenta por su nombre exacto (ej. "EFECTIVO"). Null si no existe.</summary>
         Task<Cuenta?> ObtenerPorNombreAsync(string nombreCuenta);
+
+        /// <summary>Cuentas ACTIVAS ordenadas por nombre (para los desplegables). Solo lectura.</summary>
+        Task<List<Cuenta>> ListarActivasAsync();
     }
 }
