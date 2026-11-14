@@ -14,11 +14,53 @@ namespace Socios.Api.Controllers
     {
         private readonly ICajaDiariaUseCase _cajaDiariaUseCase;
         private readonly ICuentaRepository _cuentaRepository;
+        private readonly ICajaRepository _cajaRepository;
 
-        public CajaController(ICajaDiariaUseCase cajaDiariaUseCase, ICuentaRepository cuentaRepository)
+        public CajaController(
+            ICajaDiariaUseCase cajaDiariaUseCase,
+            ICuentaRepository cuentaRepository,
+            ICajaRepository cajaRepository)
         {
             _cajaDiariaUseCase = cajaDiariaUseCase;
             _cuentaRepository = cuentaRepository;
+            _cajaRepository = cajaRepository;
+        }
+
+        /// <summary>
+        /// Consulta de movimientos de caja para la grilla. Filtros opcionales (query string, AND):
+        /// fechaDesde/fechaHasta (inclusive; sin ninguna = hoy, salvo que se pida un nroCaja: ahí
+        /// se trae la caja completa aunque haya abierto otro día), idUsuario (su caja chica: lo
+        /// registrado en sus cajas, incluidas sus transferencias), nroCaja (una caja puntual: lo
+        /// mismo que cuenta su cierre), idCuenta, entidad (nombre, apellido, razón social o DNI),
+        /// descripcion (motivo u observación) y tipo (TODOS/INGRESO/EGRESO). Sin usuario ni caja
+        /// se ven los movimientos de todas las cajas. Solo lectura: va directo al repositorio.
+        ///   - Tipo inválido o fecha desde posterior a hasta → 400.
+        ///   - Sin coincidencias → 200 con lista vacía.
+        /// </summary>
+        [HttpGet("movimientos")]
+        public async Task<IActionResult> BuscarMovimientosAsync([FromQuery] CajaMovimientoFiltroDto filtro)
+        {
+            DateTime? desde = filtro.FechaDesde?.Date;
+            DateTime? hasta = filtro.FechaHasta?.Date;
+
+            if (desde is null && hasta is null)
+            {
+                // Con una caja puntual (nroCaja) y sin fechas NO se filtra por fecha: la caja puede
+                // estar abierta desde otro día y "Mi caja" tiene que mostrar todo lo que cuenta su
+                // cierre. Sin caja ni fechas, la vista por defecto es la de hoy.
+                if (!filtro.NroCaja.HasValue)
+                    desde = hasta = DateTime.Today;
+            }
+            else
+            {
+                // Solo una de las fechas: la que falta toma la otra (un solo día), para no invertir el rango.
+                desde ??= hasta;
+                hasta ??= desde;
+            }
+
+            var movimientos = await _cajaRepository.BuscarMovimientosAsync(filtro, desde, hasta);
+
+            return Ok(movimientos);
         }
 
         /// <summary>

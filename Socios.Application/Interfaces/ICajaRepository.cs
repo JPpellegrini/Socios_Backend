@@ -23,6 +23,14 @@ namespace Socios.Application.Interfaces
         Task<ComprobanteTransferenciaDto?> ObtenerComprobanteTransferenciaAsync(int idMovimiento);
 
         /// <summary>
+        /// Movimientos de caja para la grilla de consulta, entre dos fechas (ambas inclusive, ya
+        /// resueltas; null = sin límite de ese lado) y con los filtros opcionales, del más antiguo
+        /// al más reciente. Solo lectura.
+        /// </summary>
+        Task<List<CajaMovimientoListadoDto>> BuscarMovimientosAsync(
+            CajaMovimientoFiltroDto filtro, DateTime? fechaDesde, DateTime? fechaHasta);
+
+        /// <summary>
         /// Trae los datos para imprimir el comprobante de pago de un movimiento de caja que
         /// corresponde al cobro de una cuota. Null si el movimiento no existe o no es el pago
         /// de una cuota. Solo lectura.
