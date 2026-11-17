@@ -409,10 +409,10 @@ namespace Socios.Infrastructure.Context
 
             // Seed de Prestaciones de prueba
             modelBuilder.Entity<Prestacion>().HasData(
-                new Prestacion { Id_Prestacion = 1, NombrePrestacion = "PODOLOGÍA" },
-                new Prestacion { Id_Prestacion = 2, NombrePrestacion = "CARDIOLOGÍA" },
-                new Prestacion { Id_Prestacion = 3, NombrePrestacion = "ALQUILER SALÓN" },
-                new Prestacion { Id_Prestacion = 4, NombrePrestacion = "COMISIÓN COBRADOR" }
+                new Prestacion { Id_Prestacion = 1, NombrePrestacion = "PODOLOGÍA", Tipo = "PRESTACION", Estado = "ACTIVA" },
+                new Prestacion { Id_Prestacion = 2, NombrePrestacion = "CARDIOLOGÍA", Tipo = "PRESTACION", Estado = "ACTIVA" },
+                new Prestacion { Id_Prestacion = 3, NombrePrestacion = "ALQUILER SALÓN", Tipo = "PRESTACION", Estado = "ACTIVA" },
+                new Prestacion { Id_Prestacion = 4, NombrePrestacion = "COMISIÓN COBRADOR", Tipo = "PRESTACION", Estado = "ACTIVA" }
             );
 
             // Seed de Tipo de Entidad de prueba

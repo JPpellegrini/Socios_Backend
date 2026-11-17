@@ -21,12 +21,39 @@ namespace Socios.Infrastructure.Repositories
             return await _context.Prestacion.AnyAsync(p => p.Id_Prestacion == idPrestacion);
         }
 
-        public async Task<List<PrestacionDto>> ListarAsync()
+        public async Task<(string Tipo, string Estado)?> ObtenerTipoYEstadoAsync(int idPrestacion)
         {
-            return await _context.Prestacion.AsNoTracking()
+            var datos = await _context.Prestacion.AsNoTracking()
+                .Where(p => p.Id_Prestacion == idPrestacion)
+                .Select(p => new { p.Tipo, p.Estado })
+                .FirstOrDefaultAsync();
+
+            return datos is null ? null : (datos.Tipo, datos.Estado);
+        }
+
+        public async Task<List<PrestacionDto>> ListarAsync(string? tipo = null, string? estado = null)
+        {
+            var consulta = _context.Prestacion.AsNoTracking();
+            if (tipo is not null)
+                consulta = consulta.Where(p => p.Tipo == tipo);
+            if (estado is not null)
+                consulta = consulta.Where(p => p.Estado == estado);
+
+            return await consulta
                 .OrderBy(p => p.NombrePrestacion)
-                .Select(p => new PrestacionDto { IdPrestacion = p.Id_Prestacion, Nombre = p.NombrePrestacion })
+                .Select(p => new PrestacionDto
+                {
+                    IdPrestacion = p.Id_Prestacion,
+                    Nombre = p.NombrePrestacion,
+                    Tipo = p.Tipo,
+                    Estado = p.Estado
+                })
                 .ToListAsync();
+        }
+
+        public async Task<Prestacion?> ObtenerAsync(int idPrestacion)
+        {
+            return await _context.Prestacion.FirstOrDefaultAsync(p => p.Id_Prestacion == idPrestacion);
         }
 
         public void Agregar(Prestacion prestacion)

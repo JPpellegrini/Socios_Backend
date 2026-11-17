@@ -1297,35 +1297,58 @@ namespace Socios.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id_Prestacion"));
 
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<string>("NombrePrestacion")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.HasKey("Id_Prestacion");
 
-                    b.ToTable("prestaciones", (string)null);
+                    b.ToTable("prestaciones", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_prestaciones_Estado", "\"Estado\" IN ('ACTIVA', 'INACTIVA')");
+
+                            t.HasCheckConstraint("CK_prestaciones_Tipo", "\"Tipo\" IN ('COLABORACION', 'PRESTACION')");
+                        });
 
                     b.HasData(
                         new
                         {
                             Id_Prestacion = 1,
-                            NombrePrestacion = "PODOLOGÍA"
+                            Estado = "ACTIVA",
+                            NombrePrestacion = "PODOLOGÍA",
+                            Tipo = "PRESTACION"
                         },
                         new
                         {
                             Id_Prestacion = 2,
-                            NombrePrestacion = "CARDIOLOGÍA"
+                            Estado = "ACTIVA",
+                            NombrePrestacion = "CARDIOLOGÍA",
+                            Tipo = "PRESTACION"
                         },
                         new
                         {
                             Id_Prestacion = 3,
-                            NombrePrestacion = "ALQUILER SALÓN"
+                            Estado = "ACTIVA",
+                            NombrePrestacion = "ALQUILER SALÓN",
+                            Tipo = "PRESTACION"
                         },
                         new
                         {
                             Id_Prestacion = 4,
-                            NombrePrestacion = "COMISIÓN COBRADOR"
+                            Estado = "ACTIVA",
+                            NombrePrestacion = "COMISIÓN COBRADOR",
+                            Tipo = "PRESTACION"
                         });
                 });
 

@@ -1,6 +1,7 @@
 using Socios.Application.DTOs;
 using Socios.Application.Exceptions;
 using Socios.Application.Interfaces;
+using Socios.Application.UseCases.Prestaciones;
 using Socios.Domain.Entities;
 using System.Text.RegularExpressions;
 
@@ -109,9 +110,8 @@ namespace Socios.Application.UseCases.Colaboradores
             if (tipoDocumento == "CUIT" && !Regex.IsMatch(documento, @"^\d{11}$"))
                 throw new ReglaNegocioException("El CUIT/CUIL debe tener 11 dígitos.");
 
-            // El servicio prestado (prestación) tiene que existir.
-            if (!await _prestaciones.ExisteAsync(dto.IdPrestacion!.Value))
-                throw new ReglaNegocioException($"No existe una prestación con el Id {dto.IdPrestacion} para asignar como servicio prestado.");
+            // El servicio prestado (prestación) tiene que existir, estar activa y ser del tipo que corresponde.
+            await PrestacionAsignacion.ValidarAsync(_prestaciones, dto.IdPrestacion!.Value, Prestacion.TipoColaboracion);
 
             // ¿Ya existe una entidad con ese documento? Se busca por DNI o por CUIT según el tipo.
             var entidad = tipoDocumento == "DNI"
@@ -216,9 +216,9 @@ namespace Socios.Application.UseCases.Colaboradores
             var entidad = colaborador.Entidad
                 ?? throw new InvalidOperationException("El colaborador no tiene una entidad asociada.");
 
-            // El servicio prestado (prestación) tiene que existir.
-            if (!await _prestaciones.ExisteAsync(dto.IdPrestacion!.Value))
-                throw new ReglaNegocioException($"No existe una prestación con el Id {dto.IdPrestacion} para asignar como servicio prestado.");
+            // El servicio prestado (prestación) tiene que existir, estar activa y ser del tipo que corresponde, salvo que se
+            // mantenga la que ya tenía (aunque se haya dado de baja después).
+            await PrestacionAsignacion.ValidarAsync(_prestaciones, dto.IdPrestacion!.Value, Prestacion.TipoColaboracion, colaborador.Id_Prestacion);
 
             // Datos de la entidad (empresa/persona) y domicilio.
             entidad.Nombre = dto.Nombre.Trim().ToUpperInvariant();

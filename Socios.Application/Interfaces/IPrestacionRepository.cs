@@ -9,11 +9,20 @@ namespace Socios.Application.Interfaces
     /// </summary>
     public interface IPrestacionRepository
     {
-        /// <summary>Indica si existe una prestación con ese Id.</summary>
+        /// <summary>Indica si existe una prestación con ese Id (en cualquier estado).</summary>
         Task<bool> ExisteAsync(int idPrestacion);
 
-        /// <summary>Todas las prestaciones, ordenadas por nombre. Solo lectura.</summary>
-        Task<List<PrestacionDto>> ListarAsync();
+        /// <summary>Tipo y estado de la prestación, o null si no existe.</summary>
+        Task<(string Tipo, string Estado)?> ObtenerTipoYEstadoAsync(int idPrestacion);
+
+        /// <summary>
+        /// Prestaciones ordenadas por nombre. Solo lectura. tipo / estado en null = sin filtrar
+        /// por ese campo.
+        /// </summary>
+        Task<List<PrestacionDto>> ListarAsync(string? tipo = null, string? estado = null);
+
+        /// <summary>La prestación trackeada, para modificarla. null si no existe.</summary>
+        Task<Prestacion?> ObtenerAsync(int idPrestacion);
 
         /// <summary>Marca la prestación para ser insertada. NO guarda: eso lo hace la unidad de trabajo.</summary>
         void Agregar(Prestacion prestacion);
